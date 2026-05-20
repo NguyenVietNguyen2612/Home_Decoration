@@ -113,6 +113,7 @@ Home_Decoration/
 ## 📝 Notes & Future Improvements
 
 - Currently uses placeholder geometric shapes for furniture (to be replaced with actual 3D models)
+- Includes a small initial sample layout of objects for testing, such as table, chairs, sofa, plant, TV, cabinet, and lamp
 - Search functionality in sidebar is implemented but not connected to a filter system
 - Object persistence (save/load) not implemented
 - Material/texture system could be enhanced with PBR materials

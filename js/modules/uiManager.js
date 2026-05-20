@@ -19,11 +19,13 @@ export function setupUIManager() {
 
     // 2. Hiệu ứng Active cho thanh công cụ
     const toolBtns = document.querySelectorAll('.tool-btn');
+    const btnHelp = document.getElementById('btn-help');
+    const helpPanel = document.getElementById('help-panel');
+    const helpClose = document.getElementById('help-close-btn');
     
     function setActiveBtn(activeId) {
         toolBtns.forEach(btn => {
-            // Không tính nút Delete vào nhóm toggle state
-            if (btn.id !== 'btn-delete') {
+            if (btn.id !== 'btn-delete' && btn.id !== 'btn-help') {
                 if (btn.id === activeId) {
                     btn.style.background = '#007bff';
                     btn.style.color = 'white';
@@ -41,6 +43,18 @@ export function setupUIManager() {
     document.getElementById('btn-rotate').addEventListener('click', () => setActiveBtn('btn-rotate'));
     document.getElementById('btn-scale').addEventListener('click', () => setActiveBtn('btn-scale'));
 
-    // Mặc định chọn nút Translate or Select
-    setActiveBtn('btn-translate');
+    if (btnHelp) {
+        btnHelp.addEventListener('click', () => {
+            if (helpPanel) helpPanel.style.display = 'flex';
+        });
+    }
+
+    if (helpClose) {
+        helpClose.addEventListener('click', () => {
+            if (helpPanel) helpPanel.style.display = 'none';
+        });
+    }
+
+    // Mặc định chọn nút Select
+    setActiveBtn('btn-select');
 }

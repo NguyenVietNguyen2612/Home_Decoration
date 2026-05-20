@@ -32,6 +32,26 @@ export function setupInteractionManager(scene, camera2D, renderer2D, orbitContro
         }
     }
 
+    function applySelectionHighlight(object, highlight) {
+        if (!object || !object.material) return;
+        const materials = Array.isArray(object.material) ? object.material : [object.material];
+        materials.forEach(material => {
+            if (!material) return;
+            if (highlight) {
+                if (!material.userData.originalEmissive) {
+                    material.userData.originalEmissive = material.emissive ? material.emissive.clone() : new THREE.Color(0x000000);
+                }
+                material.emissive = material.emissive || new THREE.Color(0x000000);
+                material.emissive.setHex(0xff0000);
+                material.emissiveIntensity = 0.4;
+            } else if (material.userData && material.userData.originalEmissive) {
+                material.emissive.copy(material.userData.originalEmissive);
+                delete material.userData.originalEmissive;
+            }
+        });
+        object.userData.isSelected = !!highlight;
+    }
+
     function setTool(tool) {
         currentTool = tool;
         updateToolbarUI();
@@ -65,8 +85,14 @@ export function setupInteractionManager(scene, camera2D, renderer2D, orbitContro
     scene.add(transformControl2D);
 
     function selectObject(obj) {
+        if (selectedObject && selectedObject !== obj) {
+            applySelectionHighlight(selectedObject, false);
+        }
+
         selectedObject = obj;
+
         if (obj) {
+            applySelectionHighlight(obj, true);
             transformControl3D.attach(obj);
             transformControl2D.attach(obj);
         } else {
@@ -82,11 +108,9 @@ export function setupInteractionManager(scene, camera2D, renderer2D, orbitContro
     const mouse = new THREE.Vector2();
 
     function setupStandardSelection(renderer, camera, transformCtrl) {
+        renderer.domElement.style.touchAction = 'none';
         renderer.domElement.addEventListener('pointerdown', (e) => {
             if (e.button !== 0) return; // Chỉ bắt chuột trái
-
-            // CHỈ cho phép Raycast (chọn vật thể) khi đang ở chế độ 'select'
-            if (currentTool !== 'select') return;
 
             const rect = renderer.domElement.getBoundingClientRect();
             mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
@@ -94,13 +118,10 @@ export function setupInteractionManager(scene, camera2D, renderer2D, orbitContro
 
             raycaster.setFromCamera(mouse, camera);
 
-            // Bắn tia raycaster trực tiếp
             const intersects = raycaster.intersectObjects(interactableObjects, true);
 
             if (intersects.length > 0) {
                 let obj = intersects[0].object;
-                
-                // Trượt lên gốc (nếu là mesh con)
                 while (obj && !interactableObjects.includes(obj)) {
                     obj = obj.parent;
                     if (!obj || obj === scene) break;
@@ -108,13 +129,15 @@ export function setupInteractionManager(scene, camera2D, renderer2D, orbitContro
 
                 if (obj && interactableObjects.includes(obj)) {
                     selectedObject = obj;
-                    // Gọi hàm selectObject để thực thi attach gizmo với object đó vào 2D và 3D TransformControl
                     selectObject(obj);
-                    // Sau khi chọn thành công, tự động chuyển qua mode 'translate' (Move) để người dùng thao tác
-                    setTool('translate');
+                    if (currentTool === 'select') {
+                        setTool('translate');
+                    } else {
+                        transformControl3D.setMode(currentTool);
+                        transformControl2D.setMode(currentTool);
+                    }
                 }
             } else {
-                // Click ra ngoài background trong mode Select -> Hủy chọn
                 selectObject(null);
                 setTool('select');
             }
@@ -176,7 +199,7 @@ export function setupInteractionManager(scene, camera2D, renderer2D, orbitContro
 
     function registerInteractableObject(mesh) {
         interactableObjects.push(mesh);
-        selectedObject = mesh;
+        selectObject(mesh);
         setTool('translate'); // Vừa thả vào là tự động nhảy sang Move
     }
 

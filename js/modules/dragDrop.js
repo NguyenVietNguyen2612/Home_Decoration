@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { createModel } from './modelLoader.js';
 
-export function setupDragDrop(scene, camera2D, renderer2D, camera3D, renderer3D, interactionManager) {
+export function setupDragDrop(scene, camera2D, renderer2D, camera3D, renderer3D, interactionManager, registerPhysicsObject) {
     // 1. Gắn sự kiện lấy thông tin khi người dùng bắt đầu Drag từ thanh Sidebar
     const items = document.querySelectorAll('.object-item');
     items.forEach(item => {
@@ -39,16 +39,11 @@ export function setupDragDrop(scene, camera2D, renderer2D, camera3D, renderer3D,
         raycaster.ray.intersectPlane(groundPlane, intersectPoint);
 
         if (intersectPoint) {
-            // Tạo đối tượng bằng ModelLoader
             const newObject = createModel(objectType);
-            
-            // Đặt vào vị trí chuột
-            newObject.position.set(intersectPoint.x, newObject.position.y, intersectPoint.z);
-            
+            newObject.position.set(intersectPoint.x, newObject.position.y + 5, intersectPoint.z);
             scene.add(newObject);
-            
-            // Đăng ký với interactionManager để lát bấm mũi tên dời đi được
             interactionManager.registerInteractableObject(newObject);
+            if (typeof registerPhysicsObject === 'function') registerPhysicsObject(newObject);
         }
     });
 
@@ -79,9 +74,10 @@ export function setupDragDrop(scene, camera2D, renderer2D, camera3D, renderer3D,
 
         if (intersectPoint) {
             const newObject = createModel(objectType);
-            newObject.position.set(intersectPoint.x, newObject.position.y, intersectPoint.z);
+            newObject.position.set(intersectPoint.x, newObject.position.y + 5, intersectPoint.z);
             scene.add(newObject);
             interactionManager.registerInteractableObject(newObject);
+            if (typeof registerPhysicsObject === 'function') registerPhysicsObject(newObject);
         }
     });
 }
