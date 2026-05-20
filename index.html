@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mini 3D Interior Design</title>
+    <link rel="stylesheet" href="css/style.css">
+    
+    <!-- Sử dụng Import Map để nạp Three.js từ CDN -->
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@latest/build/three.module.js",
+                "three/addons/": "https://unpkg.com/three@latest/examples/jsm/"
+            }
+        }
+    </script>
+</head>
+<body>
+    <div id="app-container">
+        <!-- Panel Trái: Thư viện Objects -->
+        <div id="left-sidebar">
+            <div class="search-box">
+                <input type="text" id="search-input" placeholder="Search objects...">
+            </div>
+            <div class="object-grid" id="object-grid">
+                <!-- Thêm draggable="true" để cho phép kéo thả -->
+                <div class="object-item" data-type="table" draggable="true">
+                    <img src="https://via.placeholder.com/60?text=Table" alt="Table" draggable="false">
+                    <span>Table</span>
+                </div>
+                <div class="object-item" data-type="chair" draggable="true">
+                    <img src="https://via.placeholder.com/60?text=Chair" alt="Chair" draggable="false">
+                    <span>Chair</span>
+                </div>
+                <div class="object-item" data-type="plant" draggable="true">
+                    <img src="https://via.placeholder.com/60?text=Plant" alt="Plant" draggable="false">
+                    <span>Plant</span>
+                </div>
+                <div class="object-item" data-type="bed" draggable="true">
+                    <img src="https://via.placeholder.com/60?text=Bed" alt="Bed" draggable="false">
+                    <span>Bed</span>
+                </div>
+                <div class="object-item" data-type="sofa" draggable="true">
+                    <img src="https://via.placeholder.com/60?text=Sofa" alt="Sofa" draggable="false">
+                    <span>Sofa</span>
+                </div>
+                <div class="object-item" data-type="tv" draggable="true">
+                    <img src="https://via.placeholder.com/60?text=TV" alt="TV" draggable="false">
+                    <span>TV Screen</span>
+                </div>
+                <div class="object-item" data-type="cabinet" draggable="true">
+                    <img src="https://via.placeholder.com/60?text=Cabinet" alt="Cabinet" draggable="false">
+                    <span>Cabinet</span>
+                </div>
+                <div class="object-item" data-type="lamp" draggable="true">
+                    <img src="https://via.placeholder.com/60?text=Lamp" alt="Lamp" draggable="false">
+                    <span>Lamp</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Vùng chính giữa và bên phải: Views -->
+        <div id="main-views">
+            <div id="view-2d-container">
+                <div class="view-title">2D Top-down View</div>
+                <div id="view-2d"></div>
+            </div>
+            <div id="view-3d-container">
+                <div class="view-title">3D Preview</div>
+                <div id="view-3d"></div>
+            </div>
+        </div>
+
+        <!-- Dưới cùng: Toolbar cho các phép biến đổi -->
+        <div id="bottom-toolbar">
+            <button class="tool-btn" id="btn-select" title="Select Pointer">🖱️ Select</button>
+            <button class="tool-btn" id="btn-translate" title="Move Object">⬌ Move</button>
+            <button class="tool-btn" id="btn-rotate" title="Rotate Object">↻ Rotate</button>
+            <button class="tool-btn" id="btn-scale" title="Scale Object">⤡ Scale</button>
+            <div class="divider"></div>
+            <button class="tool-btn" id="btn-delete" title="Delete Object">❌ Delete</button>
+        </div>
+    </div>
+
+    <!-- Nhúng file main.js -->
+    <script type="module" src="js/main.js"></script>
+</body>
+</html>

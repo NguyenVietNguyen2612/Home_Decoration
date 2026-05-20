@@ -1,0 +1,144 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    overflow: hidden;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f0f0f0;
+    color: #333;
+}
+
+#app-container {
+    display: grid;
+    grid-template-columns: 250px 1fr;
+    grid-template-rows: 1fr 50px;
+    height: 100vh;
+    width: 100vw;
+}
+
+/* Sidebar bên trái chứa object */
+#left-sidebar {
+    grid-column: 1 / 2;
+    grid-row: 1 / 2;
+    background: #fff;
+    border-right: 1px solid #ccc;
+    display: flex;
+    flex-direction: column;
+}
+
+.search-box {
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+}
+
+.search-box input {
+    width: 100%;
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.object-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    padding: 10px;
+    overflow-y: auto;
+}
+
+.object-item {
+    text-align: center;
+    cursor: pointer;
+    border: 1px solid transparent;
+    padding: 5px;
+    border-radius: 4px;
+    transition: background 0.2s;
+}
+
+.object-item:hover {
+    background: #e9ecef;
+    border-color: #ccc;
+}
+
+.object-item img {
+    max-width: 100%;
+    height: auto;
+}
+
+.object-item span {
+    display: block;
+    font-size: 12px;
+    margin-top: 4px;
+}
+
+/* Vùng hiển thị chính và 3D */
+#main-views {
+    grid-column: 2 / 3;
+    grid-row: 1 / 2;
+    display: flex;
+    width: 100%;
+    height: 100%;
+}
+
+#view-2d-container, #view-3d-container {
+    flex: 1; /* Chiếm 50% mỗi bên */
+    position: relative;
+    border-right: 2px solid #aaa;
+}
+
+#view-3d-container {
+    border-right: none;
+}
+
+.view-title {
+    position: absolute;
+    top: 5px;
+    left: 10px;
+    background: rgba(255,255,255,0.8);
+    padding: 2px 5px;
+    border-radius: 3px;
+    font-size: 12px;
+    font-weight: bold;
+    z-index: 10;
+}
+
+#view-2d, #view-3d {
+    width: 100%;
+    height: 100%;
+    outline: none;
+}
+
+/* Thanh công cụ biên dưới */
+#bottom-toolbar {
+    grid-column: 1 / 3;
+    grid-row: 2 / 3;
+    background: #fff;
+    border-top: 1px solid #ccc;
+    display: flex;
+    align-items: center;
+    padding: 0 10px;
+    gap: 10px;
+}
+
+.tool-btn {
+    padding: 8px 15px;
+    background: #f8f9fa;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.tool-btn:hover {
+    background: #e2e6ea;
+}
+
+.divider {
+    height: 30px;
+    width: 1px;
+    background: #ccc;
+    margin: 0 10px;
+}
