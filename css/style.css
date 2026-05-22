@@ -11,9 +11,13 @@ body {
     color: #333;
 }
 
+/* ======================================================
+   APP CONTAINER – 3 cột: sidebar | handle | main-views
+   Sử dụng CSS variable để JS có thể cập nhật kích thước
+   ====================================================== */
 #app-container {
     display: grid;
-    grid-template-columns: 250px 1fr;
+    grid-template-columns: var(--sidebar-w, 250px) 6px 1fr;
     grid-template-rows: 1fr 50px;
     height: 100vh;
     width: 100vw;
@@ -24,11 +28,100 @@ body {
     grid-column: 1 / 2;
     grid-row: 1 / 2;
     background: #fff;
-    border-right: 1px solid #ccc;
+    border-right: none; /* handle thay thế */
     display: flex;
     flex-direction: column;
+    overflow: hidden;
 }
 
+/* ======================================================
+   RESIZE HANDLES
+   ====================================================== */
+.resize-handle {
+    background: #dde1e7;
+    cursor: col-resize;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    z-index: 20;
+    transition: background 0.15s;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+.resize-handle:hover,
+.resize-handle.dragging {
+    background: #4a90d9;
+}
+
+/* Grip icon – 3 chấm dọc ở giữa thanh kéo */
+.resize-grip {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    pointer-events: none;
+}
+
+.resize-grip::before,
+.resize-grip::after,
+.resize-handle .resize-grip {
+    content: '';
+}
+
+.resize-handle .resize-grip::before {
+    content: '⋮';
+    font-size: 18px;
+    color: #888;
+    line-height: 1;
+    transition: color 0.15s;
+}
+
+.resize-handle:hover .resize-grip::before,
+.resize-handle.dragging .resize-grip::before {
+    color: #fff;
+}
+
+/* Handle 1: giữa sidebar và main-views (trong grid) */
+#rh-sidebar {
+    grid-column: 2 / 3;
+    grid-row: 1 / 2;
+    width: 6px;
+}
+
+/* Main views */
+#main-views {
+    grid-column: 3 / 4;
+    grid-row: 1 / 2;
+    display: flex;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+/* Handle 2: giữa 2D và 3D view (trong flex) */
+#rh-views {
+    flex: 0 0 6px;
+    width: 6px;
+    height: 100%;
+    align-self: stretch;
+}
+
+/* Bottom toolbar – spanning all 3 columns + handle column */
+#bottom-toolbar {
+    grid-column: 1 / 4;
+    grid-row: 2 / 3;
+    background: #fff;
+    border-top: 1px solid #ccc;
+    display: flex;
+    align-items: center;
+    padding: 0 10px;
+    gap: 10px;
+}
+
+/* ======================================================
+   SEARCH & OBJECT GRID
+   ====================================================== */
 .search-box {
     padding: 10px;
     border-bottom: 1px solid #eee;
@@ -74,23 +167,14 @@ body {
     margin-top: 4px;
 }
 
-/* Vùng hiển thị chính và 3D */
-#main-views {
-    grid-column: 2 / 3;
-    grid-row: 1 / 2;
-    display: flex;
-    width: 100%;
-    height: 100%;
-}
-
+/* ======================================================
+   VIEW CONTAINERS
+   ====================================================== */
 #view-2d-container, #view-3d-container {
-    flex: 1; /* Chiếm 50% mỗi bên */
+    flex: 1;
     position: relative;
-    border-right: 2px solid #aaa;
-}
-
-#view-3d-container {
-    border-right: none;
+    min-width: 150px;
+    overflow: hidden;
 }
 
 .view-title {
@@ -103,6 +187,7 @@ body {
     font-size: 12px;
     font-weight: bold;
     z-index: 10;
+    pointer-events: none;
 }
 
 #view-2d, #view-3d {
@@ -111,6 +196,32 @@ body {
     outline: none;
 }
 
+/* ======================================================
+   TOOLBAR BUTTONS
+   ====================================================== */
+.tool-btn {
+    padding: 8px 15px;
+    background: #f8f9fa;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.tool-btn:hover {
+    background: #e2e6ea;
+}
+
+.divider {
+    height: 30px;
+    width: 1px;
+    background: #ccc;
+    margin: 0 10px;
+}
+
+/* ======================================================
+   HELP PANEL
+   ====================================================== */
 .hidden {
     display: none;
 }
@@ -156,36 +267,4 @@ body {
     font-size: 14px;
     line-height: 1.6;
     margin: 10px 0;
-}
-
-/* Thanh công cụ biên dưới */
-#bottom-toolbar {
-    grid-column: 1 / 3;
-    grid-row: 2 / 3;
-    background: #fff;
-    border-top: 1px solid #ccc;
-    display: flex;
-    align-items: center;
-    padding: 0 10px;
-    gap: 10px;
-}
-
-.tool-btn {
-    padding: 8px 15px;
-    background: #f8f9fa;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 14px;
-}
-
-.tool-btn:hover {
-    background: #e2e6ea;
-}
-
-.divider {
-    height: 30px;
-    width: 1px;
-    background: #ccc;
-    margin: 0 10px;
 }

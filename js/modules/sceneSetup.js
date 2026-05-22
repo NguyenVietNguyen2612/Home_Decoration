@@ -170,21 +170,36 @@ export function setupDualScene() {
     const controls3D = new FreeCameraController(camera3D, renderer3D.domElement);
 
     // ======================================
-    // 3. RESIZE
+    // 3. RESIZE – dùng ResizeObserver thay vì window resize
+    //    Để tránh nhấp nháy, update renderer ngay khi container thay đổi kích thước
+    //    không quá window event dispatch (không bị delay 1 frame)
     // ======================================
-    window.addEventListener('resize', () => {
-        const aspect2D = container2D.clientWidth / container2D.clientHeight;
-        camera2D.left = -frustumSize * aspect2D / 2;
-        camera2D.right = frustumSize * aspect2D / 2;
-        camera2D.top = frustumSize / 2;
-        camera2D.bottom = -frustumSize / 2;
-        camera2D.updateProjectionMatrix();
-        renderer2D.setSize(container2D.clientWidth, container2D.clientHeight);
+    const resizeObserver = new ResizeObserver(() => {
+        // Update 2D
+        const w2 = container2D.clientWidth;
+        const h2 = container2D.clientHeight;
+        if (w2 > 0 && h2 > 0) {
+            const aspect2D = w2 / h2;
+            camera2D.left   = -frustumSize * aspect2D / 2;
+            camera2D.right  =  frustumSize * aspect2D / 2;
+            camera2D.top    =  frustumSize / 2;
+            camera2D.bottom = -frustumSize / 2;
+            camera2D.updateProjectionMatrix();
+            renderer2D.setSize(w2, h2);
+        }
 
-        camera3D.aspect = container3D.clientWidth / container3D.clientHeight;
-        camera3D.updateProjectionMatrix();
-        renderer3D.setSize(container3D.clientWidth, container3D.clientHeight);
+        // Update 3D
+        const w3 = container3D.clientWidth;
+        const h3 = container3D.clientHeight;
+        if (w3 > 0 && h3 > 0) {
+            camera3D.aspect = w3 / h3;
+            camera3D.updateProjectionMatrix();
+            renderer3D.setSize(w3, h3);
+        }
     });
+
+    resizeObserver.observe(container2D);
+    resizeObserver.observe(container3D);
 
     return { scene, camera2D, renderer2D, controls2D, camera3D, renderer3D, controls3D };
 }

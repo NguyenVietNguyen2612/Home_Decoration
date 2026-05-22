@@ -60,12 +60,23 @@
             </div>
         </div>
 
+        <!-- Thanh kéo thả 1: giữa Sidebar và Main Views -->
+        <div class="resize-handle" id="rh-sidebar" title="Kéo để thay đổi độ rộng">
+            <div class="resize-grip"></div>
+        </div>
+
         <!-- Vùng chính giữa và bên phải: Views -->
         <div id="main-views">
             <div id="view-2d-container">
                 <div class="view-title">2D Top-down View</div>
                 <div id="view-2d"></div>
             </div>
+
+            <!-- Thanh kéo thả 2: giữa 2D View và 3D View -->
+            <div class="resize-handle resize-handle-inner" id="rh-views" title="Kéo để thay đổi độ rộng">
+                <div class="resize-grip"></div>
+            </div>
+
             <div id="view-3d-container">
                 <div class="view-title">3D Preview</div>
                 <div id="view-3d"></div>
@@ -98,7 +109,7 @@
                 <p>6. Trong chế độ <strong>Scale</strong>, kéo tay nắm trên gizmo để thay đổi kích thước vật thể.</p>
                 <p>7. Nhấn <strong>Delete</strong> hoặc <strong>Backspace</strong> để xóa vật thể đang chọn.</p>
                 <p>8. Chuột trái: chọn/giữ vật thể; chuột phải: xoay/góc nhìn trong view 3D, Pan trong view 2D; cuộn lăn: phóng to/thu nhỏ trong cả 2D và 3D.</p>
-                <p>9. Dùng chuột giữa (scroll wheel) để Pan nhanh hơn nếu cần.</p>
+                <p>9. Kéo các thanh phân cách dọc để thay đổi kích thước các cửa sổ.</p>
             </div>
         </div>
     </div>
