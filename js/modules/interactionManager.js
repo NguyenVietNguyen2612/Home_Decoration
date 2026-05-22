@@ -48,11 +48,34 @@ export function setupInteractionManager(scene, camera2D, renderer2D, orbitContro
     const gizmoScene3D = new THREE.Scene();
     const gizmoScene2D = new THREE.Scene();
 
+    // Hàm tiện ích để xoá bỏ các mũi tên/cục scale hướng âm (negative axes)
+    function removeNegativeGizmoArrows(transformControl) {
+        const elementsToRemove = [];
+        const center = new THREE.Vector3();
+        
+        transformControl.traverse(child => {
+            if (child.isMesh && child.geometry) {
+                child.geometry.computeBoundingBox();
+                child.geometry.boundingBox.getCenter(center);
+                
+                // Nếu trọng tâm của mesh nằm lùi về hướng âm quá -0.1
+                if (center.x < -0.1 || center.y < -0.1 || center.z < -0.1) {
+                    elementsToRemove.push(child);
+                }
+            }
+        });
+
+        elementsToRemove.forEach(el => {
+            if (el.parent) el.parent.remove(el);
+        });
+    }
+
     const transformControl3D = new TransformControls(camera3D, renderer3D.domElement);
     transformControl3D.addEventListener('dragging-changed', (e) => {
         if (orbitControls3D && 'enabled' in orbitControls3D) orbitControls3D.enabled = !e.value;
         _onDragChange(e);
     });
+    removeNegativeGizmoArrows(transformControl3D);
     gizmoScene3D.add(transformControl3D);
 
     const transformControl2D = new TransformControls(camera2D, renderer2D.domElement);
@@ -61,6 +84,7 @@ export function setupInteractionManager(scene, camera2D, renderer2D, orbitContro
         _onDragChange(e);
     });
     transformControl2D.showY = false;
+    removeNegativeGizmoArrows(transformControl2D);
     gizmoScene2D.add(transformControl2D);
 
     // ==========================================
