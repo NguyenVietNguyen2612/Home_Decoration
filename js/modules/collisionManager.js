@@ -50,16 +50,58 @@ export class CollisionManager {
     /**
      * @param {THREE.Object3D}   movingObj
      * @param {THREE.Object3D[]} [exclude]
+     * @param {THREE.Vector3}    [oldPos]
      * @returns {{ collides: boolean, collidingWith: THREE.Object3D[] }}
      */
-    checkCollision(movingObj, exclude = []) {
-        const movingBox     = new THREE.Box3().setFromObject(movingObj);
+    checkCollision(movingObj, exclude = [], oldPos = null) {
+        const newBox = new THREE.Box3().setFromObject(movingObj);
+        let oldBox = null;
+        let sweptBox = null;
+
+        if (oldPos) {
+            const delta = movingObj.position.clone().sub(oldPos);
+            oldBox = newBox.clone().translate(delta.negate());
+            sweptBox = newBox.clone().union(oldBox);
+        } else {
+            sweptBox = newBox;
+        }
+
         const collidingWith = [];
 
         for (const obj of this._objects) {
             if (obj === movingObj || exclude.includes(obj)) continue;
+            
             const otherBox = new THREE.Box3().setFromObject(obj);
-            if (movingBox.intersectsBox(otherBox)) {
+            
+            // Thu nhỏ 1mm để chống dính mép khi trượt
+            otherBox.expandByScalar(-0.001);
+            
+            let isColliding = false;
+            if (oldBox && oldBox.intersectsBox(otherBox)) {
+                // Đã chạm hoặc kẹt từ trước
+                const dir = movingObj.position.clone().sub(oldPos);
+                
+                const cA = new THREE.Vector3();
+                const cB = new THREE.Vector3();
+                oldBox.getCenter(cA);
+                otherBox.getCenter(cB);
+                
+                // Vector từ A trỏ tới B
+                const toB = cB.sub(cA);
+                
+                // dot > 0.001 nghĩa là đang di chuyển ĐÂM VÀO hoặc XUYÊN QUA tâm B
+                if (dir.dot(toB) > 0.001) {
+                    isColliding = sweptBox.intersectsBox(otherBox);
+                } else {
+                    // Đang trượt ngang (dot ~ 0) hoặc lùi ra xa (dot < 0) -> Cho phép!
+                    isColliding = false;
+                }
+            } else {
+                // Chưa chạm -> check quét để chống bay xuyên tường
+                isColliding = sweptBox.intersectsBox(otherBox);
+            }
+
+            if (isColliding) {
                 collidingWith.push(obj);
             }
         }

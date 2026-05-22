@@ -46,20 +46,17 @@ export function setupInteractionManager(scene, camera2D, renderer2D, orbitContro
     // ==========================================
     const transformControl3D = new TransformControls(camera3D, renderer3D.domElement);
     transformControl3D.addEventListener('dragging-changed', (e) => {
-        // Khoá camera controller khi đang kéo gizmo để không xung đột
-        if (orbitControls3D && 'enabled' in orbitControls3D) {
-            orbitControls3D.enabled = !e.value;
-        }
+        if (orbitControls3D && 'enabled' in orbitControls3D) orbitControls3D.enabled = !e.value;
+        _onDragChange(e);
     });
     scene.add(transformControl3D);
 
     const transformControl2D = new TransformControls(camera2D, renderer2D.domElement);
     transformControl2D.addEventListener('dragging-changed', (e) => {
-        if (orbitControls2D && 'enabled' in orbitControls2D) {
-            orbitControls2D.enabled = !e.value;
-        }
+        if (orbitControls2D && 'enabled' in orbitControls2D) orbitControls2D.enabled = !e.value;
+        _onDragChange(e);
     });
-    transformControl2D.showY = false; // 2D top-down: chỉ trục X và Z
+    transformControl2D.showY = false;
     scene.add(transformControl2D);
 
     // ==========================================
@@ -107,10 +104,9 @@ export function setupInteractionManager(scene, camera2D, renderer2D, orbitContro
             return;
         }
 
-        const { collides, collidingWith } = collisionManager.checkCollision(t, selectedObjects);
+        const { collides, collidingWith } = collisionManager.checkCollision(t, selectedObjects, _sv.pos);
 
         if (collides) {
-            // Hiện box đỏ cho cả object đang kéo và object bị chạm
             collisionManager.showColliding([...collidingWith]);
             _restoreState(t);
         } else {
@@ -119,15 +115,19 @@ export function setupInteractionManager(scene, camera2D, renderer2D, orbitContro
         }
     }
 
-    transformControl3D.addEventListener('mouseDown', _onGizmoDown);
-    transformControl3D.addEventListener('change',    _onGizmoChange);
-    transformControl2D.addEventListener('mouseDown', _onGizmoDown);
-    transformControl2D.addEventListener('change',    _onGizmoChange);
+    // Lắng nghe dragging-changed thay vì mouseDown để đảm bảo luôn bắt được trạng thái bắt đầu kéo
+    function _onDragChange(e) {
+        if (e.value) {
+            // Vừa bắt đầu kéo
+            _onGizmoDown();
+        } else {
+            // Vừa thả chuột
+            if (collisionManager) collisionManager.hideAll();
+        }
+    }
 
-    // Ẩn bounding box khi kéo kết thúc
-    const _hideBBoxOnDragEnd = () => { if (collisionManager) collisionManager.hideAll(); };
-    transformControl3D.addEventListener('mouseUp', _hideBBoxOnDragEnd);
-    transformControl2D.addEventListener('mouseUp', _hideBBoxOnDragEnd);
+    transformControl3D.addEventListener('change', _onGizmoChange);
+    transformControl2D.addEventListener('change', _onGizmoChange);
 
     // ==========================================
     // 3. TOOLBAR UI
@@ -238,6 +238,15 @@ export function setupInteractionManager(scene, camera2D, renderer2D, orbitContro
         }
 
         buildGroup();
+        
+        // Cập nhật ngay trạng thái vị trí để tránh dính tọa độ object cũ
+        const t = selectedObjects.length > 1 ? selectionGroup : selectedObjects[0];
+        if (t) {
+            _saveState(t);
+        } else {
+            _sv.valid = false;
+        }
+        
         attachGizmo();
     }
 
