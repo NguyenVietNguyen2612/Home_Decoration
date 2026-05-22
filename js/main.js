@@ -1,6 +1,6 @@
 import { setupDualScene } from './modules/sceneSetup.js';
 import { setupLighting } from './modules/lighting.js';
-import { createRoomGeometry } from './modules/roomGeometry.js'; // Thêm lại import này
+import { createRoomGeometry } from './modules/roomGeometry.js';
 import { setupInteractionManager } from './modules/interactionManager.js';
 import { setupDragDrop } from './modules/dragDrop.js';
 import { setupUIManager } from './modules/uiManager.js';
@@ -16,11 +16,16 @@ const { scene, camera2D, renderer2D, controls2D, camera3D, renderer3D, controls3
 setupLighting(scene);
 
 // --- VẼ PHÒNG (SÀN, TƯỜNG) ---
-createRoomGeometry(scene); // Gọi hàm để hiện sàn và tường
+const { roomGroup } = createRoomGeometry(scene);
 
-// --- KIỂM SOÁT TƯƠNG TÁC (TransformControls, Raycast click) ---
-// Gắn công cụ biến đổi (Kéo, Xoay, Scale) vào View 3D và 2D
-const interactionManager = setupInteractionManager(scene, camera2D, renderer2D, controls2D, camera3D, renderer3D, controls3D);
+// --- KIỂM SOÁT TƯƠNG TÁC ---
+const interactionManager = setupInteractionManager(
+    scene, camera2D, renderer2D, controls2D, camera3D, renderer3D, controls3D
+);
+
+// --- ĐĂNG KÝ PHÒNG LÀ OBJECT TƯƠNG TÁC ---
+// Phòng có thể được chọn và di chuyển trên lưới như các vật thể nội thất
+interactionManager.registerInteractableObject(roomGroup);
 
 // --- CƠ CHẾ KÉO THẢ TỪ SIDEBAR ---
 setupDragDrop(scene, camera2D, renderer2D, camera3D, renderer3D, interactionManager, registerPhysicsObject);
@@ -49,17 +54,17 @@ function updatePhysics() {
     }
 }
 
-// --- TẠO SƠ BỘ MỘT VÀI OBJECT MẪU ĐỂ THỬ NGHIỆM ---
+// --- TẠO SƠ BỘ MỘT VÀI OBJECT MẪU ---
 function addSampleObjects(scene, interactionManager) {
     const samples = [
-        { type: 'table', x: 0, z: -1 },
-        { type: 'chair', x: -2, z: -1 },
-        { type: 'chair', x: 2, z: -1 },
-        { type: 'sofa', x: 0, z: 2 },
-        { type: 'plant', x: -3.5, z: 3 },
-        { type: 'tv', x: 3.5, z: 1.5 },
-        { type: 'cabinet', x: 4, z: -3 },
-        { type: 'lamp', x: -4, z: -3 }
+        { type: 'table',   x:  0,    z: -1   },
+        { type: 'chair',   x: -2,    z: -1   },
+        { type: 'chair',   x:  2,    z: -1   },
+        { type: 'sofa',    x:  0,    z:  2   },
+        { type: 'plant',   x: -3.5,  z:  3   },
+        { type: 'tv',      x:  3.5,  z:  1.5 },
+        { type: 'cabinet', x:  4,    z: -3   },
+        { type: 'lamp',    x: -4,    z: -3   }
     ];
 
     samples.forEach(item => {
@@ -77,14 +82,11 @@ addSampleObjects(scene, interactionManager);
 function animate() {
     requestAnimationFrame(animate);
 
-    // Cập nhật Controls
     controls2D.update();
     controls3D.update();
 
-    // Cập nhật vật lý
     updatePhysics();
 
-    // Render cả 2 Views bằng cùng 1 Scene
     renderer2D.render(scene, camera2D);
     renderer3D.render(scene, camera3D);
 }

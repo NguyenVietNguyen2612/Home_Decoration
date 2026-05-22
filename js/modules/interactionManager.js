@@ -116,11 +116,22 @@ export function setupInteractionManager(scene, camera2D, renderer2D, orbitContro
             return;
         }
         const target = selectedObjects.length > 1 ? selectionGroup : selectedObjects[0];
+
+        // Nếu target là Group (ví dụ: căn phòng) và đang ở chế độ Move,
+        // khoá trục Y để phòng chỉ trượt trên mặt phẳng lưới (XZ)
+        const isGroup = target.isGroup;
+        if (currentTool === 'translate' && isGroup) {
+            transformControl3D.showY = false;
+        } else {
+            transformControl3D.showY = true;
+        }
+
         transformControl3D.setMode(currentTool);
         transformControl3D.attach(target);
         transformControl2D.setMode(currentTool);
         transformControl2D.attach(target);
     }
+
 
     // ==========================================
     // 6. SET TOOL
