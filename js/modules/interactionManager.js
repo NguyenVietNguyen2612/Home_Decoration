@@ -46,13 +46,18 @@ export function setupInteractionManager(scene, camera2D, renderer2D, orbitContro
     // ==========================================
     const transformControl3D = new TransformControls(camera3D, renderer3D.domElement);
     transformControl3D.addEventListener('dragging-changed', (e) => {
-        orbitControls3D.enabled = !e.value;
+        // Khoá camera controller khi đang kéo gizmo để không xung đột
+        if (orbitControls3D && 'enabled' in orbitControls3D) {
+            orbitControls3D.enabled = !e.value;
+        }
     });
     scene.add(transformControl3D);
 
     const transformControl2D = new TransformControls(camera2D, renderer2D.domElement);
     transformControl2D.addEventListener('dragging-changed', (e) => {
-        orbitControls2D.enabled = !e.value;
+        if (orbitControls2D && 'enabled' in orbitControls2D) {
+            orbitControls2D.enabled = !e.value;
+        }
     });
     transformControl2D.showY = false; // 2D top-down: chỉ trục X và Z
     scene.add(transformControl2D);
