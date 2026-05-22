@@ -44,12 +44,16 @@ export function setupInteractionManager(scene, camera2D, renderer2D, orbitContro
     // ==========================================
     // 2. TRANSFORM CONTROLS (GIZMO)
     // ==========================================
+    // Khởi tạo 2 scene riêng biệt chứa gizmo để render đè lên view tương ứng
+    const gizmoScene3D = new THREE.Scene();
+    const gizmoScene2D = new THREE.Scene();
+
     const transformControl3D = new TransformControls(camera3D, renderer3D.domElement);
     transformControl3D.addEventListener('dragging-changed', (e) => {
         if (orbitControls3D && 'enabled' in orbitControls3D) orbitControls3D.enabled = !e.value;
         _onDragChange(e);
     });
-    scene.add(transformControl3D);
+    gizmoScene3D.add(transformControl3D);
 
     const transformControl2D = new TransformControls(camera2D, renderer2D.domElement);
     transformControl2D.addEventListener('dragging-changed', (e) => {
@@ -57,7 +61,7 @@ export function setupInteractionManager(scene, camera2D, renderer2D, orbitContro
         _onDragChange(e);
     });
     transformControl2D.showY = false;
-    scene.add(transformControl2D);
+    gizmoScene2D.add(transformControl2D);
 
     // ==========================================
     // COLLISION DETECTION trong khi kéo gizmo
@@ -439,6 +443,8 @@ export function setupInteractionManager(scene, camera2D, renderer2D, orbitContro
     return {
         registerInteractableObject,
         interactableObjects,
-        getSelectedObjects: () => selectedObjects
+        getSelectedObjects: () => selectedObjects,
+        gizmoScene3D,
+        gizmoScene2D
     };
 }

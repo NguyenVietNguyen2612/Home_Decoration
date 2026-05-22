@@ -83,6 +83,8 @@ function addSampleObjects(scene, interactionManager) {
 
 addSampleObjects(scene, interactionManager);
 
+const { gizmoScene3D, gizmoScene2D } = interactionManager;
+
 // --- VÒNG LẶP RENDER ---
 function animate() {
     requestAnimationFrame(animate);
@@ -95,8 +97,18 @@ function animate() {
     // Chỉ sync box của những helper đang visible (khi va chạm)
     collisionManager.update();
 
+    // Tắt tự động xoá màn hình để render chồng 2 scene lên nhau
+    renderer2D.autoClear = false;
+    renderer2D.clear();
     renderer2D.render(scene, camera2D);
+    renderer2D.clearDepth(); // Cần xoá depth buffer để trục gizmo luôn đè lên trên vật thể
+    renderer2D.render(gizmoScene2D, camera2D);
+
+    renderer3D.autoClear = false;
+    renderer3D.clear();
     renderer3D.render(scene, camera3D);
+    renderer3D.clearDepth();
+    renderer3D.render(gizmoScene3D, camera3D);
 }
 
 animate();
