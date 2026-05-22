@@ -319,13 +319,55 @@ export function setupInteractionManager(scene, camera2D, renderer2D, orbitContro
     setupViewSelection(renderer2D, camera2D);
 
     // ==========================================
-    // 9. PHÍM TẮT
+    // 9. PHÍM TẮT & TRẠNG THÁI HOVER CHUỘT
     // ==========================================
+    let hoveredView = '3D'; // Lưu trạng thái chuột đang ở view nào
+    renderer3D.domElement.addEventListener('mouseenter', () => hoveredView = '3D');
+    renderer2D.domElement.addEventListener('mouseenter', () => hoveredView = '2D');
+
     window.addEventListener('keydown', (e) => {
         if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
 
         switch (e.key) {
             case 'w': case 'W':
+                // Zoom In
+                if (hoveredView === '3D') {
+                    if (orbitControls3D.zoom) orbitControls3D.zoom(0.5);
+                } else if (hoveredView === '2D') {
+                    camera2D.zoom *= 1.05;
+                    camera2D.updateProjectionMatrix();
+                }
+                break;
+            case 's': case 'S':
+                // Zoom Out
+                if (hoveredView === '3D') {
+                    if (orbitControls3D.zoom) orbitControls3D.zoom(-0.5);
+                } else if (hoveredView === '2D') {
+                    camera2D.zoom /= 1.05;
+                    camera2D.updateProjectionMatrix();
+                }
+                break;
+            case 'a': case 'A':
+                // Pan Left
+                if (hoveredView === '3D') {
+                    if (orbitControls3D.pan) orbitControls3D.pan(-0.5, 0);
+                } else if (hoveredView === '2D') {
+                    camera2D.position.x -= 0.5;
+                    if (orbitControls2D.target) orbitControls2D.target.x -= 0.5;
+                    camera2D.updateProjectionMatrix();
+                }
+                break;
+            case 'd': case 'D':
+                // Pan Right
+                if (hoveredView === '3D') {
+                    if (orbitControls3D.pan) orbitControls3D.pan(0.5, 0);
+                } else if (hoveredView === '2D') {
+                    camera2D.position.x += 0.5;
+                    if (orbitControls2D.target) orbitControls2D.target.x += 0.5;
+                    camera2D.updateProjectionMatrix();
+                }
+                break;
+            case 't': case 'T':
                 if (selectedObjects.length > 0) setTool('translate');
                 break;
             case 'e': case 'E':

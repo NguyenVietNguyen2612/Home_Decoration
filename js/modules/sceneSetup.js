@@ -98,6 +98,20 @@ class FreeCameraController {
         this._pitch = this.camera.rotation.x;
     }
 
+    zoom(direction) {
+        if (!this.enabled) return;
+        const forward = new THREE.Vector3().setFromMatrixColumn(this.camera.matrix, 2).negate();
+        this.camera.position.addScaledVector(forward, direction * this.moveSpeed * 2);
+    }
+
+    pan(deltaX, deltaY) {
+        if (!this.enabled) return;
+        const right = new THREE.Vector3().setFromMatrixColumn(this.camera.matrix, 0);
+        const up = new THREE.Vector3().setFromMatrixColumn(this.camera.matrix, 1);
+        if (deltaX !== 0) this.camera.position.addScaledVector(right, deltaX * this.moveSpeed * 2);
+        if (deltaY !== 0) this.camera.position.addScaledVector(up, deltaY * this.moveSpeed * 2);
+    }
+
     update() { /* no-op – tương thích với animation loop */ }
 
     dispose() {
