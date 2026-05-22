@@ -167,7 +167,7 @@ export function setupDualScene() {
     const camera3D = new THREE.PerspectiveCamera(
         45,
         container3D.clientWidth / container3D.clientHeight,
-        0.1, 200
+        0.01, 200
     );
 
     // Đặt camera nhìn vào phòng từ góc chéo + đồng bộ rotation order trước lookAt

@@ -4,17 +4,17 @@ import { TransformControls } from 'three/addons/controls/TransformControls.js';
 export function setupInteractionManager(scene, camera2D, renderer2D, orbitControls2D, camera3D, renderer3D, orbitControls3D, collisionManager = null) {
 
     let selectedObjects = [];
-    let currentTool     = 'none';
+    let currentTool = 'none';
     const interactableObjects = [];
 
     // ==========================================
     // 1. SELECTION GROUP (dùng khi chọn nhiều object)
     // ==========================================
     const selectionGroup = new THREE.Group();
-    selectionGroup.name  = '__selectionGroup__';
+    selectionGroup.name = '__selectionGroup__';
     scene.add(selectionGroup);
 
-    const _box    = new THREE.Box3();
+    const _box = new THREE.Box3();
     const _center = new THREE.Vector3();
 
     /** Trả tất cả children của selectionGroup về scene */
@@ -52,12 +52,12 @@ export function setupInteractionManager(scene, camera2D, renderer2D, orbitContro
     function removeNegativeGizmoArrows(transformControl) {
         const elementsToRemove = [];
         const center = new THREE.Vector3();
-        
+
         transformControl.traverse(child => {
             if (child.isMesh && child.geometry) {
                 child.geometry.computeBoundingBox();
                 child.geometry.boundingBox.getCenter(center);
-                
+
                 // Nếu trọng tâm của mesh nằm lùi về hướng âm quá -0.1
                 if (center.x < -0.1 || center.y < -0.1 || center.z < -0.1) {
                     elementsToRemove.push(child);
@@ -70,12 +70,46 @@ export function setupInteractionManager(scene, camera2D, renderer2D, orbitContro
         });
     }
 
+    // Hàm vô hiệu hoá tính năng tự động scale theo màn hình của Gizmo (để trục có kích thước vật lý cố định)
+    function makeConstantWorldSize(transformControl) {
+        const gizmo = transformControl._gizmo;
+        if (!gizmo) return;
+
+        const originalUpdate = gizmo.updateMatrixWorld;
+        gizmo.updateMatrixWorld = function (force) {
+            originalUpdate.call(this, force); // Gọi logic gốc, nó sẽ tính toán và đè scale mới, sau đó updateMatrixWorld
+
+            const mode = this.mode;
+            if (!this.picker || !this.picker[mode]) return;
+
+            const handles = [
+                ...this.picker[mode].children,
+                ...this.gizmo[mode].children,
+                ...this.helper[mode].children
+            ];
+
+            for (let i = 0; i < handles.length; i++) {
+                const handle = handles[i];
+                if (handle.name === 'DELTA') continue; // Bỏ qua helper tính khoảng cách
+
+                // Nếu handle không bị TransformControls ẩn đi (scale = 1e-10)
+                if (handle.scale.x > 0.0001) {
+                    // Cố định kích thước trục trong không gian 3D (0.75 units)
+                    handle.scale.set(2.5, 2.5, 2.5);
+                    // Ép Three.js cập nhật lại ma trận với scale mới này ngay lập tức!
+                    handle.updateMatrixWorld(true);
+                }
+            }
+        };
+    }
+
     const transformControl3D = new TransformControls(camera3D, renderer3D.domElement);
     transformControl3D.addEventListener('dragging-changed', (e) => {
         if (orbitControls3D && 'enabled' in orbitControls3D) orbitControls3D.enabled = !e.value;
         _onDragChange(e);
     });
     removeNegativeGizmoArrows(transformControl3D);
+    makeConstantWorldSize(transformControl3D);
     gizmoScene3D.add(transformControl3D);
 
     const transformControl2D = new TransformControls(camera2D, renderer2D.domElement);
@@ -85,6 +119,7 @@ export function setupInteractionManager(scene, camera2D, renderer2D, orbitContro
     });
     transformControl2D.showY = false;
     removeNegativeGizmoArrows(transformControl2D);
+    makeConstantWorldSize(transformControl2D);
     gizmoScene2D.add(transformControl2D);
 
     // ==========================================
@@ -94,8 +129,8 @@ export function setupInteractionManager(scene, camera2D, renderer2D, orbitContro
     //   - change   : nếu va chạm → khôi phục; không va chạm → cập nhật last valid
     // ==========================================
     const _sv = {
-        pos:   new THREE.Vector3(),
-        rot:   new THREE.Euler(),
+        pos: new THREE.Vector3(),
+        rot: new THREE.Euler(),
         scale: new THREE.Vector3(1, 1, 1),
         valid: false
     };
@@ -119,7 +154,7 @@ export function setupInteractionManager(scene, camera2D, renderer2D, orbitContro
     }
     function _onGizmoChange() {
         if (!collisionManager) return;
-        
+
         // Chỉ xử lý va chạm khi thực sự đang kéo (tránh event 'change' khi mới attach gizmo)
         if (!transformControl3D.dragging && !transformControl2D.dragging) return;
 
@@ -161,9 +196,9 @@ export function setupInteractionManager(scene, camera2D, renderer2D, orbitContro
     // 3. TOOLBAR UI
     // ==========================================
     const btnTranslate = document.getElementById('btn-translate');
-    const btnRotate    = document.getElementById('btn-rotate');
-    const btnScale     = document.getElementById('btn-scale');
-    const btnDelete    = document.getElementById('btn-delete');
+    const btnRotate = document.getElementById('btn-rotate');
+    const btnScale = document.getElementById('btn-scale');
+    const btnDelete = document.getElementById('btn-delete');
 
     function updateToolbarUI() {
         const map = { translate: btnTranslate, rotate: btnRotate, scale: btnScale };
@@ -171,9 +206,9 @@ export function setupInteractionManager(scene, camera2D, renderer2D, orbitContro
             if (!btn) continue;
             const active = key === currentTool;
             btn.style.backgroundColor = active ? '#b8daff' : '';
-            btn.style.borderColor     = active ? '#0056b3' : '';
-            btn.style.color           = active ? '#004085' : '';
-            btn.style.fontWeight      = active ? 'bold'    : 'normal';
+            btn.style.borderColor = active ? '#0056b3' : '';
+            btn.style.color = active ? '#004085' : '';
+            btn.style.fontWeight = active ? 'bold' : 'normal';
         }
     }
 
@@ -266,7 +301,7 @@ export function setupInteractionManager(scene, camera2D, renderer2D, orbitContro
         }
 
         buildGroup();
-        
+
         // Cập nhật ngay trạng thái vị trí để tránh dính tọa độ object cũ
         const t = selectedObjects.length > 1 ? selectionGroup : selectedObjects[0];
         if (t) {
@@ -274,7 +309,7 @@ export function setupInteractionManager(scene, camera2D, renderer2D, orbitContro
         } else {
             _sv.valid = false;
         }
-        
+
         attachGizmo();
     }
 
@@ -291,8 +326,8 @@ export function setupInteractionManager(scene, camera2D, renderer2D, orbitContro
     //   - Nếu chuột KHÔNG di chuyển nhiều  → là click → thực hiện chọn
     //   - Nếu chuột DI CHUYỂN nhiều        → là kéo gizmo → bỏ qua
     // ==========================================
-    const raycaster   = new THREE.Raycaster();
-    const _mouse      = new THREE.Vector2();
+    const raycaster = new THREE.Raycaster();
+    const _mouse = new THREE.Vector2();
     const CLICK_THRESHOLD = 5; // pixels
 
     function setupViewSelection(renderer, camera) {
@@ -313,8 +348,8 @@ export function setupInteractionManager(scene, camera2D, renderer2D, orbitContro
             if (Math.sqrt(dx * dx + dy * dy) > CLICK_THRESHOLD) return;
 
             const rect = renderer.domElement.getBoundingClientRect();
-            _mouse.x =  ((e.clientX - rect.left) / rect.width)  * 2 - 1;
-            _mouse.y = -((e.clientY - rect.top)  / rect.height) * 2 + 1;
+            _mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+            _mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
 
             raycaster.setFromCamera(_mouse, camera);
             const intersects = raycaster.intersectObjects(interactableObjects, true);
@@ -457,7 +492,7 @@ export function setupInteractionManager(scene, camera2D, renderer2D, orbitContro
     function registerInteractableObject(mesh, collidable = true) {
         if (!mesh.userData) mesh.userData = {};
         mesh.userData.isCollidable = collidable;
-        
+
         interactableObjects.push(mesh);
         if (collisionManager && collidable) collisionManager.register(mesh);
         selectObject(mesh, false);
