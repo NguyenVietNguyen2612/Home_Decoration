@@ -6,12 +6,12 @@
     <title>Mini 3D Interior Design</title>
     <link rel="stylesheet" href="css/style.css">
     
-    <!-- Sử dụng Import Map để nạp Three.js từ CDN -->
+    <!-- Sử dụng Import Map để nạp Three.js từ CDN - Pin cùng version để tránh xung đột prototype -->
     <script type="importmap">
         {
             "imports": {
-                "three": "https://unpkg.com/three@latest/build/three.module.js",
-                "three/addons/": "https://unpkg.com/three@latest/examples/jsm/"
+                "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+                "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
             }
         }
     </script>
