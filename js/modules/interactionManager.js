@@ -3,18 +3,17 @@ import { TransformControls } from 'three/addons/controls/TransformControls.js';
 
 export function setupInteractionManager(scene, camera2D, renderer2D, orbitControls2D, camera3D, renderer3D, orbitControls3D) {
     let selectedObject = null;
-    let currentTool = 'select'; // Trạng thái công cụ hiện tại: 'select', 'translate', 'rotate', 'scale'
+    let currentTool = 'none'; // Trạng thái công cụ hiện tại: 'none', 'translate', 'rotate', 'scale'
     const interactableObjects = [];
 
     // Các nút bấm toolbar
-    const btnSelect = document.getElementById('btn-select');
     const btnTranslate = document.getElementById('btn-translate');
     const btnRotate = document.getElementById('btn-rotate');
     const btnScale = document.getElementById('btn-scale');
     const btnDelete = document.getElementById('btn-delete');
 
     function updateToolbarUI() {
-        const buttons = { 'select': btnSelect, 'translate': btnTranslate, 'rotate': btnRotate, 'scale': btnScale };
+        const buttons = { 'translate': btnTranslate, 'rotate': btnRotate, 'scale': btnScale };
         for (const [key, btn] of Object.entries(buttons)) {
             if (btn) {
                 if (key === currentTool) {
@@ -56,13 +55,12 @@ export function setupInteractionManager(scene, camera2D, renderer2D, orbitContro
         currentTool = tool;
         updateToolbarUI();
         
-        if (tool !== 'select' && selectedObject) {
+        if (tool !== 'none' && selectedObject) {
             transformControl3D.setMode(tool);
             transformControl2D.setMode(tool);
             transformControl3D.attach(selectedObject);
             transformControl2D.attach(selectedObject);
         } else {
-            // Khi ở chế độ Select, tháo Gizmo ra để click vào các mesh không bị vướng
             transformControl3D.detach();
             transformControl2D.detach();
         }
@@ -130,7 +128,7 @@ export function setupInteractionManager(scene, camera2D, renderer2D, orbitContro
                 if (obj && interactableObjects.includes(obj)) {
                     selectedObject = obj;
                     selectObject(obj);
-                    if (currentTool === 'select') {
+                    if (currentTool === 'none') {
                         setTool('translate');
                     } else {
                         transformControl3D.setMode(currentTool);
@@ -139,7 +137,7 @@ export function setupInteractionManager(scene, camera2D, renderer2D, orbitContro
                 }
             } else {
                 selectObject(null);
-                setTool('select');
+                setTool('none');
             }
         });
     }
@@ -163,14 +161,14 @@ export function setupInteractionManager(scene, camera2D, renderer2D, orbitContro
                 break;
             case 'q':
                 selectedObject = null;
-                setTool('select');
+                setTool('none');
                 break;
             case 'delete':
             case 'backspace':
                 if (selectedObject) {
                     const target = selectedObject;
                     selectedObject = null;
-                    setTool('select');
+                    setTool('none');
                     scene.remove(target);
                     const index = interactableObjects.indexOf(target);
                     if (index > -1) interactableObjects.splice(index, 1);
@@ -179,15 +177,14 @@ export function setupInteractionManager(scene, camera2D, renderer2D, orbitContro
         }
     });
 
-    if(btnSelect) btnSelect.addEventListener('click', () => setTool('select'));
-    if(btnTranslate) btnTranslate.addEventListener('click', () => { if(selectedObject) setTool('translate'); else setTool('select'); });
-    if(btnRotate) btnRotate.addEventListener('click', () => { if(selectedObject) setTool('rotate'); else setTool('select'); });
-    if(btnScale) btnScale.addEventListener('click', () => { if(selectedObject) setTool('scale'); else setTool('select'); });
+    if(btnTranslate) btnTranslate.addEventListener('click', () => { if(selectedObject) setTool('translate'); else setTool('none'); });
+    if(btnRotate) btnRotate.addEventListener('click', () => { if(selectedObject) setTool('rotate'); else setTool('none'); });
+    if(btnScale) btnScale.addEventListener('click', () => { if(selectedObject) setTool('scale'); else setTool('none'); });
     if(btnDelete) btnDelete.addEventListener('click', () => {
         if (selectedObject) {
             const target = selectedObject;
             selectedObject = null;
-            setTool('select');
+            setTool('none');
             scene.remove(target);
             const index = interactableObjects.indexOf(target);
             if (index > -1) interactableObjects.splice(index, 1);
@@ -195,7 +192,7 @@ export function setupInteractionManager(scene, camera2D, renderer2D, orbitContro
     });
 
     // Khởi tạo giao diện tool mặc định
-    setTool('select');
+    setTool('none');
 
     function registerInteractableObject(mesh) {
         interactableObjects.push(mesh);

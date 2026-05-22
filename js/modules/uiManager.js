@@ -38,7 +38,6 @@ export function setupUIManager() {
     }
 
     // Gắn event để đổi màu button 
-    document.getElementById('btn-select').addEventListener('click', () => setActiveBtn('btn-select'));
     document.getElementById('btn-translate').addEventListener('click', () => setActiveBtn('btn-translate'));
     document.getElementById('btn-rotate').addEventListener('click', () => setActiveBtn('btn-rotate'));
     document.getElementById('btn-scale').addEventListener('click', () => setActiveBtn('btn-scale'));
@@ -55,6 +54,6 @@ export function setupUIManager() {
         });
     }
 
-    // Mặc định chọn nút Select
-    setActiveBtn('btn-select');
+    // Mặc định không chọn nút nào (sẽ được cập nhật khi chọn vật thể)
+    setActiveBtn('');
 }
