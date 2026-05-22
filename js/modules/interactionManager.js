@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { TransformControls } from 'three/addons/controls/TransformControls.js';
 
-export function setupInteractionManager(scene, camera2D, renderer2D, orbitControls2D, camera3D, renderer3D, orbitControls3D) {
+export function setupInteractionManager(scene, camera2D, renderer2D, orbitControls2D, camera3D, renderer3D, orbitControls3D, collisionManager = null) {
 
     let selectedObjects = [];
     let currentTool     = 'none';
@@ -61,6 +61,73 @@ export function setupInteractionManager(scene, camera2D, renderer2D, orbitContro
     });
     transformControl2D.showY = false; // 2D top-down: chỉ trục X và Z
     scene.add(transformControl2D);
+
+    // ==========================================
+    // COLLISION DETECTION trong khi kéo gizmo
+    // Sử dụng chiến lược "revert to last valid position":
+    //   - mouseDown: lưu vị trí hợp lệ hiện tại
+    //   - change   : nếu va chạm → khôi phục; không va chạm → cập nhật last valid
+    // ==========================================
+    const _sv = {
+        pos:   new THREE.Vector3(),
+        rot:   new THREE.Euler(),
+        scale: new THREE.Vector3(1, 1, 1),
+        valid: false
+    };
+
+    function _saveState(obj) {
+        _sv.pos.copy(obj.position);
+        _sv.rot.copy(obj.rotation);
+        _sv.scale.copy(obj.scale);
+        _sv.valid = true;
+    }
+    function _restoreState(obj) {
+        if (!_sv.valid) return;
+        obj.position.copy(_sv.pos);
+        obj.rotation.copy(_sv.rot);
+        obj.scale.copy(_sv.scale);
+        obj.updateMatrixWorld(true);
+    }
+    function _onGizmoDown() {
+        const t = selectedObjects.length > 1 ? selectionGroup : selectedObjects[0];
+        if (t) _saveState(t);
+    }
+    function _onGizmoChange() {
+        if (!collisionManager) return;
+        
+        // Chỉ xử lý va chạm khi thực sự đang kéo (tránh event 'change' khi mới attach gizmo)
+        if (!transformControl3D.dragging && !transformControl2D.dragging) return;
+
+        const t = selectedObjects.length > 1 ? selectionGroup : selectedObjects[0];
+        if (!t) return;
+
+        // Bỏ qua check va chạm nếu object không tham gia collision (ví dụ: căn phòng)
+        if (t.userData && t.userData.isCollidable === false) {
+            _saveState(t);
+            return;
+        }
+
+        const { collides, collidingWith } = collisionManager.checkCollision(t, selectedObjects);
+
+        if (collides) {
+            // Hiện box đỏ cho cả object đang kéo và object bị chạm
+            collisionManager.showColliding([...collidingWith]);
+            _restoreState(t);
+        } else {
+            collisionManager.hideAll();
+            _saveState(t);
+        }
+    }
+
+    transformControl3D.addEventListener('mouseDown', _onGizmoDown);
+    transformControl3D.addEventListener('change',    _onGizmoChange);
+    transformControl2D.addEventListener('mouseDown', _onGizmoDown);
+    transformControl2D.addEventListener('change',    _onGizmoChange);
+
+    // Ẩn bounding box khi kéo kết thúc
+    const _hideBBoxOnDragEnd = () => { if (collisionManager) collisionManager.hideAll(); };
+    transformControl3D.addEventListener('mouseUp', _hideBBoxOnDragEnd);
+    transformControl2D.addEventListener('mouseUp', _hideBBoxOnDragEnd);
 
     // ==========================================
     // 3. TOOLBAR UI
@@ -272,6 +339,7 @@ export function setupInteractionManager(scene, camera2D, renderer2D, orbitContro
                         if (t.parent) t.parent.remove(t);
                         const i = interactableObjects.indexOf(t);
                         if (i > -1) interactableObjects.splice(i, 1);
+                        if (collisionManager) collisionManager.unregister(t);
                     });
                 }
                 break;
@@ -299,6 +367,7 @@ export function setupInteractionManager(scene, camera2D, renderer2D, orbitContro
                 if (t.parent) t.parent.remove(t);
                 const i = interactableObjects.indexOf(t);
                 if (i > -1) interactableObjects.splice(i, 1);
+                if (collisionManager) collisionManager.unregister(t);
             });
         }
     });
@@ -306,11 +375,19 @@ export function setupInteractionManager(scene, camera2D, renderer2D, orbitContro
     // ==========================================
     // 11. ĐĂNG KÝ OBJECT MỚI (từ drag-drop hoặc sample)
     // ==========================================
-    function registerInteractableObject(mesh) {
+    function registerInteractableObject(mesh, collidable = true) {
+        if (!mesh.userData) mesh.userData = {};
+        mesh.userData.isCollidable = collidable;
+        
         interactableObjects.push(mesh);
-        selectObject(mesh, false);   // auto-chọn
-        setTool('translate');         // auto bật Move
+        if (collisionManager && collidable) collisionManager.register(mesh);
+        selectObject(mesh, false);
+        setTool('translate');
     }
 
-    return { registerInteractableObject, interactableObjects };
+    return {
+        registerInteractableObject,
+        interactableObjects,
+        getSelectedObjects: () => selectedObjects
+    };
 }
