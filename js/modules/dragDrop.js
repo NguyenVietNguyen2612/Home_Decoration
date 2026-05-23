@@ -17,7 +17,7 @@ export function setupDragDrop(scene, camera2D, renderer2D, camera3D, renderer3D,
         e.preventDefault(); // Phải có preventDefault thì mới kích hoạt drop được
     });
 
-    container2D.addEventListener('drop', (e) => {
+    container2D.addEventListener('drop', async (e) => {
         e.preventDefault();
         const objectType = e.dataTransfer.getData('objectType');
         if (!objectType) return;
@@ -39,7 +39,7 @@ export function setupDragDrop(scene, camera2D, renderer2D, camera3D, renderer3D,
         raycaster.ray.intersectPlane(groundPlane, intersectPoint);
 
         if (intersectPoint) {
-            const newObject = createModel(objectType);
+            const newObject = await createModel(objectType);
             newObject.position.set(intersectPoint.x, newObject.position.y + 5, intersectPoint.z);
             scene.add(newObject);
             interactionManager.registerInteractableObject(newObject);
@@ -54,7 +54,7 @@ export function setupDragDrop(scene, camera2D, renderer2D, camera3D, renderer3D,
         e.preventDefault();
     });
 
-    container3D.addEventListener('drop', (e) => {
+    container3D.addEventListener('drop', async (e) => {
         e.preventDefault();
         const objectType = e.dataTransfer.getData('objectType');
         if (!objectType) return;
@@ -73,7 +73,7 @@ export function setupDragDrop(scene, camera2D, renderer2D, camera3D, renderer3D,
         raycaster.ray.intersectPlane(groundPlane, intersectPoint);
 
         if (intersectPoint) {
-            const newObject = createModel(objectType);
+            const newObject = await createModel(objectType);
             newObject.position.set(intersectPoint.x, newObject.position.y + 5, intersectPoint.z);
             scene.add(newObject);
             interactionManager.registerInteractableObject(newObject);

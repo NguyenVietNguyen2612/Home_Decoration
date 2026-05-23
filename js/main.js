@@ -45,9 +45,18 @@ function registerPhysicsObject(mesh) {
 }
 
 function updatePhysics() {
+    const isDragging = interactionManager.isGizmoDragging();
+
     for (let i = physicsObjects.length - 1; i >= 0; i--) {
         const mesh = physicsObjects[i];
         if (!mesh.userData || mesh.userData.baseY === undefined) continue;
+
+        // Nếu đang kéo gizmo → tạm dừng trọng lực, reset velocity để khi thả không bị "nảy"
+        if (isDragging) {
+            mesh.userData.velocity.y = 0;
+            continue;
+        }
+
         if (mesh.position.y > mesh.userData.baseY) {
             mesh.userData.velocity.y += gravity;
             mesh.position.y += mesh.userData.velocity.y;
@@ -60,7 +69,7 @@ function updatePhysics() {
 }
 
 // --- TẠO SƠ BỘ MỘT VÀI OBJECT MẪU ---
-function addSampleObjects(scene, interactionManager) {
+async function addSampleObjects(scene, interactionManager) {
     const samples = [
         { type: 'table',   x:  0,    z: -1   },
         { type: 'chair',   x: -2,    z: -1   },
@@ -72,13 +81,17 @@ function addSampleObjects(scene, interactionManager) {
         { type: 'lamp',    x: -4,    z: -3   }
     ];
 
-    samples.forEach(item => {
-        const mesh = createModel(item.type);
-        mesh.position.set(item.x, mesh.position.y, item.z);
-        scene.add(mesh);
-        interactionManager.registerInteractableObject(mesh);
-        registerPhysicsObject(mesh);
-    });
+    for (const item of samples) {
+        try {
+            const mesh = await createModel(item.type);
+            mesh.position.set(item.x, mesh.position.y, item.z);
+            scene.add(mesh);
+            interactionManager.registerInteractableObject(mesh);
+            registerPhysicsObject(mesh);
+        } catch (err) {
+            console.error(`Không thể tải object mẫu ${item.type}:`, err);
+        }
+    }
 }
 
 addSampleObjects(scene, interactionManager);

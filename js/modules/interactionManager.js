@@ -178,8 +178,12 @@ export function setupInteractionManager(scene, camera2D, renderer2D, orbitContro
         }
     }
 
+    // Cờ theo dõi trạng thái đang kéo gizmo - dùng để tạm dừng trọng lực
+    let _isGizmoDragging = false;
+
     // Lắng nghe dragging-changed thay vì mouseDown để đảm bảo luôn bắt được trạng thái bắt đầu kéo
     function _onDragChange(e) {
+        _isGizmoDragging = e.value;
         if (e.value) {
             // Vừa bắt đầu kéo
             _onGizmoDown();
@@ -252,10 +256,10 @@ export function setupInteractionManager(scene, camera2D, renderer2D, orbitContro
         }
         const target = selectedObjects.length > 1 ? selectionGroup : selectedObjects[0];
 
-        // Nếu target là Group (ví dụ: căn phòng) và đang ở chế độ Move,
+        // Nếu target là căn phòng (name === 'room') và đang ở chế độ Move,
         // khoá trục Y để phòng chỉ trượt trên mặt phẳng lưới (XZ)
-        const isGroup = target.isGroup;
-        if (currentTool === 'translate' && isGroup) {
+        const isRoom = target.name === 'room';
+        if (currentTool === 'translate' && isRoom) {
             transformControl3D.showY = false;
         } else {
             transformControl3D.showY = true;
@@ -644,6 +648,7 @@ export function setupInteractionManager(scene, camera2D, renderer2D, orbitContro
         registerInteractableObject,
         interactableObjects,
         getSelectedObjects: () => selectedObjects,
+        isGizmoDragging: () => _isGizmoDragging,
         gizmoScene3D,
         gizmoScene2D
     };
