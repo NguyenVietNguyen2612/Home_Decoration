@@ -162,7 +162,7 @@ export function setupInteractionManager(scene, camera2D, renderer2D, orbitContro
         // --- CLAMP SÀN: Ngăn object xuống dưới mặt phẳng lưới (Y = 0) ---
         // Tính nửa chiều cao của object để biết được khi nào đáy object chạm sàn
         const objBox = new THREE.Box3().setFromObject(t);
-        const halfH  = (objBox.max.y - objBox.min.y) / 2;
+        const halfH = (objBox.max.y - objBox.min.y) / 2;
         const floorY = halfH; // Tâm object ở độ cao này thì đáy vừa chạm mặt sàn
         if (t.position.y < floorY) {
             t.position.y = floorY;
@@ -351,7 +351,7 @@ export function setupInteractionManager(scene, camera2D, renderer2D, orbitContro
     function setupViewSelection(renderer, camera) {
         let downX = 0, downY = 0;
         let isDragging = false;
-        
+
         // Tạo element cho Box Selection (Khung chữ nhật)
         const rectDiv = document.createElement('div');
         rectDiv.style.position = 'absolute';
@@ -364,7 +364,7 @@ export function setupInteractionManager(scene, camera2D, renderer2D, orbitContro
 
         renderer.domElement.addEventListener('pointerdown', (e) => {
             if (e.button !== 0) return;
-            
+
             downX = e.clientX;
             downY = e.clientY;
 
@@ -393,15 +393,15 @@ export function setupInteractionManager(scene, camera2D, renderer2D, orbitContro
 
         renderer.domElement.addEventListener('pointermove', (e) => {
             if (!isDragging) return;
-            
+
             const currentX = e.clientX;
             const currentY = e.clientY;
-            
+
             const left = Math.min(downX, currentX);
             const top = Math.min(downY, currentY);
             const width = Math.abs(currentX - downX);
             const height = Math.abs(currentY - downY);
-            
+
             const rect = renderer.domElement.getBoundingClientRect();
             rectDiv.style.left = `${left - rect.left}px`;
             rectDiv.style.top = `${top - rect.top}px`;
@@ -416,12 +416,12 @@ export function setupInteractionManager(scene, camera2D, renderer2D, orbitContro
                 isDragging = false;
                 rectDiv.style.display = 'none';
                 renderer.domElement.releasePointerCapture(e.pointerId);
-                
+
                 const upX = e.clientX;
                 const upY = e.clientY;
                 const dx = upX - downX;
                 const dy = upY - downY;
-                
+
                 // Nếu thực sự có quét thành hình chữ nhật (vượt ngưỡng click)
                 if (Math.abs(dx) > CLICK_THRESHOLD || Math.abs(dy) > CLICK_THRESHOLD) {
                     const rect = renderer.domElement.getBoundingClientRect();
@@ -429,23 +429,23 @@ export function setupInteractionManager(scene, camera2D, renderer2D, orbitContro
                     const maxX = Math.max(downX, upX);
                     const minY = Math.min(downY, upY);
                     const maxY = Math.max(downY, upY);
-                    
+
                     // Chuyển Box Selection sang toạ độ chuẩn hoá NDC [-1, 1]
                     const ndcMinX = ((minX - rect.left) / rect.width) * 2 - 1;
                     const ndcMaxX = ((maxX - rect.left) / rect.width) * 2 - 1;
                     const ndcMaxY = -((minY - rect.top) / rect.height) * 2 + 1; // Y ngược
                     const ndcMinY = -((maxY - rect.top) / rect.height) * 2 + 1;
-                    
+
                     const selected = [];
                     const box3 = new THREE.Box3();
-                    
+
                     // Quét toàn bộ object và kiểm tra va chạm 2D AABB
                     interactableObjects.forEach(obj => {
                         box3.setFromObject(obj);
                         let objMinX = Infinity, objMaxX = -Infinity;
                         let objMinY = Infinity, objMaxY = -Infinity;
                         let isBehindCamera = false;
-                        
+
                         const corners = [
                             new THREE.Vector3(box3.min.x, box3.min.y, box3.min.z),
                             new THREE.Vector3(box3.max.x, box3.min.y, box3.min.z),
@@ -456,7 +456,7 @@ export function setupInteractionManager(scene, camera2D, renderer2D, orbitContro
                             new THREE.Vector3(box3.min.x, box3.max.y, box3.max.z),
                             new THREE.Vector3(box3.max.x, box3.max.y, box3.max.z),
                         ];
-                        
+
                         corners.forEach(corner => {
                             corner.project(camera);
                             if (corner.z > 1) isBehindCamera = true;
@@ -465,7 +465,7 @@ export function setupInteractionManager(scene, camera2D, renderer2D, orbitContro
                             objMinY = Math.min(objMinY, corner.y);
                             objMaxY = Math.max(objMaxY, corner.y);
                         });
-                        
+
                         // Nếu box 2D của object đè lên box selection
                         if (!isBehindCamera &&
                             objMinX <= ndcMaxX && objMaxX >= ndcMinX &&
@@ -473,7 +473,7 @@ export function setupInteractionManager(scene, camera2D, renderer2D, orbitContro
                             selected.push(obj);
                         }
                     });
-                    
+
                     const isMulti = e.ctrlKey || e.metaKey;
                     if (selected.length > 0) {
                         // Nếu không giữ phím Ctrl -> Chọn mới hoàn toàn
@@ -481,19 +481,19 @@ export function setupInteractionManager(scene, camera2D, renderer2D, orbitContro
                             selectedObjects.forEach(o => applySelectionHighlight(o, false));
                             selectedObjects = [];
                         }
-                        
+
                         selected.forEach(obj => {
                             if (!selectedObjects.includes(obj)) {
                                 selectedObjects.push(obj);
                                 applySelectionHighlight(obj, true);
                             }
                         });
-                        
+
                         buildGroup();
                         const t = selectedObjects.length > 1 ? selectionGroup : selectedObjects[0];
                         if (t) _saveState(t);
                         attachGizmo();
-                        
+
                         if (currentTool === 'none') setTool('translate');
                     } else if (!isMulti) {
                         // Nếu quét khoảng trống và không giữ phím Ctrl -> Bỏ chọn tất cả
@@ -541,69 +541,31 @@ export function setupInteractionManager(scene, camera2D, renderer2D, orbitContro
     setupViewSelection(renderer2D, camera2D);
 
     // ==========================================
-    // 9. PHÍM TẮT & TRẠNG THÁI HOVER CHUỘT
+    // 9. PHÍM TẮT & CHUỘT (SMOOTH MOVEMENT)
     // ==========================================
     let hoveredView = '3D'; // Lưu trạng thái chuột đang ở view nào
     renderer3D.domElement.addEventListener('mouseenter', () => hoveredView = '3D');
     renderer2D.domElement.addEventListener('mouseenter', () => hoveredView = '2D');
 
+    // Theo dõi trạng thái phím
+    const keys = { w: false, a: false, s: false, d: false };
+
     window.addEventListener('keydown', (e) => {
         if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+        const key = e.key.toLowerCase();
+        if (keys.hasOwnProperty(key)) keys[key] = true;
 
-        switch (e.key) {
-            case 'w': case 'W':
-                // Zoom In
-                if (hoveredView === '3D') {
-                    if (orbitControls3D.zoom) orbitControls3D.zoom(0.5);
-                } else if (hoveredView === '2D') {
-                    camera2D.zoom *= 1.05;
-                    camera2D.updateProjectionMatrix();
-                }
-                break;
-            case 's': case 'S':
-                // Zoom Out
-                if (hoveredView === '3D') {
-                    if (orbitControls3D.zoom) orbitControls3D.zoom(-0.5);
-                } else if (hoveredView === '2D') {
-                    camera2D.zoom /= 1.05;
-                    camera2D.updateProjectionMatrix();
-                }
-                break;
-            case 'a': case 'A':
-                // Pan Left
-                if (hoveredView === '3D') {
-                    if (orbitControls3D.pan) orbitControls3D.pan(-0.5, 0);
-                } else if (hoveredView === '2D') {
-                    camera2D.position.x -= 0.5;
-                    if (orbitControls2D.target) orbitControls2D.target.x -= 0.5;
-                    camera2D.updateProjectionMatrix();
-                }
-                break;
-            case 'd': case 'D':
-                // Pan Right
-                if (hoveredView === '3D') {
-                    if (orbitControls3D.pan) orbitControls3D.pan(0.5, 0);
-                } else if (hoveredView === '2D') {
-                    camera2D.position.x += 0.5;
-                    if (orbitControls2D.target) orbitControls2D.target.x += 0.5;
-                    camera2D.updateProjectionMatrix();
-                }
-                break;
-            case 't': case 'T':
-                if (selectedObjects.length > 0) setTool('translate');
-                break;
-            case 'e': case 'E':
-                if (selectedObjects.length > 0) setTool('rotate');
-                break;
-            case 'r': case 'R':
-                if (selectedObjects.length > 0) setTool('scale');
-                break;
-            case 'q': case 'Q':
+        // Các phím tắt công cụ không cần smooth
+        switch (key) {
+            case 't': if (selectedObjects.length > 0) setTool('translate'); break;
+            case 'e': if (selectedObjects.length > 0) setTool('rotate'); break;
+            case 'r': if (selectedObjects.length > 0) setTool('scale'); break;
+            case 'q':
                 selectObject(null, false);
                 setTool('none');
                 break;
-            case 'Delete':
-            case 'Backspace':
+            case 'delete':
+            case 'backspace':
                 if (selectedObjects.length > 0) {
                     const targets = [...selectedObjects];
                     selectObject(null, false);
@@ -618,6 +580,46 @@ export function setupInteractionManager(scene, camera2D, renderer2D, orbitContro
                 break;
         }
     });
+
+    window.addEventListener('keyup', (e) => {
+        const key = e.key.toLowerCase();
+        if (keys.hasOwnProperty(key)) keys[key] = false;
+    });
+
+    // Vòng lặp cập nhật di chuyển mượt mà
+    function updateCameraMovement() {
+        requestAnimationFrame(updateCameraMovement);
+
+        if (hoveredView === '3D') {
+            if (keys.w && orbitControls3D.zoom) orbitControls3D.zoom(0.15);
+            if (keys.s && orbitControls3D.zoom) orbitControls3D.zoom(-0.15);
+            if (keys.a && orbitControls3D.pan) orbitControls3D.pan(-0.15, 0);
+            if (keys.d && orbitControls3D.pan) orbitControls3D.pan(0.15, 0);
+        } else if (hoveredView === '2D') {
+            const panAmount = 0.4 / camera2D.zoom;
+            if (keys.w) {
+                camera2D.position.z -= panAmount;
+                if (orbitControls2D.target) orbitControls2D.target.z -= panAmount;
+                camera2D.updateProjectionMatrix();
+            }
+            if (keys.s) {
+                camera2D.position.z += panAmount;
+                if (orbitControls2D.target) orbitControls2D.target.z += panAmount;
+                camera2D.updateProjectionMatrix();
+            }
+            if (keys.a) {
+                camera2D.position.x -= panAmount;
+                if (orbitControls2D.target) orbitControls2D.target.x -= panAmount;
+                camera2D.updateProjectionMatrix();
+            }
+            if (keys.d) {
+                camera2D.position.x += panAmount;
+                if (orbitControls2D.target) orbitControls2D.target.x += panAmount;
+                camera2D.updateProjectionMatrix();
+            }
+        }
+    }
+    updateCameraMovement();
 
     // ==========================================
     // 10. TOOLBAR BUTTONS
