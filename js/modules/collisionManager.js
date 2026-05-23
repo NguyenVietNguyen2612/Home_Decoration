@@ -33,6 +33,19 @@ export class CollisionManager {
     }
 
     unregister(obj) {
+        // Đảm bảo gỡ cả các object con (như các bức tường của phòng)
+        obj.traverse((child) => {
+            const idx = this._objects.indexOf(child);
+            if (idx > -1) {
+                this._objects.splice(idx, 1);
+                const helper = this._helpers.get(child);
+                if (helper) {
+                    this.scene.remove(helper);
+                    this._helpers.delete(child);
+                }
+            }
+        });
+
         const idx = this._objects.indexOf(obj);
         if (idx > -1) this._objects.splice(idx, 1);
 
@@ -77,6 +90,12 @@ export class CollisionManager {
                 if (ancestor === movingObj) isDescendant = true;
             });
             if (isDescendant) continue;
+            
+            // Nếu vật di chuyển là PHÒNG, nó chỉ nên bị chặn bởi các TƯỜNG khác (của phòng khác)
+            // Không nên bị chặn bởi nội thất, nếu không sẽ không thể di chuyển phòng
+            if (movingObj.name === 'room' && !obj.userData.isWall) {
+                continue;
+            }
             
             const otherBox = new THREE.Box3().setFromObject(obj);
             

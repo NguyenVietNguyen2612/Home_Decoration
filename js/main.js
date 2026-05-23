@@ -27,6 +27,12 @@ function updateGrid() {
     groundPlane.geometry.dispose(); // Xóa hình học cũ
     groundPlane.geometry = new THREE.PlaneGeometry(size, size);
     
+    // Cập nhật độ lặp lại của texture (tránh kéo căng)
+    if (groundPlane.material.map) {
+        groundPlane.material.map.repeat.set(size / 10, size / 10);
+        groundPlane.material.map.needsUpdate = true;
+    }
+    
     // Cập nhật màu sắc
     groundPlane.material.color.set(color);
 }
@@ -40,7 +46,8 @@ if (inputGridSize && inputGridColor) {
 setupLighting(scene);
 
 // --- VẼ PHÒNG ---
-const { roomGroup, walls } = createRoomGeometry(scene);
+const { roomGroup, walls } = createRoomGeometry('room_basic');
+scene.add(roomGroup);
 
 // --- COLLISION MANAGER (bounding box + kiểm tra va chạm) ---
 const collisionManager = new CollisionManager(scene);
@@ -60,7 +67,7 @@ const interactionManager = setupInteractionManager(
 interactionManager.registerInteractableObject(roomGroup, false);
 
 // --- CƠ CHẾ KÉO THẢ TỪ SIDEBAR ---
-setupDragDrop(scene, camera2D, renderer2D, camera3D, renderer3D, interactionManager, registerPhysicsObject);
+setupDragDrop(scene, camera2D, renderer2D, camera3D, renderer3D, interactionManager, registerPhysicsObject, groundPlane, collisionManager);
 
 // --- VẬT LÝ NHẸ (Trọng lực) ---
 const physicsObjects = [];

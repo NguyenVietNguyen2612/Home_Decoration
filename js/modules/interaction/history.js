@@ -51,8 +51,19 @@ export function setupHistoryManager(context) {
             if (!interactableObjects.includes(mesh)) {
                 scene.add(mesh);
                 interactableObjects.push(mesh);
-                if (collisionManager && mesh.userData.isCollidable !== false) {
-                    collisionManager.register(mesh);
+                if (collisionManager) {
+                    // Nếu là nội thất thông thường
+                    if (mesh.userData.isCollidable !== false) {
+                        collisionManager.register(mesh);
+                    }
+                    // Nếu là phòng, phải đăng ký lại các bức tường
+                    if (mesh.name === 'room') {
+                        mesh.traverse(child => {
+                            if (child.userData && child.userData.isWall) {
+                                collisionManager.register(child);
+                            }
+                        });
+                    }
                 }
             }
         });

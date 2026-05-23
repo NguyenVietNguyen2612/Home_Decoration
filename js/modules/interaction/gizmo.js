@@ -107,10 +107,6 @@ export function setupGizmos(context) {
             return;
         }
 
-        if (t.userData && t.userData.isCollidable === false) {
-            _saveState(t);
-            return;
-        }
 
         const { collides, collidingWith } = collisionManager.checkCollision(t, selectedObjects, _sv.pos);
 
@@ -143,6 +139,7 @@ export function setupGizmos(context) {
     });
     removeNegativeGizmoArrows(transformControl3D);
     makeConstantWorldSize(transformControl3D);
+    transformControl3D.setTranslationSnap(0.1); // Bắt dính lưới 0.1 để các object khít nhau
     gizmoScene3D.add(transformControl3D);
 
     const transformControl2D = new TransformControls(camera2D, renderer2D.domElement);
@@ -153,6 +150,7 @@ export function setupGizmos(context) {
     transformControl2D.showY = false;
     removeNegativeGizmoArrows(transformControl2D);
     makeConstantWorldSize(transformControl2D);
+    transformControl2D.setTranslationSnap(0.1); // Bắt dính lưới 0.1
     gizmoScene2D.add(transformControl2D);
 
     transformControl3D.addEventListener('change', _onGizmoChange);
