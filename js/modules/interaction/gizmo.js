@@ -97,10 +97,8 @@ export function setupGizmos(context) {
         if (!t) return;
 
         const objBox = new THREE.Box3().setFromObject(t);
-        const halfH = (objBox.max.y - objBox.min.y) / 2;
-        const floorY = halfH; 
-        if (t.position.y < floorY) {
-            t.position.y = floorY;
+        if (objBox.min.y < 0.02) {
+            t.position.y += (0.02 - objBox.min.y);
             t.updateMatrixWorld(true);
         }
 
@@ -168,15 +166,10 @@ export function setupGizmos(context) {
         }
         const target = selectedObjects.length > 1 ? selectionGroup : selectedObjects[0];
 
-        const isRoom = target.name === 'room';
-        if (currentTool === 'translate' && isRoom) {
-            transformControl3D.showY = false;
-        } else {
-            transformControl3D.showY = true;
-        }
-
+        transformControl3D.showY = true;
         transformControl3D.setMode(currentTool);
         transformControl3D.attach(target);
+        
         transformControl2D.setMode(currentTool);
         transformControl2D.attach(target);
     }

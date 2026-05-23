@@ -126,13 +126,21 @@ class FreeCameraController {
 export function setupDualScene() {
     // SCENE CHUNG
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x87CEEB); // Màu xanh bầu trời
+    
+    // Tải texture mây trời thay cho màu đơn (đã được xử lý ghép mí liền mạch)
+    const textureLoader = new THREE.TextureLoader();
+    const skyTexture = textureLoader.load('assets/textures/sky_clouds_seamless.jpg');
+    skyTexture.colorSpace = THREE.SRGBColorSpace;
+    skyTexture.mapping = THREE.EquirectangularReflectionMapping;
+    scene.background = skyTexture;
+    scene.environment = skyTexture; // Cung cấp ánh sáng môi trường từ bầu trời
 
     const groundGeo = new THREE.PlaneGeometry(100, 100);
     const groundMat = new THREE.MeshStandardMaterial({ 
         color: 0x888888, 
         roughness: 1, 
-        metalness: 0 
+        metalness: 0,
+        side: THREE.DoubleSide
     });
     const groundPlane = new THREE.Mesh(groundGeo, groundMat);
     groundPlane.rotation.x = -Math.PI / 2;

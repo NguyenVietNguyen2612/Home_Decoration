@@ -3,6 +3,66 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
 const gltfLoader = new GLTFLoader();
 
+export function loadGLTFModel(url, targetSize = 3.0) {
+    return new Promise((resolve, reject) => {
+        gltfLoader.load(
+            url,
+            (gltf) => {
+                const model = gltf.scene;
+                
+                // Bật bóng đổ cho tất cả các phần tử của model
+                model.traverse((child) => {
+                    if (child.isMesh) {
+                        child.castShadow = true;
+                        child.receiveShadow = true;
+                        child.frustumCulled = false; // Ngăn object biến mất khi zoom sát do sai số bounding box
+                    }
+                });
+
+                // Tính Box ban đầu để lấy kích thước
+                const initialBox = new THREE.Box3().setFromObject(model);
+                const initialSize = initialBox.getSize(new THREE.Vector3());
+                
+                // Đa số model tải trên mạng dùng đơn vị cm, milimet hoặc tỉ lệ tuỳ ý.
+                // Ta sẽ scale nó lại sao cho chiều dài nhất của model là khoảng targetSize
+                const maxSize = Math.max(initialSize.x, initialSize.y, initialSize.z);
+                const scaleFactor = targetSize / maxSize;
+                
+                model.scale.set(scaleFactor, scaleFactor, scaleFactor);
+                model.updateMatrixWorld(true); // Cập nhật lại ma trận sau khi scale
+
+                // Lấy lại kích thước và tâm MỚI sau khi đã scale
+                const box = new THREE.Box3().setFromObject(model);
+                const center = box.getCenter(new THREE.Vector3());
+                const size = box.getSize(new THREE.Vector3());
+                
+                // Đẩy model về đúng tâm (0,0,0) của group
+                model.position.x += (model.position.x - center.x);
+                model.position.y += (model.position.y - center.y);
+                model.position.z += (model.position.z - center.z);
+                
+                const group = new THREE.Group();
+                group.add(model);
+                
+                // Đặt model nổi lên trên mặt sàn cộng thêm 0.02 để cách mặt đất
+                group.position.y = (size.y / 2) + 0.02;
+                
+                group.userData.isInteractable = true;
+                // Lưu baseY cho hàm updatePhysics
+                group.userData.baseY = (size.y / 2) + 0.02;
+                group.userData.velocity = new THREE.Vector3();
+
+                resolve(group);
+            },
+            undefined,
+            (error) => {
+                console.error(`Lỗi khi tải ${url}:`, error);
+                reject(error);
+            }
+        );
+    });
+}
+
 // Hàm tạo các vật thể cơ bản lúc kéo thả (Sau này bạn có thể thay bằng GLTFLoader)
 export async function createModel(type) {
     let geometry, material;
@@ -30,64 +90,7 @@ export async function createModel(type) {
             yOffset = 0.4;
             break;
         case 'sofa':
-            return new Promise((resolve, reject) => {
-                gltfLoader.load(
-                    'furnitures/sofa_single.glb',
-                    (gltf) => {
-                        const model = gltf.scene;
-                        
-                        // Bật bóng đổ cho tất cả các phần tử của model
-                        model.traverse((child) => {
-                            if (child.isMesh) {
-                                child.castShadow = true;
-                                child.receiveShadow = true;
-                                child.frustumCulled = false; // Ngăn object biến mất khi zoom sát do sai số bounding box
-                            }
-                        });
-
-                        // Tính Box ban đầu để lấy kích thước
-                        const initialBox = new THREE.Box3().setFromObject(model);
-                        const initialSize = initialBox.getSize(new THREE.Vector3());
-                        
-                        // Đa số model tải trên mạng dùng đơn vị cm, milimet hoặc tỉ lệ tuỳ ý.
-                        // Ta sẽ scale nó lại sao cho chiều dài nhất của cái Sofa là khoảng 3.0 mét (3 đơn vị)
-                        const maxSize = Math.max(initialSize.x, initialSize.y, initialSize.z);
-                        const targetSize = 3.0; // Chiều dài tối đa 3 mét
-                        const scaleFactor = targetSize / maxSize;
-                        
-                        model.scale.set(scaleFactor, scaleFactor, scaleFactor);
-                        model.updateMatrixWorld(true); // Cập nhật lại ma trận sau khi scale
-
-                        // Lấy lại kích thước và tâm MỚI sau khi đã scale
-                        const box = new THREE.Box3().setFromObject(model);
-                        const center = box.getCenter(new THREE.Vector3());
-                        const size = box.getSize(new THREE.Vector3());
-                        
-                        // Đẩy model về đúng tâm (0,0,0) của group
-                        model.position.x += (model.position.x - center.x);
-                        model.position.y += (model.position.y - center.y);
-                        model.position.z += (model.position.z - center.z);
-                        
-                        const group = new THREE.Group();
-                        group.add(model);
-                        
-                        // Đặt model nổi lên trên mặt sàn
-                        group.position.y = size.y / 2;
-                        
-                        group.userData.isInteractable = true;
-                        // Lưu baseY cho hàm updatePhysics
-                        group.userData.baseY = size.y / 2;
-                        group.userData.velocity = new THREE.Vector3();
-
-                        resolve(group);
-                    },
-                    undefined,
-                    (error) => {
-                        console.error('Lỗi khi tải sofa_single.glb:', error);
-                        reject(error);
-                    }
-                );
-            });
+            return loadGLTFModel('furnitures/sofa_single.glb', 3.0);
         case 'tv':
             geometry = new THREE.BoxGeometry(2.5, 1.5, 0.2);
             material = new THREE.MeshStandardMaterial({ color: 0x111111 }); // Đen
@@ -112,10 +115,12 @@ export async function createModel(type) {
     const mesh = new THREE.Mesh(geometry, material);
     mesh.castShadow = true;
     mesh.receiveShadow = true;
-    mesh.position.y = yOffset;
+    mesh.position.y = yOffset + 0.02; // Thêm 0.02 để cao hơn nền 1 lớp
     
     // Đánh dấu đây là vật thể người dùng có thể tương tác/chỉnh sửa
     mesh.userData.isInteractable = true;
+    mesh.userData.baseY = yOffset + 0.02;
+    mesh.userData.velocity = new THREE.Vector3();
 
     return mesh;
 }
