@@ -71,6 +71,13 @@ export class CollisionManager {
         for (const obj of this._objects) {
             if (obj === movingObj || exclude.includes(obj)) continue;
             
+            // Nếu object nằm trong chính cái đang di chuyển (vd: movingObj là phòng, obj là tường)
+            let isDescendant = false;
+            obj.traverseAncestors((ancestor) => {
+                if (ancestor === movingObj) isDescendant = true;
+            });
+            if (isDescendant) continue;
+            
             const otherBox = new THREE.Box3().setFromObject(obj);
             
             // Thu nhỏ 1mm để chống dính mép khi trượt

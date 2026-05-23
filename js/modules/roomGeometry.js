@@ -66,5 +66,5 @@ export function createRoomGeometry(scene) {
     // Thêm roomGroup vào scene
     scene.add(roomGroup);
 
-    return { roomGroup, floor, doorGroup };
+    return { roomGroup, floor, doorGroup, walls: [backWall, leftWall, rightWall] };
 }

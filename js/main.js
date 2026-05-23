@@ -17,10 +17,13 @@ const { scene, camera2D, renderer2D, controls2D, camera3D, renderer3D, controls3
 setupLighting(scene);
 
 // --- VẼ PHÒNG ---
-const { roomGroup } = createRoomGeometry(scene);
+const { roomGroup, walls } = createRoomGeometry(scene);
 
 // --- COLLISION MANAGER (bounding box + kiểm tra va chạm) ---
 const collisionManager = new CollisionManager(scene);
+
+// Đăng ký các bức tường vào CollisionManager để cản các vật thể khác
+walls.forEach(wall => collisionManager.register(wall));
 
 // --- KIỂM SOÁT TƯƠNG TÁC ---
 const interactionManager = setupInteractionManager(
