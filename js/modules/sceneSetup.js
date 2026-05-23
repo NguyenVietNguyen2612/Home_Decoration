@@ -126,11 +126,19 @@ class FreeCameraController {
 export function setupDualScene() {
     // SCENE CHUNG
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0xf5f5f5);
+    scene.background = new THREE.Color(0x87CEEB); // Màu xanh bầu trời
 
-    const gridHelper = new THREE.GridHelper(100, 100, 0x888888, 0xcccccc);
-    gridHelper.position.y = -0.01;
-    scene.add(gridHelper);
+    const groundGeo = new THREE.PlaneGeometry(100, 100);
+    const groundMat = new THREE.MeshStandardMaterial({ 
+        color: 0x888888, 
+        roughness: 1, 
+        metalness: 0 
+    });
+    const groundPlane = new THREE.Mesh(groundGeo, groundMat);
+    groundPlane.rotation.x = -Math.PI / 2;
+    groundPlane.position.y = -0.01;
+    groundPlane.receiveShadow = true;
+    scene.add(groundPlane);
 
     // ======================================
     // 1. VIEW 2D (nhìn từ trên xuống – OrbitControls)
@@ -215,5 +223,5 @@ export function setupDualScene() {
     resizeObserver.observe(container2D);
     resizeObserver.observe(container3D);
 
-    return { scene, camera2D, renderer2D, controls2D, camera3D, renderer3D, controls3D };
+    return { scene, groundPlane, camera2D, renderer2D, controls2D, camera3D, renderer3D, controls3D };
 }

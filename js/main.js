@@ -7,11 +7,34 @@ import { setupUIManager } from './modules/uiManager.js';
 import { createModel } from './modules/modelLoader.js';
 import { CollisionManager } from './modules/collisionManager.js';
 
+import * as THREE from 'three';
+
 // --- KHỞI TẠO UI ---
 setupUIManager();
 
 // --- KHỞI TẠO DUAL SCENE ---
-const { scene, camera2D, renderer2D, controls2D, camera3D, renderer3D, controls3D } = setupDualScene();
+let { scene, groundPlane, camera2D, renderer2D, controls2D, camera3D, renderer3D, controls3D } = setupDualScene();
+
+// --- XỬ LÝ SỰ KIỆN TÙY CHỈNH NỀN (MẶT PHẲNG) ---
+const inputGridSize = document.getElementById('grid-size');
+const inputGridColor = document.getElementById('grid-color');
+
+function updateGrid() {
+    const size = parseInt(inputGridSize.value) || 100;
+    const color = inputGridColor.value;
+    
+    // Cập nhật kích thước
+    groundPlane.geometry.dispose(); // Xóa hình học cũ
+    groundPlane.geometry = new THREE.PlaneGeometry(size, size);
+    
+    // Cập nhật màu sắc
+    groundPlane.material.color.set(color);
+}
+
+if (inputGridSize && inputGridColor) {
+    inputGridSize.addEventListener('change', updateGrid);
+    inputGridColor.addEventListener('input', updateGrid);
+}
 
 // --- ÁNH SÁNG & BÓNG ĐỔ ---
 setupLighting(scene);

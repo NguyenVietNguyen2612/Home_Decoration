@@ -134,12 +134,32 @@ body {
     border-radius: 4px;
 }
 
+.sidebar-scrollable {
+    flex: 1;
+    overflow-y: auto;
+    padding-bottom: 20px;
+}
+
+.category-header {
+    padding: 15px 10px 5px 10px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #444;
+    background: #fff;
+    border-bottom: 1px solid #eee;
+    margin-bottom: 5px;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    cursor: pointer;
+    user-select: none;
+}
+
 .object-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 10px;
     padding: 10px;
-    overflow-y: auto;
 }
 
 .object-item {

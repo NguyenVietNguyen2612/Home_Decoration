@@ -3,16 +3,18 @@ export function setupUIManager() {
     // 1. TÌM KIẾM OBJECT
     // ======================================================
     const searchInput = document.getElementById('search-input');
-    const objectGrid  = document.getElementById('object-grid');
-    const items       = objectGrid.querySelectorAll('.object-item');
+    const sidebarContent = document.getElementById('sidebar-content');
+    const items = sidebarContent ? sidebarContent.querySelectorAll('.object-item') : [];
 
-    searchInput.addEventListener('input', (e) => {
-        const searchTerm = e.target.value.toLowerCase();
-        items.forEach(item => {
-            const name = item.querySelector('span').innerText.toLowerCase();
-            item.style.display = name.includes(searchTerm) ? 'block' : 'none';
+    if (searchInput) {
+        searchInput.addEventListener('input', (e) => {
+            const searchTerm = e.target.value.toLowerCase();
+            items.forEach(item => {
+                const name = item.querySelector('span').innerText.toLowerCase();
+                item.style.display = name.includes(searchTerm) ? 'block' : 'none';
+            });
         });
-    });
+    }
 
     // ======================================================
     // 2. TOOLBAR ACTIVE STATE

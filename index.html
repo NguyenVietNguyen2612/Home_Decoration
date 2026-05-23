@@ -25,40 +25,78 @@
             <div class="search-box">
                 <input type="text" id="search-input" placeholder="Search objects...">
             </div>
-            <div class="object-grid" id="object-grid">
-                <!-- Thêm draggable="true" để cho phép kéo thả -->
-                <div class="object-item" data-type="table" draggable="true">
-                    <img src="https://via.placeholder.com/60?text=Table" alt="Table" draggable="false">
-                    <span>Table</span>
-                </div>
-                <div class="object-item" data-type="chair" draggable="true">
-                    <img src="https://via.placeholder.com/60?text=Chair" alt="Chair" draggable="false">
-                    <span>Chair</span>
-                </div>
-                <div class="object-item" data-type="plant" draggable="true">
-                    <img src="https://via.placeholder.com/60?text=Plant" alt="Plant" draggable="false">
-                    <span>Plant</span>
-                </div>
-                <div class="object-item" data-type="bed" draggable="true">
-                    <img src="https://via.placeholder.com/60?text=Bed" alt="Bed" draggable="false">
-                    <span>Bed</span>
-                </div>
-                <div class="object-item" data-type="sofa" draggable="true">
-                    <img src="https://via.placeholder.com/60?text=Sofa" alt="Sofa" draggable="false">
-                    <span>Sofa</span>
-                </div>
-                <div class="object-item" data-type="tv" draggable="true">
-                    <img src="https://via.placeholder.com/60?text=TV" alt="TV" draggable="false">
-                    <span>TV Screen</span>
-                </div>
-                <div class="object-item" data-type="cabinet" draggable="true">
-                    <img src="https://via.placeholder.com/60?text=Cabinet" alt="Cabinet" draggable="false">
-                    <span>Cabinet</span>
-                </div>
-                <div class="object-item" data-type="lamp" draggable="true">
-                    <img src="https://via.placeholder.com/60?text=Lamp" alt="Lamp" draggable="false">
-                    <span>Lamp</span>
-                </div>
+            <div id="sidebar-content" class="sidebar-scrollable">
+                
+                <details class="category-details" open>
+                    <summary class="category-header">🛋️ Furnitures</summary>
+                    <div class="object-grid" id="furnitures-grid">
+                        <div class="object-item" data-type="table" draggable="true">
+                            <img src="https://via.placeholder.com/60?text=Table" alt="Table" draggable="false">
+                            <span>Table</span>
+                        </div>
+                        <div class="object-item" data-type="chair" draggable="true">
+                            <img src="https://via.placeholder.com/60?text=Chair" alt="Chair" draggable="false">
+                            <span>Chair</span>
+                        </div>
+                        <div class="object-item" data-type="plant" draggable="true">
+                            <img src="https://via.placeholder.com/60?text=Plant" alt="Plant" draggable="false">
+                            <span>Plant</span>
+                        </div>
+                        <div class="object-item" data-type="bed" draggable="true">
+                            <img src="https://via.placeholder.com/60?text=Bed" alt="Bed" draggable="false">
+                            <span>Bed</span>
+                        </div>
+                        <div class="object-item" data-type="sofa" draggable="true">
+                            <img src="https://via.placeholder.com/60?text=Sofa" alt="Sofa" draggable="false">
+                            <span>Sofa</span>
+                        </div>
+                        <div class="object-item" data-type="tv" draggable="true">
+                            <img src="https://via.placeholder.com/60?text=TV" alt="TV" draggable="false">
+                            <span>TV Screen</span>
+                        </div>
+                        <div class="object-item" data-type="cabinet" draggable="true">
+                            <img src="https://via.placeholder.com/60?text=Cabinet" alt="Cabinet" draggable="false">
+                            <span>Cabinet</span>
+                        </div>
+                        <div class="object-item" data-type="lamp" draggable="true">
+                            <img src="https://via.placeholder.com/60?text=Lamp" alt="Lamp" draggable="false">
+                            <span>Lamp</span>
+                        </div>
+                    </div>
+                </details>
+
+                <details class="category-details" open>
+                    <summary class="category-header">🏠 Rooms</summary>
+                    <div class="object-grid" id="rooms-grid">
+                        <div class="object-item" data-type="room_basic" draggable="true">
+                            <img src="https://via.placeholder.com/60?text=Basic" alt="Basic Room" draggable="false">
+                            <span>Basic Room</span>
+                        </div>
+                        <div class="object-item" data-type="room_l_shape" draggable="true">
+                            <img src="https://via.placeholder.com/60?text=L-Shape" alt="L-Shape Room" draggable="false">
+                            <span>L-Shape</span>
+                        </div>
+                    </div>
+                </details>
+
+                <details class="category-details" open>
+                    <summary class="category-header">🌿 Ground</summary>
+                    <div class="object-grid" id="ground-grid">
+                        <div class="object-item" data-type="ground_wood" draggable="true">
+                            <img src="https://via.placeholder.com/60?text=Wood" alt="Wood Floor" draggable="false">
+                            <span>Wood</span>
+                        </div>
+                        <div class="object-item" data-type="ground_tile" draggable="true">
+                            <img src="https://via.placeholder.com/60?text=Tile" alt="Tile Floor" draggable="false">
+                            <span>Tile</span>
+                        </div>
+                        <div class="object-item" data-type="ground_grass" draggable="true">
+                            <img src="https://via.placeholder.com/60?text=Grass" alt="Grass Floor" draggable="false">
+                            <span>Grass</span>
+                        </div>
+                    </div>
+                </details>
+
             </div>
         </div>
 
@@ -90,6 +128,12 @@
             <button class="tool-btn" id="btn-translate" title="Move Object">⬌ Move</button>
             <button class="tool-btn" id="btn-rotate" title="Rotate Object">↻ Rotate</button>
             <button class="tool-btn" id="btn-scale" title="Scale Object">⤡ Scale</button>
+            <div class="divider"></div>
+            <div class="grid-controls" style="display: flex; align-items: center; gap: 8px; margin-left: 10px; margin-right: 10px;">
+                <label style="font-size: 13px; font-weight: 600;">Nền:</label>
+                <input type="number" id="grid-size" value="100" min="10" max="500" step="10" title="Kích thước nền" style="width: 55px; height: 26px; border: 1px solid #ccc; border-radius: 4px; padding: 2px;">
+                <input type="color" id="grid-color" value="#888888" title="Màu nền" style="padding: 0; cursor: pointer; border: 1px solid #ccc; border-radius: 4px; background: transparent; width: 30px; height: 26px;">
+            </div>
             <div class="divider"></div>
             <button class="tool-btn" id="btn-delete" title="Delete Object">❌ Delete</button>
             <button class="tool-btn" id="btn-help" title="Help">ℹ️ Help</button>
