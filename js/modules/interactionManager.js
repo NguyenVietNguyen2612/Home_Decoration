@@ -153,15 +153,29 @@ export function setupInteractionManager(scene, camera2D, renderer2D, orbitContro
         if (t) _saveState(t);
     }
     function _onGizmoChange() {
-        if (!collisionManager) return;
-
-        // Chỉ xử lý va chạm khi thực sự đang kéo (tránh event 'change' khi mới attach gizmo)
+        // Chỉ xử lý khi thực sự đang kéo (tránh event 'change' khi mới attach gizmo)
         if (!transformControl3D.dragging && !transformControl2D.dragging) return;
 
         const t = selectedObjects.length > 1 ? selectionGroup : selectedObjects[0];
         if (!t) return;
 
-        // Bỏ qua check va chạm nếu object không tham gia collision (ví dụ: căn phòng)
+        // --- CLAMP SÀN: Ngăn object xuống dưới mặt phẳng lưới (Y = 0) ---
+        // Tính nửa chiều cao của object để biết được khi nào đáy object chạm sàn
+        const objBox = new THREE.Box3().setFromObject(t);
+        const halfH  = (objBox.max.y - objBox.min.y) / 2;
+        const floorY = halfH; // Tâm object ở độ cao này thì đáy vừa chạm mặt sàn
+        if (t.position.y < floorY) {
+            t.position.y = floorY;
+            t.updateMatrixWorld(true);
+        }
+
+        // --- COLLISION CHECK NGANG ---
+        if (!collisionManager) {
+            _saveState(t);
+            return;
+        }
+
+        // Bỏ qua check va chạm nếu object không tham gia collision (íd dụ: căn phòng)
         if (t.userData && t.userData.isCollidable === false) {
             _saveState(t);
             return;

@@ -59,8 +59,63 @@ function updatePhysics() {
 
         if (mesh.position.y > mesh.userData.baseY) {
             mesh.userData.velocity.y += gravity;
+            
+            const nextY = mesh.position.y + mesh.userData.velocity.y;
+            
+            // --- Va chạm dọc: tìm object cao nhất bên dưới ---
+            // Lấy AABB của object đang rơi tại vị trí TIẾP THEO
+            const meshBox = new THREE.Box3().setFromObject(mesh);
+            const meshHeight = meshBox.max.y - meshBox.min.y;
+            
+            // Giả lập vị trí tiếp theo để tính box
+            const futureMinY = nextY - meshHeight / 2;
+            
+            let landingY = mesh.userData.baseY; // Mặc định là mặt sàn
+            
+            for (const otherMesh of interactionManager.interactableObjects) {
+                if (otherMesh === mesh) continue;
+                // Bỏ qua chính các physicsObjects khác không liên quan
+                // và bỏ qua phòng (room) vì phòng quá lớn
+                if (otherMesh.name === 'room') continue;
+
+                const otherBox = new THREE.Box3().setFromObject(otherMesh);
+                
+                // Kiểm tra XZ overlap (2 bounding box có chồng lên nhau theo mặt phẳng ngang không?)
+                const meshBoxXZ = meshBox.clone();
+                meshBoxXZ.min.y = -Infinity;
+                meshBoxXZ.max.y = Infinity;
+                const otherBoxXZ = otherBox.clone();
+                otherBoxXZ.min.y = -Infinity;
+                otherBoxXZ.max.y = Infinity;
+                
+                if (!meshBoxXZ.intersectsBox(otherBoxXZ)) continue; // Không chồng XZ → bỏ qua
+                
+                // Nếu chồng XZ, kiểm tra xem đỉnh của otherMesh có nằm TRONG đường rơi không
+                const topOfOther = otherBox.max.y;
+                
+                // object đang rơi xuống, topOfOther phải cao hơn sàn và thấp hơn vị trí hiện tại
+                if (topOfOther > mesh.userData.baseY && topOfOther < mesh.position.y) {
+                    // Điểm đứng mới = đỉnh object kia + nửa chiều cao object đang rơi
+                    const candidateY = topOfOther + meshHeight / 2;
+                    if (candidateY > landingY) {
+                        landingY = candidateY;
+                    }
+                }
+            }
+            
+            // Thực sự áp dụng di chuyển
             mesh.position.y += mesh.userData.velocity.y;
-            if (mesh.position.y <= mesh.userData.baseY) {
+            
+            // Đảm bảo landingY không bao giờ thấp hơn mặt sàn gốc
+            landingY = Math.max(landingY, mesh.userData.baseY);
+            
+            if (mesh.position.y <= landingY) {
+                mesh.position.y = landingY;
+                mesh.userData.velocity.y = 0;
+            }
+            
+            // Failsafe: nếu vì lý do nào đó object đã lọt xuống dưới sàn → kéo lên ngay
+            if (mesh.position.y < mesh.userData.baseY) {
                 mesh.position.y = mesh.userData.baseY;
                 mesh.userData.velocity.y = 0;
             }
