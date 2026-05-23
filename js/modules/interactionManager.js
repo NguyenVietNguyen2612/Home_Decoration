@@ -5,6 +5,7 @@ import { setupKeyboardControls } from './interaction/keyboard.js';
 import { setupGizmos } from './interaction/gizmo.js';
 import { setupToolbarUI } from './interaction/toolbar.js';
 import { setupSelectionUtils } from './interaction/selectionUtils.js';
+import { setupHistoryManager } from './interaction/history.js';
 
 export function setupInteractionManager(scene, camera2D, renderer2D, orbitControls2D, camera3D, renderer3D, orbitControls3D, collisionManager = null) {
 
@@ -17,6 +18,13 @@ export function setupInteractionManager(scene, camera2D, renderer2D, orbitContro
     // ==========================================
     const { selectionGroup, buildGroup, dissolveGroup, applySelectionHighlight } = setupSelectionUtils({
         scene, selectedObjects
+    });
+
+    // ==========================================
+    // 1.5 HISTORY MANAGER (Undo/Redo)
+    // ==========================================
+    const { saveHistoryState, undo, redo } = setupHistoryManager({
+        scene, interactableObjects, collisionManager, selectObject, setTool
     });
 
     // ==========================================
@@ -33,7 +41,10 @@ export function setupInteractionManager(scene, camera2D, renderer2D, orbitContro
     } = setupGizmos({
         camera3D, renderer3D, orbitControls3D,
         camera2D, renderer2D, orbitControls2D,
-        selectedObjects, selectionGroup, collisionManager
+        selectedObjects, selectionGroup, collisionManager,
+        onDragChange: (isDragging) => {
+            if (!isDragging) saveHistoryState();
+        }
     });
 
     function attachGizmo() {
@@ -44,7 +55,8 @@ export function setupInteractionManager(scene, camera2D, renderer2D, orbitContro
     // 3. TOOLBAR UI (Tách ra module riêng)
     // ==========================================
     const { updateToolbarUI } = setupToolbarUI({
-        selectedObjects, interactableObjects, collisionManager, setTool, selectObject
+        selectedObjects, interactableObjects, collisionManager, setTool, selectObject,
+        undo, redo, saveHistoryState
     });
 
     // ==========================================
@@ -132,7 +144,7 @@ export function setupInteractionManager(scene, camera2D, renderer2D, orbitContro
     setupKeyboardControls({
         renderer3D, renderer2D, orbitControls3D, camera2D, orbitControls2D, 
         selectedObjects, interactableObjects, collisionManager,
-        setTool, selectObject 
+        setTool, selectObject, undo, redo, saveHistoryState
     });
 
     // ==========================================
@@ -151,6 +163,7 @@ export function setupInteractionManager(scene, camera2D, renderer2D, orbitContro
         if (collisionManager && collidable) collisionManager.register(mesh);
         selectObject(mesh, false);
         setTool('translate');
+        saveHistoryState();
     }
 
     return {

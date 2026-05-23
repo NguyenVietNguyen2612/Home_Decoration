@@ -2,7 +2,7 @@ export function setupKeyboardControls(context) {
     const { 
         renderer3D, renderer2D, orbitControls3D, camera2D, orbitControls2D, 
         selectedObjects, interactableObjects, collisionManager,
-        setTool, selectObject 
+        setTool, selectObject, undo, redo, saveHistoryState
     } = context;
 
     let hoveredView = '3D'; // Lưu trạng thái chuột đang ở view nào
@@ -15,6 +15,23 @@ export function setupKeyboardControls(context) {
     window.addEventListener('keydown', (e) => {
         if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
         const key = e.key.toLowerCase();
+
+        // Xử lý Undo/Redo shortcuts
+        if ((e.ctrlKey || e.metaKey) && key === 'z') {
+            e.preventDefault();
+            if (e.shiftKey) {
+                if (redo) redo();
+            } else {
+                if (undo) undo();
+            }
+            return;
+        }
+        if ((e.ctrlKey || e.metaKey) && key === 'y') {
+            e.preventDefault();
+            if (redo) redo();
+            return;
+        }
+
         if (keys.hasOwnProperty(key)) keys[key] = true;
 
         // Các phím tắt công cụ không cần smooth
@@ -38,6 +55,7 @@ export function setupKeyboardControls(context) {
                         if (i > -1) interactableObjects.splice(i, 1);
                         if (collisionManager) collisionManager.unregister(t);
                     });
+                    if (saveHistoryState) saveHistoryState();
                 }
                 break;
         }

@@ -1,10 +1,12 @@
 export function setupToolbarUI(context) {
-    const { selectedObjects, interactableObjects, collisionManager, setTool, selectObject } = context;
+    const { selectedObjects, interactableObjects, collisionManager, setTool, selectObject, undo, redo, saveHistoryState } = context;
 
     const btnTranslate = document.getElementById('btn-translate');
     const btnRotate = document.getElementById('btn-rotate');
     const btnScale = document.getElementById('btn-scale');
     const btnDelete = document.getElementById('btn-delete');
+    const btnUndo = document.getElementById('btn-undo');
+    const btnRedo = document.getElementById('btn-redo');
 
     function updateToolbarUI(currentTool) {
         const map = { translate: btnTranslate, rotate: btnRotate, scale: btnScale };
@@ -38,8 +40,12 @@ export function setupToolbarUI(context) {
                 if (i > -1) interactableObjects.splice(i, 1);
                 if (collisionManager) collisionManager.unregister(t);
             });
+            if (saveHistoryState) saveHistoryState();
         }
     });
+
+    if (btnUndo && undo) btnUndo.addEventListener('click', undo);
+    if (btnRedo && redo) btnRedo.addEventListener('click', redo);
 
     return { updateToolbarUI };
 }
