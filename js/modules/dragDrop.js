@@ -3,6 +3,74 @@ import { createModel } from './modelLoader.js';
 import { createRoomGeometry } from './roomGeometry.js';
 import { updateWallHoles } from './doorManager.js';
 
+function applyBackground(scene, type) {
+    scene.userData.backgroundType = type;
+    const ambientLight = scene.getObjectByName('ambientLight');
+    const dirLight = scene.getObjectByName('dirLight');
+
+    if (type === 'bg_solid') {
+        if (ambientLight) {
+            ambientLight.color.setHex(0xffffff);
+            ambientLight.intensity = 0.4;
+        }
+        if (dirLight) {
+            dirLight.color.setHex(0xfffae6);
+            dirLight.intensity = 1.5;
+        }
+        scene.background = new THREE.Color(0xdddddd);
+        scene.environment = null;
+    } else if (type === 'bg_sky') {
+        if (ambientLight) {
+            ambientLight.color.setHex(0xffffff);
+            ambientLight.intensity = 0.6; // Sáng hơn vào ban ngày (giảm nhẹ)
+        }
+        if (dirLight) {
+            dirLight.color.setHex(0xffffff);
+            dirLight.intensity = 1.75; // Nắng gắt hơn (giảm nhẹ)
+        }
+        const textureLoader = new THREE.TextureLoader();
+        const skyTexture = textureLoader.load('assets/textures/sky_clouds_seamless.jpg');
+        skyTexture.colorSpace = THREE.SRGBColorSpace;
+        skyTexture.mapping = THREE.EquirectangularReflectionMapping;
+        scene.background = skyTexture;
+        scene.environment = skyTexture;
+    } else if (type === 'bg_stars') {
+        if (ambientLight) {
+            ambientLight.color.setHex(0x88aaff); // Môi trường hơi xanh tối (đêm)
+            ambientLight.intensity = 0.15;
+        }
+        if (dirLight) {
+            dirLight.color.setHex(0xaaaaee); // Ánh trăng hắt vào
+            dirLight.intensity = 0.3;
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = 2048;
+        canvas.height = 1024;
+        const ctx = canvas.getContext('2d');
+        
+        ctx.fillStyle = '#050510';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        for (let i = 0; i < 1500; i++) {
+            const x = Math.random() * canvas.width;
+            const y = Math.random() * canvas.height;
+            const radius = Math.random() * 1.5;
+            const intensity = Math.random();
+            
+            ctx.beginPath();
+            ctx.arc(x, y, radius, 0, 2 * Math.PI);
+            ctx.fillStyle = `rgba(255, 255, 255, ${intensity})`;
+            ctx.fill();
+        }
+        
+        const texture = new THREE.CanvasTexture(canvas);
+        texture.mapping = THREE.EquirectangularReflectionMapping;
+        texture.colorSpace = THREE.SRGBColorSpace;
+        scene.background = texture;
+        scene.environment = texture;
+    }
+}
+
 export function setupDragDrop(scene, camera2D, renderer2D, camera3D, renderer3D, interactionManager, registerPhysicsObject, groundPlane, collisionManager) {
     // 1. Gắn sự kiện lấy thông tin khi người dùng bắt đầu Drag từ thanh Sidebar
     const items = document.querySelectorAll('.object-item');
@@ -23,6 +91,12 @@ export function setupDragDrop(scene, camera2D, renderer2D, camera3D, renderer3D,
         e.preventDefault();
         const objectType = e.dataTransfer.getData('objectType');
         if (!objectType) return;
+
+        // -- XỬ LÝ BACKGROUND -- (Không cần raycast điểm rơi)
+        if (objectType.startsWith('bg_')) {
+            applyBackground(scene, objectType);
+            return;
+        }
 
         // Tính tọa độ điểm drop của chuột trên màn hình 2D
         const rect = container2D.getBoundingClientRect();
@@ -45,38 +119,45 @@ export function setupDragDrop(scene, camera2D, renderer2D, camera3D, renderer3D,
             intersectPoint.x = Math.round(intersectPoint.x * 10) / 10;
             intersectPoint.z = Math.round(intersectPoint.z * 10) / 10;
 
-            // -- XỬ LÝ NỀN --
+            // -- XỬ LÝ SÀN PHÒNG --
             if (objectType.startsWith('ground_')) {
                 const textureType = objectType.split('_')[1];
                 const textureLoader = new THREE.TextureLoader();
                 const texture = textureLoader.load(`grounds/${textureType}.png`);
                 texture.wrapS = THREE.RepeatWrapping;
                 texture.wrapT = THREE.RepeatWrapping;
-                const currentGridSize = parseInt(document.getElementById('grid-size').value) || 100;
-                texture.repeat.set(currentGridSize / 10, currentGridSize / 10);
+                
+                // Kích thước sàn là 10x10, repeat 4x4 hoặc 5x5 sẽ vừa phải
+                texture.repeat.set(4, 4);
                 texture.colorSpace = THREE.SRGBColorSpace;
                 
-                groundPlane.material.map = texture;
-                groundPlane.material.color.set(0xffffff); // Đặt lại màu gốc để không bị lấn át texture
-                let roughness = 0.8;
-                switch(textureType) {
-                    case 'tile':
-                    case 'marble':
-                        roughness = 0.1; // Smooth, shiny
-                        break;
-                    case 'wood':
-                    case 'concrete':
-                        roughness = 0.6; // Slightly reflective
-                        break;
-                    case 'grass':
-                    case 'sand':
-                    case 'brick':
-                    case 'stone':
-                        roughness = 0.95; // Rough, no reflection
-                        break;
+                const roomFloor = scene.getObjectByName('roomFloor');
+                if (roomFloor) {
+                    const newMat = roomFloor.material.clone();
+                    newMat.map = texture;
+                    newMat.color.set(0xffffff); // Đặt lại màu gốc để không bị lấn át texture
+                    
+                    let roughness = 0.8;
+                    switch(textureType) {
+                        case 'tile':
+                        case 'marble':
+                            roughness = 0.1; // Smooth, shiny
+                            break;
+                        case 'wood':
+                        case 'concrete':
+                            roughness = 0.6; // Slightly reflective
+                            break;
+                        case 'grass':
+                        case 'sand':
+                        case 'brick':
+                        case 'stone':
+                            roughness = 0.95; // Rough, no reflection
+                            break;
+                    }
+                    newMat.roughness = roughness;
+                    newMat.needsUpdate = true;
+                    roomFloor.material = newMat;
                 }
-                groundPlane.material.roughness = roughness;
-                groundPlane.material.needsUpdate = true;
                 return;
             }
 
@@ -105,21 +186,12 @@ export function setupDragDrop(scene, camera2D, renderer2D, camera3D, renderer3D,
                 return;
             }
 
-            // -- XỬ LÝ HÌNH DẠNG PHÒNG --
-            if (objectType.startsWith('room_')) {
-                const { roomGroup, walls } = createRoomGeometry(objectType);
-                roomGroup.position.set(intersectPoint.x, 0, intersectPoint.z);
-                scene.add(roomGroup);
-                interactionManager.registerInteractableObject(roomGroup, false);
-                if (collisionManager) {
-                    walls.forEach(w => collisionManager.register(w));
-                }
-                return;
-            }
+
 
             // -- XỬ LÝ NỘI THẤT --
             const newObject = await createModel(objectType);
             newObject.position.set(intersectPoint.x, newObject.position.y + 5, intersectPoint.z);
+            newObject.userData.type = objectType;
             scene.add(newObject);
             interactionManager.registerInteractableObject(newObject);
             if (typeof registerPhysicsObject === 'function') registerPhysicsObject(newObject);
@@ -139,6 +211,12 @@ export function setupDragDrop(scene, camera2D, renderer2D, camera3D, renderer3D,
         const objectType = e.dataTransfer.getData('objectType');
         if (!objectType) return;
 
+        // -- XỬ LÝ BACKGROUND -- (Không cần raycast điểm rơi)
+        if (objectType.startsWith('bg_')) {
+            applyBackground(scene, objectType);
+            return;
+        }
+
         const rect = container3D.getBoundingClientRect();
         const mouseX = ((e.clientX - rect.left) / rect.width) * 2 - 1;
         const mouseY = -((e.clientY - rect.top) / rect.height) * 2 + 1;
@@ -157,38 +235,43 @@ export function setupDragDrop(scene, camera2D, renderer2D, camera3D, renderer3D,
             intersectPoint.x = Math.round(intersectPoint.x * 10) / 10;
             intersectPoint.z = Math.round(intersectPoint.z * 10) / 10;
 
-            // -- XỬ LÝ NỀN --
+            // -- XỬ LÝ SÀN PHÒNG --
             if (objectType.startsWith('ground_')) {
                 const textureType = objectType.split('_')[1];
                 const textureLoader = new THREE.TextureLoader();
                 const texture = textureLoader.load(`grounds/${textureType}.png`);
                 texture.wrapS = THREE.RepeatWrapping;
                 texture.wrapT = THREE.RepeatWrapping;
-                const currentGridSize = parseInt(document.getElementById('grid-size').value) || 100;
-                texture.repeat.set(currentGridSize / 10, currentGridSize / 10);
+                texture.repeat.set(4, 4);
                 texture.colorSpace = THREE.SRGBColorSpace;
                 
-                groundPlane.material.map = texture;
-                groundPlane.material.color.set(0xffffff);
-                let roughness = 0.8;
-                switch(textureType) {
-                    case 'tile':
-                    case 'marble':
-                        roughness = 0.1; // Smooth, shiny
-                        break;
-                    case 'wood':
-                    case 'concrete':
-                        roughness = 0.6; // Slightly reflective
-                        break;
-                    case 'grass':
-                    case 'sand':
-                    case 'brick':
-                    case 'stone':
-                        roughness = 0.95; // Rough, no reflection
-                        break;
+                const roomFloor = scene.getObjectByName('roomFloor');
+                if (roomFloor) {
+                    const newMat = roomFloor.material.clone();
+                    newMat.map = texture;
+                    newMat.color.set(0xffffff);
+                    
+                    let roughness = 0.8;
+                    switch(textureType) {
+                        case 'tile':
+                        case 'marble':
+                            roughness = 0.1; // Smooth, shiny
+                            break;
+                        case 'wood':
+                        case 'concrete':
+                            roughness = 0.6; // Slightly reflective
+                            break;
+                        case 'grass':
+                        case 'sand':
+                        case 'brick':
+                        case 'stone':
+                            roughness = 0.95; // Rough, no reflection
+                            break;
+                    }
+                    newMat.roughness = roughness;
+                    newMat.needsUpdate = true;
+                    roomFloor.material = newMat;
                 }
-                groundPlane.material.roughness = roughness;
-                groundPlane.material.needsUpdate = true;
                 return;
             }
 
@@ -216,21 +299,12 @@ export function setupDragDrop(scene, camera2D, renderer2D, camera3D, renderer3D,
                 return;
             }
 
-            // -- XỬ LÝ HÌNH DẠNG PHÒNG --
-            if (objectType.startsWith('room_')) {
-                const { roomGroup, walls } = createRoomGeometry(objectType);
-                roomGroup.position.set(intersectPoint.x, 0, intersectPoint.z);
-                scene.add(roomGroup);
-                interactionManager.registerInteractableObject(roomGroup, false);
-                if (collisionManager) {
-                    walls.forEach(w => collisionManager.register(w));
-                }
-                return;
-            }
+
 
             // -- XỬ LÝ NỘI THẤT --
             const newObject = await createModel(objectType);
             newObject.position.set(intersectPoint.x, newObject.position.y + 5, intersectPoint.z);
+            newObject.userData.type = objectType;
             scene.add(newObject);
             interactionManager.registerInteractableObject(newObject);
             if (typeof registerPhysicsObject === 'function') registerPhysicsObject(newObject);

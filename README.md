@@ -1,4 +1,4 @@
-# Home Decoration - Mini 3D Interior Design Application
+# Room Decoration - Mini 3D Interior Design Application
 
 A web-based 3D interior design tool that allows users to drag and drop furniture objects into both 2D top-down and 3D perspective views. Built with Three.js for rendering and featuring intuitive object manipulation controls.
 
@@ -12,7 +12,7 @@ A web-based 3D interior design tool that allows users to drag and drop furniture
 
 ## 🖼️ Overview
 
-Home Decoration is a mini 3D interior design application that enables users to:
+Room Decoration is a mini 3D interior design application that enables users to:
 - Browse furniture objects in a sidebar library
 - Drag and drop objects into either 2D or 3D views
 - Manipulate objects (move, rotate, scale) using transform controls

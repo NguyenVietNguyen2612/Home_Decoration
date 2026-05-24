@@ -159,14 +159,16 @@ export function setupInteractionManager(scene, camera2D, renderer2D, orbitContro
     // ==========================================
     // 11. ĐĂNG KÝ OBJECT MỚI (từ drag-drop hoặc sample)
     // ==========================================
-    function registerInteractableObject(mesh, collidable = true) {
+    function registerInteractableObject(mesh, collidable = true, autoSelect = true) {
         if (!mesh.userData) mesh.userData = {};
         mesh.userData.isCollidable = collidable;
 
         interactableObjects.push(mesh);
         if (collisionManager && collidable) collisionManager.register(mesh);
-        selectObject(mesh, false);
-        setTool('translate');
+        if (autoSelect) {
+            selectObject(mesh, false);
+            setTool('translate');
+        }
         saveHistoryState();
     }
 

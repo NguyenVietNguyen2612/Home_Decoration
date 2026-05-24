@@ -1,260 +1,112 @@
 <!DOCTYPE html>
-<html lang="vi">
-
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mini 3D Interior Design</title>
-    <link rel="stylesheet" href="css/style.css">
-
-    <!-- Sử dụng Import Map để nạp Three.js từ CDN - Pin cùng version để tránh xung đột prototype -->
-    <script type="importmap">
-        {
-            "imports": {
-                "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
-                "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
-            }
-        }
-    </script>
+    <title>Room Decoration - Home</title>
+    <link rel="stylesheet" href="css/home.css">
 </head>
-
 <body>
-    <div id="app-container">
-        <!-- Panel Trái: Thư viện Objects -->
-        <div id="left-sidebar">
-            <div class="search-box">
-                <input type="text" id="search-input" placeholder="Search objects...">
-            </div>
-            <div id="sidebar-content" class="sidebar-scrollable">
-                
-                <details class="category-details" open>
-                    <summary class="category-header">🛋️ Furnitures</summary>
-                    <div style="margin-left: 10px;">
-                        <details class="category-details">
-                            <summary class="category-header">🪴 Decorations</summary>
-                            <div class="object-grid" id="decorations-grid">
-                                <div class="object-item" data-type="decorations/flower_vase" draggable="true">
-                                    <img src="https://via.placeholder.com/60?text=Vase" alt="Flower Vase" draggable="false">
-                                    <span>Flower Vase</span>
-                                </div>
-                                <div class="object-item" data-type="decorations/flowers_with_the_vase" draggable="true">
-                                    <img src="https://via.placeholder.com/60?text=Flowers" alt="Flowers with Vase" draggable="false">
-                                    <span>Flowers w/ Vase</span>
-                                </div>
-                            </div>
-                        </details>
+    <!-- Animated background elements -->
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
 
-                        <details class="category-details">
-                            <summary class="category-header">🛋️ Things</summary>
-                            <div class="object-grid" id="things-grid">
-                                <div class="object-item" data-type="things/bed" draggable="true">
-                                    <img src="https://via.placeholder.com/60?text=Bed" alt="Bed" draggable="false">
-                                    <span>Bed</span>
-                                </div>
-                                <div class="object-item" data-type="things/bed_agape" draggable="true">
-                                    <img src="https://via.placeholder.com/60?text=BedAgape" alt="Bed Agape" draggable="false">
-                                    <span>Bed Agape</span>
-                                </div>
-                                <div class="object-item" data-type="things/leather_couch" draggable="true">
-                                    <img src="https://via.placeholder.com/60?text=Leather" alt="Leather Couch" draggable="false">
-                                    <span>Leather Couch</span>
-                                </div>
-                                <div class="object-item" data-type="things/sofa_couch" draggable="true">
-                                    <img src="https://via.placeholder.com/60?text=Sofa" alt="Sofa Couch" draggable="false">
-                                    <span>Sofa Couch</span>
-                                </div>
-                            </div>
-                        </details>
-
-                        <details class="category-details">
-                            <summary class="category-header">🚪 Doors & Windows</summary>
-                            <div class="object-grid" id="doors-grid">
-                                <div class="object-item" data-type="doors/door" draggable="true">
-                                    <img src="https://via.placeholder.com/60?text=Door" alt="Door" draggable="false">
-                                    <span>Door</span>
-                                </div>
-                                <div class="object-item" data-type="doors/door (1)" draggable="true">
-                                    <img src="https://via.placeholder.com/60?text=Door1" alt="Door 1" draggable="false">
-                                    <span>Door 1</span>
-                                </div>
-                                <div class="object-item" data-type="doors/door_door_metal" draggable="true">
-                                    <img src="https://via.placeholder.com/60?text=Metal" alt="Metal Door" draggable="false">
-                                    <span>Metal Door</span>
-                                </div>
-                                <div class="object-item" data-type="doors/door_with_frame" draggable="true">
-                                    <img src="https://via.placeholder.com/60?text=Frame" alt="Door with Frame" draggable="false">
-                                    <span>Door w/ Frame</span>
-                                </div>
-                                <div class="object-item" data-type="doors/sliding_door" draggable="true">
-                                    <img src="https://via.placeholder.com/60?text=Sliding" alt="Sliding Door" draggable="false">
-                                    <span>Sliding Door</span>
-                                </div>
-                                <div class="object-item" data-type="doors/window" draggable="true">
-                                    <img src="https://via.placeholder.com/60?text=Window" alt="Window" draggable="false">
-                                    <span>Window</span>
-                                </div>
-                                <div class="object-item" data-type="doors/window (1)" draggable="true">
-                                    <img src="https://via.placeholder.com/60?text=Win1" alt="Window 1" draggable="false">
-                                    <span>Window 1</span>
-                                </div>
-                                <div class="object-item" data-type="doors/window (2)" draggable="true">
-                                    <img src="https://via.placeholder.com/60?text=Win2" alt="Window 2" draggable="false">
-                                    <span>Window 2</span>
-                                </div>
-                                <div class="object-item" data-type="doors/window (3)" draggable="true">
-                                    <img src="https://via.placeholder.com/60?text=Win3" alt="Window 3" draggable="false">
-                                    <span>Window 3</span>
-                                </div>
-                                <div class="object-item" data-type="doors/window__wodden_4_mb" draggable="true">
-                                    <img src="https://via.placeholder.com/60?text=Wodden" alt="Wooden Window" draggable="false">
-                                    <span>Wooden Window</span>
-                                </div>
-                            </div>
-                        </details>
-                    </div>
-                </details>
-
-                <details class="category-details">
-                    <summary class="category-header">🏠 Rooms</summary>
-                    <div class="object-grid" id="rooms-grid">
-                        <div class="object-item" data-type="room_basic" draggable="true">
-                            <img src="rooms/room_basic.svg" alt="New Room" draggable="false">
-                            <span>New Room</span>
-                        </div>
-                        <div class="object-item" data-type="wall_wallpaper_floral" draggable="true">
-                            <img src="rooms/wallpaper_floral.png" alt="Floral Wallpaper" draggable="false">
-                            <span>Floral</span>
-                        </div>
-                        <div class="object-item" data-type="wall_brick_wall" draggable="true">
-                            <img src="rooms/brick_wall.png" alt="Brick Wall" draggable="false">
-                            <span>Brick</span>
-                        </div>
-                        <div class="object-item" data-type="wall_wood_panel" draggable="true">
-                            <img src="rooms/wood_panel.png" alt="Wood Panel" draggable="false">
-                            <span>Wood Panel</span>
-                        </div>
-                        <div class="object-item" data-type="wall_concrete_wall" draggable="true">
-                            <img src="rooms/concrete_wall.png" alt="Concrete Wall" draggable="false">
-                            <span>Concrete</span>
-                        </div>
-                        <div class="object-item" data-type="wall_paint_blue" draggable="true">
-                            <img src="rooms/paint_blue.png" alt="Blue Paint" draggable="false">
-                            <span>Blue Paint</span>
-                        </div>
-                    </div>
-                </details>
-
-                <details class="category-details">
-                    <summary class="category-header">🌿 Ground</summary>
-                    <div class="object-grid" id="ground-grid">
-                        <div class="object-item" data-type="ground_wood" draggable="true">
-                            <img src="grounds/wood.png" alt="Wood Floor" draggable="false">
-                            <span>Wood</span>
-                        </div>
-                        <div class="object-item" data-type="ground_tile" draggable="true">
-                            <img src="grounds/tile.png" alt="Tile Floor" draggable="false">
-                            <span>Tile</span>
-                        </div>
-                        <div class="object-item" data-type="ground_grass" draggable="true">
-                            <img src="grounds/grass.png" alt="Grass Floor" draggable="false">
-                            <span>Grass</span>
-                        </div>
-                        <div class="object-item" data-type="ground_marble" draggable="true">
-                            <img src="grounds/marble.png" alt="Marble Floor" draggable="false">
-                            <span>Marble</span>
-                        </div>
-                        <div class="object-item" data-type="ground_concrete" draggable="true">
-                            <img src="grounds/concrete.png" alt="Concrete Floor" draggable="false">
-                            <span>Concrete</span>
-                        </div>
-                        <div class="object-item" data-type="ground_brick" draggable="true">
-                            <img src="grounds/brick.png" alt="Brick Floor" draggable="false">
-                            <span>Brick</span>
-                        </div>
-                        <div class="object-item" data-type="ground_stone" draggable="true">
-                            <img src="grounds/stone.png" alt="Stone Floor" draggable="false">
-                            <span>Stone</span>
-                        </div>
-                        <div class="object-item" data-type="ground_sand" draggable="true">
-                            <img src="grounds/sand.png" alt="Sand Floor" draggable="false">
-                            <span>Sand</span>
-                        </div>
-                    </div>
-                </details>
-
-            </div>
-        </div>
-
-        <!-- Thanh kéo thả 1: giữa Sidebar và Main Views -->
-        <div class="resize-handle" id="rh-sidebar" title="Kéo để thay đổi độ rộng">
-            <div class="resize-grip"></div>
-        </div>
-
-        <!-- Vùng chính giữa và bên phải: Views -->
-        <div id="main-views">
-            <div id="view-2d-container">
-                <div class="view-title">2D Top-down View</div>
-                <div id="view-2d"></div>
-            </div>
-
-            <!-- Thanh kéo thả 2: giữa 2D View và 3D View -->
-            <div class="resize-handle resize-handle-inner" id="rh-views" title="Kéo để thay đổi độ rộng">
-                <div class="resize-grip"></div>
-            </div>
-
-            <div id="view-3d-container">
-                <div class="view-title">3D Preview</div>
-                <div id="view-3d"></div>
-            </div>
-        </div>
-
-        <!-- Dưới cùng: Toolbar cho các phép biến đổi -->
-        <div id="bottom-toolbar">
-            <button class="tool-btn" id="btn-translate" title="Move Object">⬌ Move</button>
-            <button class="tool-btn" id="btn-rotate" title="Rotate Object">↻ Rotate</button>
-            <button class="tool-btn" id="btn-scale" title="Scale Object">⤡ Scale</button>
-            <div class="divider"></div>
-            <button class="tool-btn" id="btn-undo" title="Undo (Ctrl+Z)">↩ Undo</button>
-            <button class="tool-btn" id="btn-redo" title="Redo (Ctrl+Y)">↪ Redo</button>
-            <div class="divider"></div>
-            <div class="grid-controls" style="display: flex; align-items: center; gap: 8px; margin-left: 10px; margin-right: 10px;">
-                <label style="font-size: 13px; font-weight: 600;">Nền:</label>
-                <input type="number" id="grid-size" value="100" min="10" max="500" step="10" title="Kích thước nền" style="width: 55px; height: 26px; border: 1px solid #ccc; border-radius: 4px; padding: 2px;">
-                <input type="color" id="grid-color" value="#888888" title="Màu nền" style="padding: 0; cursor: pointer; border: 1px solid #ccc; border-radius: 4px; background: transparent; width: 30px; height: 26px;">
-            </div>
-            <div class="divider"></div>
-            <button class="tool-btn" id="btn-delete" title="Delete Object">❌ Delete</button>
-            <button class="tool-btn" id="btn-help" title="Help">ℹ️ Help</button>
+    <div class="home-container">
+        <h1>Room Decoration</h1>
+        <p>Design your dream space in stunning 3D. Create, explore, and visualize your ideas with ease.</p>
+        
+        <div class="menu-grid">
+            <button class="menu-btn primary" onclick="window.location.href='editor.html'">
+                <span class="btn-icon">✨</span>
+                Dự án mới
+            </button>
+            <button class="menu-btn" onclick="openSavedProjects()">
+                <span class="btn-icon">📁</span>
+                Dự án sẵn có
+            </button>
+            <button class="menu-btn" onclick="alert('Tính năng Cài đặt đang được phát triển.')">
+                <span class="btn-icon">⚙️</span>
+                Cài đặt
+            </button>
+            <button class="menu-btn" onclick="alert('Tính năng Ngôn ngữ đang được phát triển.')">
+                <span class="btn-icon">🌐</span>
+                Ngôn ngữ
+            </button>
         </div>
     </div>
 
-    <div id="help-panel" class="hidden">
-        <div id="help-card">
-            <div id="help-header">
-                <h2>Hướng dẫn sử dụng</h2>
-                <button id="help-close-btn" title="Close help">✕</button>
+    <!-- Saved Projects Modal -->
+    <div class="modal-overlay" id="projects-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Bản thiết kế đã lưu</h2>
+                <button class="close-btn" onclick="closeSavedProjects()">✕</button>
             </div>
-            <div class="help-content">
-                <p>1. <strong>Thêm vật thể:</strong> Kéo thả từ danh sách bên trái vào khu vực 2D hoặc 3D.</p>
-                <p>2. <strong>Chọn vật thể:</strong> Nhấp chuột trái để chọn. Quét chuột từ vùng trống để chọn nhiều vật
-                    thể (Box Selection). Giữ <strong>Ctrl</strong> khi click/quét để chọn thêm.</p>
-                <p>3. <strong>Công cụ & Phím tắt:</strong> Chọn nút dưới màn hình hoặc dùng phím <strong>T</strong>
-                    (Move), <strong>E</strong> (Rotate), <strong>R</strong> (Scale), <strong>Q</strong> (Bỏ chọn).</p>
-                <p>4. <strong>Thao tác (Gizmo):</strong> Kéo các trục để di chuyển, xoay hoặc thay đổi kích thước. (Lưu
-                    ý: Khi chọn nhiều vật thể, trục dọc Y sẽ bị khóa).</p>
-                <p>5. <strong>Điều hướng bằng phím (trên View đang trỏ chuột):</strong> Phím <strong>W / S</strong> để
-                    Phóng to / Thu nhỏ, <strong>A / D</strong> để Di chuyển (Pan).</p>
-                <p>6. <strong>Điều hướng bằng chuột:</strong> Chuột phải để xoay góc nhìn (3D) hoặc Pan (2D). Cuộn chuột
-                    để Phóng to / Thu nhỏ.</p>
-                <p>7. <strong>Xóa vật thể:</strong> Chọn vật thể và nhấn phím <strong>Delete / Backspace</strong> hoặc
-                    nút <strong>❌ Delete</strong>.</p>
-                <p>8. <strong>Giao diện:</strong> Kéo các thanh phân cách dọc để thay đổi kích thước cửa sổ.</p>
+            <div class="project-list" id="project-list-container">
+                <!-- Danh sách sẽ được tải qua JS -->
             </div>
         </div>
     </div>
 
-    <!-- Nhúng file main.js -->
-    <script type="module" src="js/main.js"></script>
+    <script>
+        function openSavedProjects() {
+            const modal = document.getElementById('projects-modal');
+            const container = document.getElementById('project-list-container');
+            
+            // Clear current list
+            container.innerHTML = '';
+            
+            try {
+                const saved = localStorage.getItem('home_decoration_designs');
+                if (saved) {
+                    const designs = JSON.parse(saved);
+                    if (designs.length > 0) {
+                        // Reverse to show newest first
+                        designs.reverse().forEach(design => {
+                            const date = new Date(design.date).toLocaleDateString('vi-VN', {
+                                year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
+                            });
+                            
+                            const item = document.createElement('div');
+                            item.className = 'project-item';
+                            item.innerHTML = `
+                                <div class="project-info">
+                                    <h3>${design.name}</h3>
+                                    <p>${date} • ${design.furnitures.length} objects</p>
+                                </div>
+                                <span style="color: #6366f1; font-size: 1.2rem;">➔</span>
+                            `;
+                            // Khi click vào project, mở editor (Trong tương lai có thể truyền id qua URL: editor.html?id=...)
+                            item.onclick = () => {
+                                // Tạm thời cứ chuyển hướng sang editor, tính năng load cụ thể sẽ được code sau
+                                window.location.href = 'editor.html';
+                            };
+                            container.appendChild(item);
+                        });
+                    } else {
+                        container.innerHTML = '<p class="no-projects">Bạn chưa lưu bản thiết kế nào.</p>';
+                    }
+                } else {
+                    container.innerHTML = '<p class="no-projects">Bạn chưa lưu bản thiết kế nào.</p>';
+                }
+            } catch (e) {
+                container.innerHTML = '<p class="no-projects">Lỗi khi tải dữ liệu.</p>';
+            }
+            
+            modal.classList.add('active');
+        }
+
+        function closeSavedProjects() {
+            document.getElementById('projects-modal').classList.remove('active');
+        }
+
+        // Đóng modal khi bấm ra ngoài
+        document.getElementById('projects-modal').addEventListener('click', (e) => {
+            if (e.target === document.getElementById('projects-modal')) {
+                closeSavedProjects();
+            }
+        });
+    </script>
 </body>
-
 </html>

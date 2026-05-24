@@ -66,11 +66,68 @@ const interactionManager = setupInteractionManager(
 // --- ĐĂNG KÝ PHÒNG LÀ OBJECT TƯƠNG TÁC ---
 // Phòng có thể chọn/di chuyển nhưng không tham gia collision detection
 // (bbox phòng bao trùm toàn bộ nội thất → luôn "va chạm" với mọi vật thể)
-interactionManager.registerInteractableObject(roomGroup, false);
+interactionManager.registerInteractableObject(roomGroup, false, false);
 
 // --- CƠ CHẾ KÉO THẢ TỪ SIDEBAR ---
 setupDragDrop(scene, camera2D, renderer2D, camera3D, renderer3D, interactionManager, registerPhysicsObject, groundPlane, collisionManager);
 
+// --- NÚT TẠO LẠI PHÒNG (NẾU LỠ XÓA) ---
+const btnNewRoom = document.getElementById('btn-new-room');
+if (btnNewRoom) {
+    btnNewRoom.addEventListener('click', () => {
+        let existingRoom = scene.getObjectByName('room');
+        if (existingRoom) {
+            alert('Căn phòng vẫn đang tồn tại. Bạn chỉ cần tạo mới khi lỡ tay xóa mất phòng thôi nhé!');
+            return;
+        }
+
+        const { roomGroup, walls } = createRoomGeometry('room_basic');
+        scene.add(roomGroup);
+        walls.forEach(wall => collisionManager.register(wall));
+        interactionManager.registerInteractableObject(roomGroup, false, false);
+    });
+}
+
+// --- NÚT LƯU BẢN THIẾT KẾ ---
+const btnSave = document.getElementById('btn-save');
+if (btnSave) {
+    btnSave.addEventListener('click', () => {
+        const designName = prompt('Nhập tên cho bản thiết kế này (ví dụ: Phòng ngủ của tôi):', 'My Dream Room');
+        if (!designName) return;
+
+        const designData = {
+            id: Date.now().toString(),
+            name: designName,
+            date: new Date().toISOString(),
+            backgroundType: scene.userData.backgroundType || 'bg_solid',
+            furnitures: []
+        };
+
+        // Thu thập thông tin các nội thất đang có trên scene
+        interactionManager.interactableObjects.forEach(obj => {
+            if (obj.name !== 'room' && obj.userData && obj.userData.type) {
+                designData.furnitures.push({
+                    type: obj.userData.type,
+                    position: { x: obj.position.x, y: obj.position.y, z: obj.position.z },
+                    rotation: { x: obj.rotation.x, y: obj.rotation.y, z: obj.rotation.z },
+                    scale: { x: obj.scale.x, y: obj.scale.y, z: obj.scale.z }
+                });
+            }
+        });
+
+        // Lưu vào localStorage
+        let savedDesigns = [];
+        try {
+            const saved = localStorage.getItem('home_decoration_designs');
+            if (saved) savedDesigns = JSON.parse(saved);
+        } catch (e) {}
+
+        savedDesigns.push(designData);
+        localStorage.setItem('home_decoration_designs', JSON.stringify(savedDesigns));
+
+        alert(`Đã lưu bản thiết kế "${designName}" thành công! \n(Dữ liệu được lưu trong LocalStorage để dùng cho trang chủ sau này)`);
+    });
+}
 // --- TƯƠNG TÁC ĐẶC BIỆT CỦA CỬA ---
 setupDoorInteractions(renderer3D, camera3D, scene);
 
@@ -173,33 +230,7 @@ function updatePhysics() {
     }
 }
 
-// --- TẠO SƠ BỘ MỘT VÀI OBJECT MẪU ---
-async function addSampleObjects(scene, interactionManager) {
-    const samples = [
-        { type: 'table',   x:  0,    z: -1   },
-        { type: 'chair',   x: -2,    z: -1   },
-        { type: 'chair',   x:  2,    z: -1   },
-        { type: 'sofa',    x:  0,    z:  2   },
-        { type: 'plant',   x: -3.5,  z:  3   },
-        { type: 'tv',      x:  3.5,  z:  1.5 },
-        { type: 'cabinet', x:  4,    z: -3   },
-        { type: 'lamp',    x: -4,    z: -3   }
-    ];
 
-    for (const item of samples) {
-        try {
-            const mesh = await createModel(item.type);
-            mesh.position.set(item.x, mesh.position.y, item.z);
-            scene.add(mesh);
-            interactionManager.registerInteractableObject(mesh);
-            registerPhysicsObject(mesh);
-        } catch (err) {
-            console.error(`Không thể tải object mẫu ${item.type}:`, err);
-        }
-    }
-}
-
-addSampleObjects(scene, interactionManager);
 
 const { gizmoScene3D, gizmoScene2D } = interactionManager;
 

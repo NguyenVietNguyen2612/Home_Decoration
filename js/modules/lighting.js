@@ -4,10 +4,12 @@ export function setupLighting(scene) {
     // 1. Ánh sáng môi trường (Ambient Light)
     // Cung cấp ánh sáng nền nhẹ, tránh cho bóng đổ bị tối đen hoàn toàn
     const ambientLight = new THREE.AmbientLight(0xffffff, 0.4); 
+    ambientLight.name = 'ambientLight';
     scene.add(ambientLight);
 
     // 2. Ánh sáng định hướng (Directional Light) - Mô phỏng ánh sáng mặt trời qua cửa sổ
     const dirLight = new THREE.DirectionalLight(0xfffae6, 1.5);
+    dirLight.name = 'dirLight';
     dirLight.position.set(10, 10, 5);
     dirLight.castShadow = true; // Bật đổ bóng
     
@@ -27,6 +29,7 @@ export function setupLighting(scene) {
 
     // 3. Ánh sáng điểm (Point Light) - Mô phỏng đèn trần trong phòng
     const pointLight = new THREE.PointLight(0xffd700, 1, 10);
+    pointLight.name = 'pointLight';
     pointLight.position.set(0, 4, 0);
     pointLight.castShadow = true;
     pointLight.shadow.bias = -0.001;

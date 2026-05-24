@@ -9,45 +9,39 @@ export function createRoomGeometry(type = 'room_basic') {
 
     const walls = [];
     const floorMaterial = new THREE.MeshStandardMaterial({
-        color: 0xffffff, map: textures.floorMap, roughness: 0.8
+        color: 0xe0e0e0, roughness: 0.8
     });
     const wallMaterial = new THREE.MeshStandardMaterial({
-        color: 0xefefef, map: textures.wallMap
+        color: 0xefefef
     });
 
     if (type === 'room_basic') {
         // --- 1. SÀN NHÀ 10x10 ---
         const floor = new THREE.Mesh(new THREE.PlaneGeometry(10, 10), floorMaterial);
+        floor.name = 'roomFloor';
         floor.rotation.x = -Math.PI / 2;
         floor.receiveShadow = true;
         roomGroup.add(floor);
 
         // --- 2. TƯỜNG ---
         // Tường sau
-        const backWall = new THREE.Mesh(new THREE.BoxGeometry(10, 5, 0.2), wallMaterial.clone());
-        backWall.position.set(0, 2.5, -5.1);
+        const backWall = new THREE.Mesh(new THREE.BoxGeometry(10, 7.5, 0.2), wallMaterial.clone());
+        backWall.position.set(0, 3.75, -5.1);
         backWall.receiveShadow = true;
         backWall.userData.isWall = true;
         roomGroup.add(backWall);
         walls.push(backWall);
 
         // Tường trái
-        const leftWall = new THREE.Mesh(new THREE.BoxGeometry(10, 5, 0.2), wallMaterial.clone());
-        leftWall.position.set(-5.1, 2.5, 0);
+        const leftWall = new THREE.Mesh(new THREE.BoxGeometry(10, 7.5, 0.2), wallMaterial.clone());
+        leftWall.position.set(-5.1, 3.75, 0);
         leftWall.rotation.y = Math.PI / 2;
         leftWall.receiveShadow = true;
         leftWall.userData.isWall = true;
         roomGroup.add(leftWall);
         walls.push(leftWall);
 
-        // Tường phải
-        const rightWall = new THREE.Mesh(new THREE.BoxGeometry(10, 5, 0.2), wallMaterial.clone());
-        rightWall.position.set(5.1, 2.5, 0);
-        rightWall.rotation.y = Math.PI / 2;
-        rightWall.receiveShadow = true;
-        rightWall.userData.isWall = true;
-        roomGroup.add(rightWall);
-        walls.push(rightWall);
+
 
     } else if (type === 'room_l_shape') {
         // --- 1. SÀN NHÀ L-SHAPE (2 phần) ---

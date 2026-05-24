@@ -127,13 +127,9 @@ export function setupDualScene() {
     // SCENE CHUNG
     const scene = new THREE.Scene();
     
-    // Tải texture mây trời thay cho màu đơn (đã được xử lý ghép mí liền mạch)
-    const textureLoader = new THREE.TextureLoader();
-    const skyTexture = textureLoader.load('assets/textures/sky_clouds_seamless.jpg');
-    skyTexture.colorSpace = THREE.SRGBColorSpace;
-    skyTexture.mapping = THREE.EquirectangularReflectionMapping;
-    scene.background = skyTexture;
-    scene.environment = skyTexture; // Cung cấp ánh sáng môi trường từ bầu trời
+    // Mặc định dùng nền màu đơn
+    scene.background = new THREE.Color(0xdddddd);
+    scene.environment = null;
 
     const groundGeo = new THREE.PlaneGeometry(100, 100);
     const groundMat = new THREE.MeshStandardMaterial({ 
