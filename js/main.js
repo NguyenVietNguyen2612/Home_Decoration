@@ -7,6 +7,7 @@ import { setupUIManager } from './modules/uiManager.js';
 import { createModel } from './modules/modelLoader.js';
 import { CollisionManager } from './modules/collisionManager.js';
 import { setupDoorInteractions } from './modules/doorManager.js';
+import { generateThumbnails } from './modules/thumbnailGenerator.js';
 
 import * as THREE from 'three';
 
@@ -72,6 +73,9 @@ setupDragDrop(scene, camera2D, renderer2D, camera3D, renderer3D, interactionMana
 
 // --- TƯƠNG TÁC ĐẶC BIỆT CỦA CỬA ---
 setupDoorInteractions(renderer3D, camera3D, scene);
+
+// --- TẠO ẢNH PREVIEW TỰ ĐỘNG CHO SIDEBAR ---
+generateThumbnails(renderer3D);
 
 // --- VẬT LÝ NHẸ (Trọng lực) ---
 const physicsObjects = [];

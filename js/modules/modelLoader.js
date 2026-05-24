@@ -75,6 +75,12 @@ export async function createModel(type) {
     let geometry, material;
     let yOffset = 0; // Độ cao để đưa vật thể nổi hẳn lên trên lưới tọa độ
 
+    // Xử lý động cho bất kỳ model cửa nào nằm trong thư mục doors
+    if (type.startsWith('doors/')) {
+        const fileName = type.replace('doors/', '');
+        return loadGLTFModel(`furnitures/doors/${fileName}.glb`, 2.0); // Chiều cao tầm 2m
+    }
+
     switch (type) {
         case 'table':
             geometry = new THREE.BoxGeometry(3, 1.5, 2);
@@ -98,8 +104,6 @@ export async function createModel(type) {
             break;
         case 'sofa':
             return loadGLTFModel('furnitures/sofa_single.glb', 3.0);
-        case 'door_with_frame':
-            return loadGLTFModel('furnitures/doors/door_with_frame.glb', 2.0); // Chiều cao tầm 2m
         case 'tv':
             geometry = new THREE.BoxGeometry(2.5, 1.5, 0.2);
             material = new THREE.MeshStandardMaterial({ color: 0x111111 }); // Đen
