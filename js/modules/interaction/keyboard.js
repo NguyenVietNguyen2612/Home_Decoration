@@ -1,6 +1,8 @@
+import { updateWallHoles } from '../doorManager.js';
+
 export function setupKeyboardControls(context) {
     const { 
-        renderer3D, renderer2D, orbitControls3D, camera2D, orbitControls2D, 
+        scene, renderer3D, renderer2D, orbitControls3D, camera2D, orbitControls2D, 
         selectedObjects, interactableObjects, collisionManager,
         setTool, selectObject, undo, redo, saveHistoryState
     } = context;
@@ -55,6 +57,7 @@ export function setupKeyboardControls(context) {
                         if (i > -1) interactableObjects.splice(i, 1);
                         if (collisionManager) collisionManager.unregister(t);
                     });
+                    updateWallHoles(scene);
                     if (saveHistoryState) saveHistoryState();
                 }
                 break;

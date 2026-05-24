@@ -6,6 +6,7 @@ import { setupGizmos } from './interaction/gizmo.js';
 import { setupToolbarUI } from './interaction/toolbar.js';
 import { setupSelectionUtils } from './interaction/selectionUtils.js';
 import { setupHistoryManager } from './interaction/history.js';
+import { updateWallHoles } from './doorManager.js';
 
 export function setupInteractionManager(scene, camera2D, renderer2D, orbitControls2D, camera3D, renderer3D, orbitControls3D, collisionManager = null) {
 
@@ -43,7 +44,10 @@ export function setupInteractionManager(scene, camera2D, renderer2D, orbitContro
         camera2D, renderer2D, orbitControls2D,
         selectedObjects, selectionGroup, collisionManager,
         onDragChange: (isDragging) => {
-            if (!isDragging) saveHistoryState();
+            if (!isDragging) {
+                updateWallHoles(scene);
+                saveHistoryState();
+            }
         }
     });
 
@@ -55,7 +59,7 @@ export function setupInteractionManager(scene, camera2D, renderer2D, orbitContro
     // 3. TOOLBAR UI (Tách ra module riêng)
     // ==========================================
     const { updateToolbarUI } = setupToolbarUI({
-        selectedObjects, interactableObjects, collisionManager, setTool, selectObject,
+        scene, selectedObjects, interactableObjects, collisionManager, setTool, selectObject,
         undo, redo, saveHistoryState
     });
 
@@ -142,7 +146,7 @@ export function setupInteractionManager(scene, camera2D, renderer2D, orbitContro
     // 9. PHÍM TẮT & CHUỘT (SMOOTH MOVEMENT - Tách ra module riêng)
     // ==========================================
     setupKeyboardControls({
-        renderer3D, renderer2D, orbitControls3D, camera2D, orbitControls2D, 
+        scene, renderer3D, renderer2D, orbitControls3D, camera2D, orbitControls2D, 
         selectedObjects, interactableObjects, collisionManager,
         setTool, selectObject, undo, redo, saveHistoryState
     });

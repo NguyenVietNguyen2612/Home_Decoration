@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { createModel } from './modelLoader.js';
 import { createRoomGeometry } from './roomGeometry.js';
+import { updateWallHoles } from './doorManager.js';
 
 export function setupDragDrop(scene, camera2D, renderer2D, camera3D, renderer3D, interactionManager, registerPhysicsObject, groundPlane, collisionManager) {
     // 1. Gắn sự kiện lấy thông tin khi người dùng bắt đầu Drag từ thanh Sidebar
@@ -122,6 +123,7 @@ export function setupDragDrop(scene, camera2D, renderer2D, camera3D, renderer3D,
             scene.add(newObject);
             interactionManager.registerInteractableObject(newObject);
             if (typeof registerPhysicsObject === 'function') registerPhysicsObject(newObject);
+            updateWallHoles(scene);
         }
     });
 
@@ -232,6 +234,7 @@ export function setupDragDrop(scene, camera2D, renderer2D, camera3D, renderer3D,
             scene.add(newObject);
             interactionManager.registerInteractableObject(newObject);
             if (typeof registerPhysicsObject === 'function') registerPhysicsObject(newObject);
+            updateWallHoles(scene);
         }
     });
 }

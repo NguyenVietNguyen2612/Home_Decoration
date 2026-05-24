@@ -1,5 +1,7 @@
+import { updateWallHoles } from '../doorManager.js';
+
 export function setupToolbarUI(context) {
-    const { selectedObjects, interactableObjects, collisionManager, setTool, selectObject, undo, redo, saveHistoryState } = context;
+    const { scene, selectedObjects, interactableObjects, collisionManager, setTool, selectObject, undo, redo, saveHistoryState } = context;
 
     const btnTranslate = document.getElementById('btn-translate');
     const btnRotate = document.getElementById('btn-rotate');
@@ -40,6 +42,7 @@ export function setupToolbarUI(context) {
                 if (i > -1) interactableObjects.splice(i, 1);
                 if (collisionManager) collisionManager.unregister(t);
             });
+            updateWallHoles(scene);
             if (saveHistoryState) saveHistoryState();
         }
     });

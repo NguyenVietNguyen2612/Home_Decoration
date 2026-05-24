@@ -1,3 +1,5 @@
+import { updateWallHoles } from '../doorManager.js';
+
 export function setupHistoryManager(context) {
     const { scene, interactableObjects, collisionManager, selectObject, setTool } = context;
 
@@ -69,6 +71,7 @@ export function setupHistoryManager(context) {
         });
 
         if (collisionManager) collisionManager.update();
+        updateWallHoles(scene);
     }
 
     function undo() {

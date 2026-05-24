@@ -6,6 +6,7 @@ import { setupDragDrop } from './modules/dragDrop.js';
 import { setupUIManager } from './modules/uiManager.js';
 import { createModel } from './modules/modelLoader.js';
 import { CollisionManager } from './modules/collisionManager.js';
+import { setupDoorInteractions } from './modules/doorManager.js';
 
 import * as THREE from 'three';
 
@@ -68,6 +69,9 @@ interactionManager.registerInteractableObject(roomGroup, false);
 
 // --- CƠ CHẾ KÉO THẢ TỪ SIDEBAR ---
 setupDragDrop(scene, camera2D, renderer2D, camera3D, renderer3D, interactionManager, registerPhysicsObject, groundPlane, collisionManager);
+
+// --- TƯƠNG TÁC ĐẶC BIỆT CỦA CỬA ---
+setupDoorInteractions(renderer3D, camera3D, scene);
 
 // --- VẬT LÝ NHẸ (Trọng lực) ---
 const physicsObjects = [];
@@ -145,6 +149,10 @@ function updatePhysics() {
             if (mesh.position.y <= landingY) {
                 mesh.position.y = landingY;
                 mesh.userData.velocity.y = 0;
+                
+                physicsObjects.splice(i, 1); // Xóa khỏi danh sách vật lý khi đã nằm yên
+                if (collisionManager) collisionManager.update();
+                if (mesh.userData.isDoor) updateWallHoles(scene);
             }
             
             // Failsafe: nếu vì lý do nào đó object đã lọt xuống dưới sàn → kéo lên ngay
@@ -152,6 +160,11 @@ function updatePhysics() {
                 mesh.position.y = mesh.userData.baseY;
                 mesh.userData.velocity.y = 0;
             }
+        } else {
+            // Object không lơ lửng -> loại khỏi mảng vật lý
+            physicsObjects.splice(i, 1);
+            if (collisionManager) collisionManager.update();
+            if (mesh.userData.isDoor) updateWallHoles(scene);
         }
     }
 }

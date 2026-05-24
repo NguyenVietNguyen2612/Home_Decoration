@@ -97,6 +97,11 @@ export class CollisionManager {
                 continue;
             }
             
+            // Nếu vật di chuyển là CỬA, nó có thể đi xuyên qua tường để tiến hành đục lỗ
+            if (movingObj.userData && movingObj.userData.isDoor && obj.userData && obj.userData.isWall) {
+                continue;
+            }
+            
             const otherBox = new THREE.Box3().setFromObject(obj);
             
             // Thu nhỏ 1mm để chống dính mép khi trượt

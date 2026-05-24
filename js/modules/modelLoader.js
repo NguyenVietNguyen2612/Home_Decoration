@@ -48,20 +48,27 @@ export function loadGLTFModel(url, targetSize = 3.0) {
                 group.position.y = (size.y / 2) + 0.02;
                 
                 group.userData.isInteractable = true;
-                // Lưu baseY cho hàm updatePhysics
-                group.userData.baseY = (size.y / 2) + 0.02;
-                group.userData.velocity = new THREE.Vector3();
+                    // Lưu baseY cho hàm updatePhysics
+                    group.userData.baseY = (size.y / 2) + 0.02;
+                    group.userData.velocity = new THREE.Vector3();
 
-                resolve(group);
-            },
-            undefined,
-            (error) => {
-                console.error(`Lỗi khi tải ${url}:`, error);
-                reject(error);
-            }
-        );
-    });
-}
+                    // Cấu hình đặc biệt nếu là cửa
+                    if (url.includes('door')) {
+                        group.userData.isDoor = true;
+                        group.userData.isOpen = false;
+                        group.userData.isCollidable = false; // Ngăn collision manager làm kẹt cửa với tường khi đục lỗ
+                    }
+
+                    resolve(group);
+                },
+                undefined,
+                (error) => {
+                    console.error(`Lỗi khi tải ${url}:`, error);
+                    reject(error);
+                }
+            );
+        });
+    }
 
 // Hàm tạo các vật thể cơ bản lúc kéo thả (Sau này bạn có thể thay bằng GLTFLoader)
 export async function createModel(type) {
@@ -91,6 +98,8 @@ export async function createModel(type) {
             break;
         case 'sofa':
             return loadGLTFModel('furnitures/sofa_single.glb', 3.0);
+        case 'door_with_frame':
+            return loadGLTFModel('furnitures/doors/door_with_frame.glb', 2.0); // Chiều cao tầm 2m
         case 'tv':
             geometry = new THREE.BoxGeometry(2.5, 1.5, 0.2);
             material = new THREE.MeshStandardMaterial({ color: 0x111111 }); // Đen
