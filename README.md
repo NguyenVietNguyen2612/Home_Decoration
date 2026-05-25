@@ -68,7 +68,13 @@ Home_Decoration/
 3. **Open** `index.html` in a modern web browser (Chrome, Firefox, Safari, Edge)
 4. **No build steps or dependencies** required - runs entirely client-side via CDN
 
-*Note: The application uses Three.js from unpkg CDN, so an internet connection is required for initial load.*
+> If you add new furniture `.glb` files under `furnitures/`, run the manifest generator to update the sidebar automatically:
+>
+> ```bash
+> python scripts/generate_menu_manifest.py
+> ```
+>
+>*Note: The application uses Three.js from unpkg CDN, so an internet connection is required for initial load.*
 
 ## 💻 Technologies Used
 

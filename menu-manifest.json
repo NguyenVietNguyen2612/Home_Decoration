@@ -1,0 +1,102 @@
+{
+  "generatedAt": "2026-05-25T10:45:18.395632Z",
+  "categories": [
+    {
+      "id": "decorations",
+      "label": "Decorations",
+      "icon": "🪴",
+      "items": [
+        {
+          "type": "decorations/flower_vase",
+          "label": "Flower Vase"
+        },
+        {
+          "type": "decorations/flowers_with_the_vase",
+          "label": "Flowers With The Vase"
+        }
+      ]
+    },
+    {
+      "id": "things",
+      "label": "Things",
+      "icon": "🛋️",
+      "items": [
+        {
+          "type": "things/bed",
+          "label": "Bed"
+        },
+        {
+          "type": "things/bed_agape",
+          "label": "Bed Agape"
+        },
+        {
+          "type": "things/center_tables",
+          "label": "Center Tables"
+        },
+        {
+          "type": "things/leather_couch",
+          "label": "Leather Couch"
+        },
+        {
+          "type": "things/sofa_couch",
+          "label": "Sofa Couch"
+        },
+        {
+          "type": "things/sofa_full",
+          "label": "Sofa Full"
+        },
+        {
+          "type": "things/storage_cabinet_furniture",
+          "label": "Storage Cabinet Furniture"
+        }
+      ]
+    },
+    {
+      "id": "doors",
+      "label": "Doors & Windows",
+      "icon": "🚪",
+      "items": [
+        {
+          "type": "doors/door (1)",
+          "label": "Door (1)"
+        },
+        {
+          "type": "doors/door",
+          "label": "Door"
+        },
+        {
+          "type": "doors/door_door_metal",
+          "label": "Door Door Metal"
+        },
+        {
+          "type": "doors/door_with_frame",
+          "label": "Door With Frame"
+        },
+        {
+          "type": "doors/sliding_door",
+          "label": "Sliding Door"
+        },
+        {
+          "type": "doors/window (1)",
+          "label": "Window (1)"
+        },
+        {
+          "type": "doors/window (2)",
+          "label": "Window (2)"
+        },
+        {
+          "type": "doors/window (3)",
+          "label": "Window (3)"
+        },
+        {
+          "type": "doors/window",
+          "label": "Window"
+        },
+        {
+          "type": "doors/window__wodden_4_mb",
+          "label": "Window Wodden 4 Mb"
+        }
+      ]
+    }
+  ]
+}

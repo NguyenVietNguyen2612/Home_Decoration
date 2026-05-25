@@ -72,70 +72,135 @@ export function loadGLTFModel(url, targetSize = 3.0) {
 
 // Hàm tạo các vật thể cơ bản lúc kéo thả (Sau này bạn có thể thay bằng GLTFLoader)
 export async function createModel(type) {
-    let geometry, material;
-    let yOffset = 0; // Độ cao để đưa vật thể nổi hẳn lên trên lưới tọa độ
-
-    // Xử lý động cho bất kỳ model nào nằm trong thư mục doors, things, decorations
-    if (type.startsWith('doors/') || type.startsWith('things/') || type.startsWith('decorations/')) {
-        let targetSize = 2.0; // Mặc định cao 2m
-        
-        if (type.startsWith('decorations/')) targetSize = 0.6;
-        else if (type.startsWith('things/bed')) targetSize = 3.0;
-        else if (type.startsWith('things/')) targetSize = 2.5;
-        
-        return loadGLTFModel(`furnitures/${type}.glb`, targetSize);
+    // Helper: kiểm tra file tồn tại bằng fetch HEAD, fallback sang GET
+    async function fileExists(url, timeout = 3000) {
+        try {
+            const controller = new AbortController();
+            const id = setTimeout(() => controller.abort(), timeout);
+            const res = await fetch(url, { method: 'HEAD', signal: controller.signal });
+            clearTimeout(id);
+            return res.ok;
+        } catch (e) {
+            try {
+                const controller2 = new AbortController();
+                const id2 = setTimeout(() => controller2.abort(), timeout);
+                const res2 = await fetch(url, { method: 'GET', signal: controller2.signal });
+                clearTimeout(id2);
+                return res2.ok;
+            } catch (e2) {
+                return false;
+            }
+        }
     }
 
-    switch (type) {
-        case 'table':
-            geometry = new THREE.BoxGeometry(3, 1.5, 2);
-            material = new THREE.MeshStandardMaterial({ color: 0x8b4513 }); // Màu gỗ
-            yOffset = 0.75;
-            break;
-        case 'chair':
-            geometry = new THREE.BoxGeometry(1, 1.5, 1);
-            material = new THREE.MeshStandardMaterial({ color: 0x444444 }); // Màu xám
-            yOffset = 0.75;
-            break;
-        case 'plant':
-            geometry = new THREE.CylinderGeometry(0.5, 0.3, 1.5);
-            material = new THREE.MeshStandardMaterial({ color: 0x2e8b57 }); // Màu xanh
-            yOffset = 0.75;
-            break;
-        case 'bed':
-            geometry = new THREE.BoxGeometry(3, 0.8, 4);
-            material = new THREE.MeshStandardMaterial({ color: 0x4682b4 }); // Màu xanh biển
-            yOffset = 0.4;
-            break;
-        case 'sofa':
-            return loadGLTFModel('furnitures/sofa_single.glb', 3.0);
-        case 'tv':
-            geometry = new THREE.BoxGeometry(2.5, 1.5, 0.2);
-            material = new THREE.MeshStandardMaterial({ color: 0x111111 }); // Đen
-            yOffset = 1.5;
-            break;
-        case 'cabinet':
-            geometry = new THREE.BoxGeometry(2, 3, 1.5);
-            material = new THREE.MeshStandardMaterial({ color: 0xcd853f }); // Màu gỗ Peru
-            yOffset = 1.5;
-            break;
-        case 'lamp':
-            geometry = new THREE.ConeGeometry(0.5, 2, 8);
-            material = new THREE.MeshStandardMaterial({ color: 0xffd700 }); // Màu vàng
-            yOffset = 1.0;
-            break;
-        default:
-            geometry = new THREE.BoxGeometry(1, 1, 1);
-            material = new THREE.MeshStandardMaterial({ color: 0xffffff });
-            yOffset = 0.5;
+    // Các loại vật thể đơn giản được tạo bằng geometry (giữ như trước)
+    const primitives = new Set(['table', 'chair', 'plant', 'bed', 'tv', 'cabinet', 'lamp']);
+    if (primitives.has(type)) {
+        let geometry, material, yOffset = 0;
+
+        switch (type) {
+            case 'table':
+                geometry = new THREE.BoxGeometry(3, 1.5, 2);
+                material = new THREE.MeshStandardMaterial({ color: 0x8b4513 });
+                yOffset = 0.75;
+                break;
+            case 'chair':
+                geometry = new THREE.BoxGeometry(1, 1.5, 1);
+                material = new THREE.MeshStandardMaterial({ color: 0x444444 });
+                yOffset = 0.75;
+                break;
+            case 'plant':
+                geometry = new THREE.CylinderGeometry(0.5, 0.3, 1.5);
+                material = new THREE.MeshStandardMaterial({ color: 0x2e8b57 });
+                yOffset = 0.75;
+                break;
+            case 'bed':
+                geometry = new THREE.BoxGeometry(3, 0.8, 4);
+                material = new THREE.MeshStandardMaterial({ color: 0x4682b4 });
+                yOffset = 0.4;
+                break;
+            case 'tv':
+                geometry = new THREE.BoxGeometry(2.5, 1.5, 0.2);
+                material = new THREE.MeshStandardMaterial({ color: 0x111111 });
+                yOffset = 1.5;
+                break;
+            case 'cabinet':
+                geometry = new THREE.BoxGeometry(2, 3, 1.5);
+                material = new THREE.MeshStandardMaterial({ color: 0xcd853f });
+                yOffset = 1.5;
+                break;
+            case 'lamp':
+                geometry = new THREE.ConeGeometry(0.5, 2, 8);
+                material = new THREE.MeshStandardMaterial({ color: 0xffd700 });
+                yOffset = 1.0;
+                break;
+        }
+
+        const mesh = new THREE.Mesh(geometry, material);
+        mesh.castShadow = true;
+        mesh.receiveShadow = true;
+        mesh.position.y = yOffset + 0.02;
+
+        mesh.userData.isInteractable = true;
+        mesh.userData.baseY = yOffset + 0.02;
+        mesh.userData.velocity = new THREE.Vector3();
+
+        return mesh;
     }
+
+    // Nếu không phải primitive, thử tìm file GLB tương ứng trong thư mục furnitures
+    const normalizedType = type.trim().replace(/\\/g, '/');
+    const parts = normalizedType.split('/').filter(Boolean);
+    const baseName = parts[parts.length - 1] || normalizedType;
+    const category = parts.length > 1 ? parts[0] : '';
+    const candidates = [];
+
+    function pushCandidate(path) {
+        if (!path) return;
+        candidates.push(path);
+    }
+
+    // Cố gắng tìm file chính xác theo cấu trúc folders/things/decorations
+    if (category === 'doors' || category === 'things' || category === 'decorations') {
+        pushCandidate(`furnitures/${category}/${baseName}.glb`);
+        pushCandidate(`furnitures/${category}/${baseName}_single.glb`);
+        pushCandidate(`furnitures/${category}/${baseName}_1.glb`);
+        pushCandidate(`furnitures/${normalizedType}.glb`);
+    } else {
+        pushCandidate(`furnitures/${normalizedType}.glb`);
+        pushCandidate(`furnitures/${normalizedType}_single.glb`);
+        pushCandidate(`furnitures/${normalizedType}_1.glb`);
+        pushCandidate(`furnitures/${normalizedType}/${baseName}.glb`);
+        pushCandidate(`furnitures/things/${normalizedType}.glb`);
+        pushCandidate(`furnitures/decorations/${normalizedType}.glb`);
+        pushCandidate(`furnitures/doors/${normalizedType}.glb`);
+    }
+
+    const uniqueCandidates = [...new Set(candidates)];
+
+    // Heuristics for targetSize
+    let targetSize = 2.0;
+    if (normalizedType.includes('decorat') || normalizedType.startsWith('decorations')) targetSize = 0.6;
+    if (normalizedType.includes('bed')) targetSize = 3.0;
+    if (normalizedType.includes('sofa')) targetSize = 3.0;
+    if (normalizedType.includes('thing') || normalizedType.startsWith('things')) targetSize = 2.5;
+
+    for (const url of uniqueCandidates) {
+        if (await fileExists(encodeURI(url))) {
+            return loadGLTFModel(encodeURI(url), targetSize);
+        }
+    }
+
+    // Nếu không tìm thấy GLB, trả về mesh placeholder đơn giản
+    const geometry = new THREE.BoxGeometry(1, 1, 1);
+    const material = new THREE.MeshStandardMaterial({ color: 0xffffff });
+    const yOffset = 0.5;
 
     const mesh = new THREE.Mesh(geometry, material);
     mesh.castShadow = true;
     mesh.receiveShadow = true;
-    mesh.position.y = yOffset + 0.02; // Thêm 0.02 để cao hơn nền 1 lớp
-    
-    // Đánh dấu đây là vật thể người dùng có thể tương tác/chỉnh sửa
+    mesh.position.y = yOffset + 0.02;
+
     mesh.userData.isInteractable = true;
     mesh.userData.baseY = yOffset + 0.02;
     mesh.userData.velocity = new THREE.Vector3();

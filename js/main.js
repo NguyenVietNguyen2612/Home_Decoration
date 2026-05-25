@@ -5,6 +5,7 @@ import { setupInteractionManager } from './modules/interactionManager.js';
 import { setupDragDrop } from './modules/dragDrop.js';
 import { setupUIManager } from './modules/uiManager.js';
 import { createModel } from './modules/modelLoader.js';
+import { buildFurnitureMenu } from './modules/menuBuilder.js';
 import { CollisionManager } from './modules/collisionManager.js';
 import { setupDoorInteractions } from './modules/doorManager.js';
 import { generateThumbnails } from './modules/thumbnailGenerator.js';
@@ -72,6 +73,7 @@ const interactionManager = setupInteractionManager(
 interactionManager.registerInteractableObject(roomGroup, false, false);
 
 // --- CƠ CHẾ KÉO THẢ TỪ SIDEBAR ---
+await buildFurnitureMenu();
 setupDragDrop(scene, camera2D, renderer2D, camera3D, renderer3D, interactionManager, registerPhysicsObject, groundPlane, collisionManager);
 
 // --- NÚT TẠO LẠI PHÒNG (NẾU LỠ XÓA) ---
