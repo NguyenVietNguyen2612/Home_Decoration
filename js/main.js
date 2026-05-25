@@ -10,6 +10,9 @@ import { setupDoorInteractions } from './modules/doorManager.js';
 import { generateThumbnails } from './modules/thumbnailGenerator.js';
 
 import * as THREE from 'three';
+import { GLTFExporter } from 'three/addons/exporters/GLTFExporter.js';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { applyBackground } from './modules/dragDrop.js';
 
 // --- KHỞI TẠO UI ---
 setupUIManager();
@@ -88,45 +91,120 @@ if (btnNewRoom) {
     });
 }
 
-// --- NÚT LƯU BẢN THIẾT KẾ ---
+// --- NÚT LƯU BẢN THIẾT KẾ (.GLB) ---
 const btnSave = document.getElementById('btn-save');
 if (btnSave) {
     btnSave.addEventListener('click', () => {
-        const designName = prompt('Nhập tên cho bản thiết kế này (ví dụ: Phòng ngủ của tôi):', 'My Dream Room');
+        const designName = prompt('Nhập tên cho file thiết kế (không cần đuôi .glb):', 'My_Dream_Room');
         if (!designName) return;
 
-        const designData = {
-            id: Date.now().toString(),
-            name: designName,
-            date: new Date().toISOString(),
-            backgroundType: scene.userData.backgroundType || 'bg_solid',
-            furnitures: []
-        };
+        const exporter = new GLTFExporter();
+        
+        // Nhóm tất cả các object vào một group để xuất khẩu
+        const exportGroup = new THREE.Group();
+        exportGroup.name = "export_scene";
+        exportGroup.userData.backgroundType = scene.userData.backgroundType || 'bg_solid';
 
-        // Thu thập thông tin các nội thất đang có trên scene
         interactionManager.interactableObjects.forEach(obj => {
-            if (obj.name !== 'room' && obj.userData && obj.userData.type) {
-                designData.furnitures.push({
-                    type: obj.userData.type,
-                    position: { x: obj.position.x, y: obj.position.y, z: obj.position.z },
-                    rotation: { x: obj.rotation.x, y: obj.rotation.y, z: obj.rotation.z },
-                    scale: { x: obj.scale.x, y: obj.scale.y, z: obj.scale.z }
-                });
-            }
+            const clone = obj.clone(true);
+            clone.userData = JSON.parse(JSON.stringify(obj.userData));
+            exportGroup.add(clone);
         });
 
-        // Lưu vào localStorage
-        let savedDesigns = [];
-        try {
-            const saved = localStorage.getItem('home_decoration_designs');
-            if (saved) savedDesigns = JSON.parse(saved);
-        } catch (e) {}
-
-        savedDesigns.push(designData);
-        localStorage.setItem('home_decoration_designs', JSON.stringify(savedDesigns));
-
-        alert(`Đã lưu bản thiết kế "${designName}" thành công! \n(Dữ liệu được lưu trong LocalStorage để dùng cho trang chủ sau này)`);
+        exporter.parse(
+            exportGroup,
+            function (gltf) {
+                const blob = new Blob([gltf], { type: 'application/octet-stream' });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.style.display = 'none';
+                link.href = url;
+                link.download = designName + '.glb';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
+            },
+            function (error) {
+                console.error('Lỗi khi xuất GLTF:', error);
+                alert('Có lỗi xảy ra khi lưu file!');
+            },
+            { binary: true }
+        );
     });
+}
+
+// --- XỬ LÝ TẢI FILE (.GLB) ---
+function processGLBFile(file) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const contents = e.target.result;
+        const loader = new GLTFLoader();
+        loader.parse(contents, '', function(gltf) {
+            const loadedGroup = gltf.scene.children[0] || gltf.scene;
+
+            // Xóa các object hiện tại
+            const targets = [...interactionManager.interactableObjects];
+            targets.forEach(t => {
+                if (t.parent) t.parent.remove(t);
+                const i = interactionManager.interactableObjects.indexOf(t);
+                if (i > -1) interactionManager.interactableObjects.splice(i, 1);
+                if (collisionManager) collisionManager.unregister(t);
+            });
+
+            // Phục hồi background nếu có
+            if (loadedGroup.userData && loadedGroup.userData.backgroundType) {
+                applyBackground(scene, loadedGroup.userData.backgroundType);
+            }
+
+            // Load object mới
+            const children = [...loadedGroup.children];
+            children.forEach(child => {
+                scene.add(child);
+                // Đăng ký tương tác nhưng không tự động focus
+                interactionManager.registerInteractableObject(child, child.userData.isCollidable !== false, false);
+                if (typeof registerPhysicsObject === 'function') registerPhysicsObject(child);
+            });
+        }, function (error) {
+            console.error('Lỗi khi parse file .glb:', error);
+            alert('File không hợp lệ hoặc bị lỗi!');
+        });
+    };
+    reader.readAsArrayBuffer(file);
+}
+
+const fileLoaderInput = document.getElementById('file-loader');
+if (fileLoaderInput) {
+    fileLoaderInput.addEventListener('change', (event) => {
+        const file = event.target.files[0];
+        if (!file) return;
+        processGLBFile(file);
+        fileLoaderInput.value = ''; // Reset
+    });
+}
+
+// Kiểm tra xem có cần tự động tải file từ IndexedDB không (từ trang upload chuyển sang)
+const urlParams = new URLSearchParams(window.location.search);
+if (urlParams.get('action') === 'loadFromDB') {
+    const request = indexedDB.open('RoomDecoDB', 1);
+    request.onsuccess = function(e) {
+        const db = e.target.result;
+        if (!db.objectStoreNames.contains('files')) return;
+        const tx = db.transaction('files', 'readonly');
+        const store = tx.objectStore('files');
+        const getReq = store.get('projectGLB');
+        
+        getReq.onsuccess = function() {
+            if (getReq.result) {
+                processGLBFile(getReq.result);
+                // Dọn URL để tránh reload lại tự parse tiếp
+                window.history.replaceState({}, document.title, window.location.pathname);
+            }
+        };
+    };
+    request.onerror = function() {
+        console.error('Không thể truy cập IndexedDB');
+    };
 }
 // --- TƯƠNG TÁC ĐẶC BIỆT CỦA CỬA ---
 setupDoorInteractions(renderer3D, camera3D, scene);

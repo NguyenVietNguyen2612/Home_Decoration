@@ -8,10 +8,30 @@ export function setupUIManager() {
 
     if (searchInput) {
         searchInput.addEventListener('input', (e) => {
-            const searchTerm = e.target.value.toLowerCase();
+            const searchTerm = e.target.value.toLowerCase().trim();
+            
+            // Nếu xóa hết chữ, tự động đóng lại tất cả các danh mục
+            if (searchTerm.length === 0) {
+                const allDetails = sidebarContent.querySelectorAll('details');
+                allDetails.forEach(detail => detail.removeAttribute('open'));
+            }
+
             items.forEach(item => {
-                const name = item.querySelector('span').innerText.toLowerCase();
-                item.style.display = name.includes(searchTerm) ? 'block' : 'none';
+                const name = item.querySelector('span').textContent.toLowerCase();
+                if (name.includes(searchTerm)) {
+                    item.style.display = ''; // Khôi phục style mặc định (tránh lỗi layout do dùng 'block')
+                    
+                    // Nếu đang tìm kiếm, tự động bung mở (open) các thẻ details chứa item này
+                    if (searchTerm.length > 0) {
+                        let parent = item.closest('details');
+                        while (parent) {
+                            parent.setAttribute('open', 'true');
+                            parent = parent.parentElement.closest('details');
+                        }
+                    }
+                } else {
+                    item.style.display = 'none';
+                }
             });
         });
     }

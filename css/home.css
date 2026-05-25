@@ -264,3 +264,86 @@ body {
     padding: 20px 0;
     font-style: italic;
 }
+
+/* --- LIGHT MODE OVERRIDES --- */
+body.light-mode {
+    background: linear-gradient(45deg, #e2e8f0, #f8fafc, #cbd5e1, #f8fafc);
+    color: #1e293b;
+}
+
+body.light-mode .home-container, 
+body.light-mode .upload-container {
+    background: rgba(255, 255, 255, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1);
+}
+
+body.light-mode .home-container h1, 
+body.light-mode .upload-container h1 {
+    background: linear-gradient(to right, #6366f1, #ec4899);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+body.light-mode .home-container p, 
+body.light-mode .upload-container p {
+    color: #475569;
+}
+
+body.light-mode .menu-btn {
+    background: rgba(255, 255, 255, 0.8);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    color: #334155;
+}
+
+body.light-mode .menu-btn:hover {
+    background: rgba(255, 255, 255, 1);
+    border-color: rgba(0, 0, 0, 0.2);
+}
+
+body.light-mode .menu-btn.primary {
+    background: linear-gradient(135deg, #6366f1, #a855f7);
+    color: white;
+}
+
+body.light-mode .modal-content {
+    background: #f8fafc;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+body.light-mode .modal-header h2 {
+    color: #1e293b;
+}
+
+body.light-mode .project-item {
+    background: rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+body.light-mode .project-info h3 {
+    color: #1e293b;
+}
+
+body.light-mode .project-info p {
+    color: #64748b;
+}
+
+body.light-mode .close-btn {
+    color: #475569;
+}
+
+body.light-mode .drop-zone {
+    background: rgba(0, 0, 0, 0.02);
+    border-color: rgba(0, 0, 0, 0.15);
+}
+
+body.light-mode .drop-zone .text {
+    color: #1e293b;
+}
+
+body.light-mode .btn-back {
+    color: #475569;
+}
+body.light-mode .btn-back:hover {
+    color: #1e293b;
+}

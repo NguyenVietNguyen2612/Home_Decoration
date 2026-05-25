@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Room Decoration - Upload Project</title>
+    <link rel="stylesheet" href="css/home.css">
+    <style>
+        .upload-container {
+            position: relative;
+            z-index: 10;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 50px 60px;
+            text-align: center;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            max-width: 500px;
+            width: 90%;
+            animation: slideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .upload-container h1 {
+            font-size: 2.2rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+            color: #f8fafc;
+        }
+
+        .upload-container p {
+            font-size: 1rem;
+            color: #cbd5e1;
+            margin-bottom: 30px;
+        }
+
+        .drop-zone {
+            border: 2px dashed rgba(255, 255, 255, 0.3);
+            border-radius: 16px;
+            padding: 40px 20px;
+            background: rgba(255, 255, 255, 0.02);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            margin-bottom: 20px;
+        }
+
+        .drop-zone:hover, .drop-zone.dragover {
+            background: rgba(99, 102, 241, 0.1);
+            border-color: #6366f1;
+            transform: translateY(-2px);
+        }
+
+        .drop-zone .icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .drop-zone .text {
+            color: #f8fafc;
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .drop-zone .sub-text {
+            color: #94a3b8;
+            font-size: 0.9rem;
+        }
+
+        .btn-back {
+            display: inline-block;
+            margin-top: 15px;
+            color: #94a3b8;
+            text-decoration: none;
+            font-size: 1rem;
+            transition: color 0.3s;
+        }
+
+        .btn-back:hover {
+            color: #f8fafc;
+        }
+
+        #file-input {
+            display: none;
+        }
+
+        /* Loading Spinner */
+        .loading {
+            display: none;
+            color: #6366f1;
+            font-weight: 600;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+
+    <div class="upload-container">
+        <h1 data-i18n="upload_title">Tải lên bản thiết kế</h1>
+        <p data-i18n="upload_desc">Chọn file .glb dự án của bạn để tiếp tục chỉnh sửa</p>
+        
+        <div class="drop-zone" id="drop-zone">
+            <span class="icon">📁</span>
+            <div class="text" data-i18n="upload_drop">Kéo thả file .glb vào đây</div>
+            <div class="sub-text" data-i18n="upload_or">hoặc click để chọn file</div>
+            <input type="file" id="file-input" accept=".glb">
+        </div>
+
+        <div class="loading" id="loading" data-i18n="upload_loading">Đang tải dữ liệu...</div>
+
+        <a href="index.html" class="btn-back" data-i18n="upload_back">← Quay lại trang chủ</a>
+    </div>
+
+    <script src="js/i18n.js"></script>
+    <script>
+        // Apply theme on load
+        if (localStorage.getItem('app_theme') === 'light') {
+            document.body.classList.add('light-mode');
+        }
+
+        const dropZone = document.getElementById('drop-zone');
+        const fileInput = document.getElementById('file-input');
+        const loading = document.getElementById('loading');
+
+        // Click to open file dialog
+        dropZone.addEventListener('click', () => {
+            fileInput.click();
+        });
+
+        // Drag and drop events
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('dragover');
+        });
+
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.classList.remove('dragover');
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('dragover');
+            if (e.dataTransfer.files.length) {
+                handleFile(e.dataTransfer.files[0]);
+            }
+        });
+
+        // File input change event
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length) {
+                handleFile(e.target.files[0]);
+            }
+        });
+
+        function handleFile(file) {
+            if (!file.name.toLowerCase().endsWith('.glb')) {
+                alert('Vui lòng chọn file định dạng .glb');
+                return;
+            }
+
+            // Show loading
+            dropZone.style.display = 'none';
+            loading.style.display = 'block';
+
+            // Store file in IndexedDB
+            const request = indexedDB.open('RoomDecoDB', 1);
+
+            request.onupgradeneeded = function(e) {
+                const db = e.target.result;
+                if (!db.objectStoreNames.contains('files')) {
+                    db.createObjectStore('files');
+                }
+            };
+
+            request.onsuccess = function(e) {
+                const db = e.target.result;
+                const tx = db.transaction('files', 'readwrite');
+                const store = tx.objectStore('files');
+                
+                // Put the file into DB
+                store.put(file, 'projectGLB');
+
+                tx.oncomplete = function() {
+                    // Navigate to editor with load action
+                    window.location.href = 'editor.html?action=loadFromDB';
+                };
+                
+                tx.onerror = function() {
+                    alert('Đã xảy ra lỗi khi lưu file vào trình duyệt.');
+                    dropZone.style.display = 'block';
+                    loading.style.display = 'none';
+                };
+            };
+
+            request.onerror = function(e) {
+                alert('Trình duyệt của bạn không hỗ trợ IndexedDB.');
+                dropZone.style.display = 'block';
+                loading.style.display = 'none';
+            };
+        }
+    </script>
+</body>
+</html>

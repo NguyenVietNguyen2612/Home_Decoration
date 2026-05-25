@@ -75,10 +75,15 @@ export async function createModel(type) {
     let geometry, material;
     let yOffset = 0; // Độ cao để đưa vật thể nổi hẳn lên trên lưới tọa độ
 
-    // Xử lý động cho bất kỳ model cửa nào nằm trong thư mục doors
-    if (type.startsWith('doors/')) {
-        const fileName = type.replace('doors/', '');
-        return loadGLTFModel(`furnitures/doors/${fileName}.glb`, 2.0); // Chiều cao tầm 2m
+    // Xử lý động cho bất kỳ model nào nằm trong thư mục doors, things, decorations
+    if (type.startsWith('doors/') || type.startsWith('things/') || type.startsWith('decorations/')) {
+        let targetSize = 2.0; // Mặc định cao 2m
+        
+        if (type.startsWith('decorations/')) targetSize = 0.6;
+        else if (type.startsWith('things/bed')) targetSize = 3.0;
+        else if (type.startsWith('things/')) targetSize = 2.5;
+        
+        return loadGLTFModel(`furnitures/${type}.glb`, targetSize);
     }
 
     switch (type) {

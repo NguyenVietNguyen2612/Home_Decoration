@@ -13,98 +13,115 @@
     <div class="orb orb-3"></div>
 
     <div class="home-container">
-        <h1>Room Decoration</h1>
-        <p>Design your dream space in stunning 3D. Create, explore, and visualize your ideas with ease.</p>
+        <h1 data-i18n="home_title">Room Decoration</h1>
+        <p data-i18n="home_desc">Design your dream space in stunning 3D. Create, explore, and visualize your ideas with ease.</p>
         
         <div class="menu-grid">
             <button class="menu-btn primary" onclick="window.location.href='editor.html'">
                 <span class="btn-icon">✨</span>
-                Dự án mới
+                <span data-i18n="btn_new">Dự án mới</span>
             </button>
-            <button class="menu-btn" onclick="openSavedProjects()">
+            <button class="menu-btn" onclick="window.location.href='upload.html'">
                 <span class="btn-icon">📁</span>
-                Dự án sẵn có
+                <span data-i18n="btn_saved">Dự án sẵn có</span>
             </button>
-            <button class="menu-btn" onclick="alert('Tính năng Cài đặt đang được phát triển.')">
+            <button class="menu-btn" onclick="openSettings()">
                 <span class="btn-icon">⚙️</span>
-                Cài đặt
+                <span data-i18n="btn_settings">Cài đặt</span>
             </button>
-            <button class="menu-btn" onclick="alert('Tính năng Ngôn ngữ đang được phát triển.')">
+            <button class="menu-btn" onclick="openLanguage()">
                 <span class="btn-icon">🌐</span>
-                Ngôn ngữ
+                <span data-i18n="btn_lang">Ngôn ngữ</span>
             </button>
         </div>
     </div>
 
-    <!-- Saved Projects Modal -->
-    <div class="modal-overlay" id="projects-modal">
+    <!-- Settings Modal -->
+    <div class="modal-overlay" id="settings-modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2>Bản thiết kế đã lưu</h2>
-                <button class="close-btn" onclick="closeSavedProjects()">✕</button>
+                <h2 data-i18n="modal_settings">⚙️ Cài đặt giao diện</h2>
+                <button class="close-btn" onclick="closeSettings()">✕</button>
             </div>
-            <div class="project-list" id="project-list-container">
-                <!-- Danh sách sẽ được tải qua JS -->
+            <div style="display: flex; gap: 15px; margin-top: 20px;">
+                <button class="menu-btn" style="flex: 1; padding: 15px;" onclick="setTheme('light')">
+                    <span style="font-size: 1.5rem;">☀️</span> <span data-i18n="btn_light">Sáng</span>
+                </button>
+                <button class="menu-btn" style="flex: 1; padding: 15px;" onclick="setTheme('dark')">
+                    <span style="font-size: 1.5rem;">🌙</span> <span data-i18n="btn_dark">Tối</span>
+                </button>
             </div>
         </div>
     </div>
 
+    <!-- Language Modal -->
+    <div class="modal-overlay" id="lang-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 data-i18n="modal_lang">🌐 Chọn ngôn ngữ</h2>
+                <button class="close-btn" onclick="closeLanguage()">✕</button>
+            </div>
+            <div style="display: flex; gap: 15px; margin-top: 20px;">
+                <button class="menu-btn" style="flex: 1; padding: 15px;" onclick="changeLang('vi')">
+                    <span style="font-size: 1.5rem;">🇻🇳</span> <span data-i18n="lang_vi">Tiếng Việt</span>
+                </button>
+                <button class="menu-btn" style="flex: 1; padding: 15px;" onclick="changeLang('en')">
+                    <span style="font-size: 1.5rem;">🇬🇧</span> <span data-i18n="lang_en">Tiếng Anh</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/i18n.js"></script>
     <script>
-        function openSavedProjects() {
-            const modal = document.getElementById('projects-modal');
-            const container = document.getElementById('project-list-container');
-            
-            // Clear current list
-            container.innerHTML = '';
-            
-            try {
-                const saved = localStorage.getItem('home_decoration_designs');
-                if (saved) {
-                    const designs = JSON.parse(saved);
-                    if (designs.length > 0) {
-                        // Reverse to show newest first
-                        designs.reverse().forEach(design => {
-                            const date = new Date(design.date).toLocaleDateString('vi-VN', {
-                                year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
-                            });
-                            
-                            const item = document.createElement('div');
-                            item.className = 'project-item';
-                            item.innerHTML = `
-                                <div class="project-info">
-                                    <h3>${design.name}</h3>
-                                    <p>${date} • ${design.furnitures.length} objects</p>
-                                </div>
-                                <span style="color: #6366f1; font-size: 1.2rem;">➔</span>
-                            `;
-                            // Khi click vào project, mở editor (Trong tương lai có thể truyền id qua URL: editor.html?id=...)
-                            item.onclick = () => {
-                                // Tạm thời cứ chuyển hướng sang editor, tính năng load cụ thể sẽ được code sau
-                                window.location.href = 'editor.html';
-                            };
-                            container.appendChild(item);
-                        });
-                    } else {
-                        container.innerHTML = '<p class="no-projects">Bạn chưa lưu bản thiết kế nào.</p>';
-                    }
-                } else {
-                    container.innerHTML = '<p class="no-projects">Bạn chưa lưu bản thiết kế nào.</p>';
-                }
-            } catch (e) {
-                container.innerHTML = '<p class="no-projects">Lỗi khi tải dữ liệu.</p>';
-            }
-            
-            modal.classList.add('active');
+        // Apply theme on load
+        if (localStorage.getItem('app_theme') === 'light') {
+            document.body.classList.add('light-mode');
         }
 
-        function closeSavedProjects() {
-            document.getElementById('projects-modal').classList.remove('active');
+        function openSettings() {
+            document.getElementById('settings-modal').classList.add('active');
+        }
+
+        function closeSettings() {
+            document.getElementById('settings-modal').classList.remove('active');
+        }
+
+        function setTheme(theme) {
+            if (theme === 'light') {
+                document.body.classList.add('light-mode');
+                localStorage.setItem('app_theme', 'light');
+            } else {
+                document.body.classList.remove('light-mode');
+                localStorage.setItem('app_theme', 'dark');
+            }
+            closeSettings();
+        }
+
+        function openLanguage() {
+            document.getElementById('lang-modal').classList.add('active');
+        }
+
+        function closeLanguage() {
+            document.getElementById('lang-modal').classList.remove('active');
+        }
+
+        function changeLang(lang) {
+            if(window.setLanguage) {
+                window.setLanguage(lang);
+            }
+            closeLanguage();
         }
 
         // Đóng modal khi bấm ra ngoài
-        document.getElementById('projects-modal').addEventListener('click', (e) => {
-            if (e.target === document.getElementById('projects-modal')) {
-                closeSavedProjects();
+        document.getElementById('settings-modal').addEventListener('click', (e) => {
+            if (e.target === document.getElementById('settings-modal')) {
+                closeSettings();
+            }
+        });
+        document.getElementById('lang-modal').addEventListener('click', (e) => {
+            if (e.target === document.getElementById('lang-modal')) {
+                closeLanguage();
             }
         });
     </script>

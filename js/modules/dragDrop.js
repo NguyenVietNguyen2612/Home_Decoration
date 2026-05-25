@@ -3,7 +3,7 @@ import { createModel } from './modelLoader.js';
 import { createRoomGeometry } from './roomGeometry.js';
 import { updateWallHoles } from './doorManager.js';
 
-function applyBackground(scene, type) {
+export function applyBackground(scene, type) {
     scene.userData.backgroundType = type;
     const ambientLight = scene.getObjectByName('ambientLight');
     const dirLight = scene.getObjectByName('dirLight');

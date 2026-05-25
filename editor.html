@@ -22,16 +22,21 @@
     <div id="app-container">
         <!-- Panel Trái: Thư viện Objects -->
         <div id="left-sidebar">
+            <div style="padding: 15px 15px 0 15px;">
+                <button class="tool-btn primary" style="width: 100%;" onclick="window.location.href='index.html'" data-i18n="btn_back_home">
+                    🏠 Về trang chủ
+                </button>
+            </div>
             <div class="search-box">
-                <input type="text" id="search-input" placeholder="Search objects...">
+                <input type="text" id="search-input" placeholder="Search objects..." data-i18n="editor_search">
             </div>
             <div id="sidebar-content" class="sidebar-scrollable">
 
                 <details class="category-details">
-                    <summary class="category-header">🛋️ Furnitures</summary>
+                    <summary class="category-header" data-i18n="cat_furnitures">🛋️ Furnitures</summary>
                     <div style="margin-left: 10px;">
                         <details class="category-details">
-                            <summary class="category-header">🪴 Decorations</summary>
+                            <summary class="category-header" data-i18n="cat_decorations">🪴 Decorations</summary>
                             <div class="object-grid" id="decorations-grid">
                                 <div class="object-item" data-type="decorations/flower_vase" draggable="true">
                                     <img src="https://via.placeholder.com/60?text=Vase" alt="Flower Vase"
@@ -47,7 +52,7 @@
                         </details>
 
                         <details class="category-details">
-                            <summary class="category-header">🛋️ Things</summary>
+                            <summary class="category-header" data-i18n="cat_things">🛋️ Things</summary>
                             <div class="object-grid" id="things-grid">
                                 <div class="object-item" data-type="things/bed" draggable="true">
                                     <img src="https://via.placeholder.com/60?text=Bed" alt="Bed" draggable="false">
@@ -72,7 +77,7 @@
                         </details>
 
                         <details class="category-details">
-                            <summary class="category-header">🚪 Doors & Windows</summary>
+                            <summary class="category-header" data-i18n="cat_doors">🚪 Doors & Windows</summary>
                             <div class="object-grid" id="doors-grid">
                                 <div class="object-item" data-type="doors/door" draggable="true">
                                     <img src="https://via.placeholder.com/60?text=Door" alt="Door" draggable="false">
@@ -128,7 +133,7 @@
                 </details>
 
                 <details class="category-details">
-                    <summary class="category-header">🏠 Wallpapers</summary>
+                    <summary class="category-header" data-i18n="cat_wallpapers">🏠 Wallpapers</summary>
                     <div class="object-grid" id="rooms-grid">
                         <div class="object-item" data-type="wall_wallpaper_floral" draggable="true">
                             <img src="rooms/wallpaper_floral.png" alt="Floral Wallpaper" draggable="false">
@@ -154,7 +159,7 @@
                 </details>
 
                 <details class="category-details">
-                    <summary class="category-header">🌿 Floor</summary>
+                    <summary class="category-header" data-i18n="cat_floors">🌿 Floor</summary>
                     <div class="object-grid" id="ground-grid">
                         <div class="object-item" data-type="ground_wood" draggable="true">
                             <img src="grounds/wood.png" alt="Wood Floor" draggable="false">
@@ -192,7 +197,7 @@
                 </details>
 
                 <details class="category-details">
-                    <summary class="category-header">🌌 Background</summary>
+                    <summary class="category-header" data-i18n="cat_bg">🌌 Background</summary>
                     <div class="object-grid" id="background-grid">
                         <div class="object-item" data-type="bg_solid" draggable="true">
                             <img src="data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2260%22%20height%3D%2260%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Crect%20width%3D%2260%22%20height%3D%2260%22%20fill%3D%22%23dddddd%22%2F%3E%3Ctext%20x%3D%2250%25%22%20y%3D%2250%25%22%20dominant-baseline%3D%22middle%22%20text-anchor%3D%22middle%22%20font-family%3D%22sans-serif%22%20font-size%3D%2212%22%20fill%3D%22%23000000%22%3ESolid%3C%2Ftext%3E%3C%2Fsvg%3E"
@@ -223,7 +228,7 @@
         <!-- Vùng chính giữa và bên phải: Views -->
         <div id="main-views">
             <div id="view-2d-container">
-                <div class="view-title">2D Top-down View</div>
+                <div class="view-title" data-i18n="view_2d">2D Top-down View</div>
                 <div id="view-2d"></div>
             </div>
 
@@ -233,33 +238,33 @@
             </div>
 
             <div id="view-3d-container">
-                <div class="view-title">3D Preview</div>
+                <div class="view-title" data-i18n="view_3d">3D Preview</div>
                 <div id="view-3d"></div>
             </div>
         </div>
 
         <!-- Dưới cùng: Toolbar cho các phép biến đổi -->
         <div id="bottom-toolbar">
-            <button class="tool-btn" id="btn-translate" title="Move Object">⬌ Move</button>
-            <button class="tool-btn" id="btn-rotate" title="Rotate Object">↻ Rotate</button>
-            <button class="tool-btn" id="btn-scale" title="Scale Object">⤡ Scale</button>
+            <button class="tool-btn" id="btn-translate" title="Move Object" data-i18n="tool_move">⬌ Move</button>
+            <button class="tool-btn" id="btn-rotate" title="Rotate Object" data-i18n="tool_rotate">↻ Rotate</button>
+            <button class="tool-btn" id="btn-scale" title="Scale Object" data-i18n="tool_scale">⤡ Scale</button>
             <div class="divider"></div>
-            <button class="tool-btn" id="btn-undo" title="Undo (Ctrl+Z)">↩ Undo</button>
-            <button class="tool-btn" id="btn-redo" title="Redo (Ctrl+Y)">↪ Redo</button>
+            <button class="tool-btn" id="btn-undo" title="Undo (Ctrl+Z)" data-i18n="tool_undo">↩ Undo</button>
+            <button class="tool-btn" id="btn-redo" title="Redo (Ctrl+Y)" data-i18n="tool_redo">↪ Redo</button>
             <div class="divider"></div>
             <div class="grid-controls"
                 style="display: flex; align-items: center; gap: 8px; margin-left: 10px; margin-right: 10px;">
-                <label style="font-size: 13px; font-weight: 600;">Nền:</label>
+                <label style="font-size: 13px; font-weight: 600;" data-i18n="lbl_bg">Nền:</label>
                 <input type="number" id="grid-size" value="100" min="10" max="500" step="10" title="Kích thước nền"
                     style="width: 55px; height: 26px; border: 1px solid #ccc; border-radius: 4px; padding: 2px;">
                 <input type="color" id="grid-color" value="#888888" title="Màu nền"
                     style="padding: 0; cursor: pointer; border: 1px solid #ccc; border-radius: 4px; background: transparent; width: 30px; height: 26px;">
             </div>
             <div class="divider"></div>
-            <button class="tool-btn" id="btn-save" title="Lưu bản thiết kế">💾 Save</button>
-            <button class="tool-btn" id="btn-new-room" title="Create a New Room">🏠 New Room</button>
-            <button class="tool-btn" id="btn-delete" title="Delete Object">❌ Delete</button>
-            <button class="tool-btn" id="btn-help" title="Help">ℹ️ Help</button>
+            <button class="tool-btn" id="btn-save" title="Lưu bản thiết kế" data-i18n="tool_save">💾 Save</button>
+            <button class="tool-btn" id="btn-new-room" title="Create a New Room" data-i18n="tool_newroom">🏠 New Room</button>
+            <button class="tool-btn" id="btn-delete" title="Delete Object" data-i18n="tool_delete">❌ Delete</button>
+            <button class="tool-btn" id="btn-help" title="Help" data-i18n="tool_help">ℹ️ Help</button>
         </div>
     </div>
 
@@ -288,6 +293,15 @@
         </div>
     </div>
 
+    <input type="file" id="file-loader" accept=".glb" style="display: none;">
+
+    <script src="js/i18n.js"></script>
+    <script>
+        // Áp dụng giao diện tối nếu người dùng đã thiết lập
+        if (localStorage.getItem('app_theme') === 'dark') {
+            document.body.classList.add('dark-mode');
+        }
+    </script>
     <!-- Nhúng file main.js -->
     <script type="module" src="js/main.js"></script>
 </body>
