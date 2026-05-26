@@ -214,6 +214,81 @@ setupDoorInteractions(renderer3D, camera3D, scene);
 // --- TẠO ẢNH PREVIEW TỰ ĐỘNG CHO SIDEBAR ---
 generateThumbnails(renderer3D);
 
+// --- CHẾ ĐỘ XEM TRƯỚC (PREVIEW MODE FULLSCREEN) ---
+const cinematicOverlay = document.getElementById('cinematic-overlay');
+const btnClosePreview = document.getElementById('btn-close-preview');
+const cinematicContainer = document.getElementById('cinematic-container');
+let isPreviewing = false;
+let previewProgress = 0;
+
+// Setup Renderer & Camera riêng để không ảnh hưởng editor
+const cinematicRenderer = new THREE.WebGLRenderer({ antialias: true });
+cinematicRenderer.shadowMap.enabled = true;
+cinematicRenderer.setPixelRatio(window.devicePixelRatio);
+const cinematicCamera = new THREE.PerspectiveCamera(45, 1, 0.1, 500);
+if (cinematicContainer) {
+    cinematicContainer.appendChild(cinematicRenderer.domElement);
+}
+
+// Đường dẫn camera (Nhiều vị trí)
+const cameraPath = new THREE.CatmullRomCurve3([
+    new THREE.Vector3( 25, 15,  25), // Góc cao
+    new THREE.Vector3(-20,  5,  20), // Góc thấp
+    new THREE.Vector3(-25, 10, -25), // Góc vừa
+    new THREE.Vector3( 20,  5, -20), // Góc thấp đối diện
+    new THREE.Vector3( 28,  2,  28), // Góc siêu thấp từ sát vách tường
+    new THREE.Vector3(  0, 25,   0), // Từ trên trần nhìn xuống
+    new THREE.Vector3( 25, 15,  25)  // Vòng lặp
+]);
+cameraPath.closed = true;
+
+// Đường dẫn mục tiêu nhìn
+const lookAtPath = new THREE.CatmullRomCurve3([
+    new THREE.Vector3( 0,  3,  0),
+    new THREE.Vector3( 5,  3, -5),
+    new THREE.Vector3( 0,  1,  0),
+    new THREE.Vector3(-5,  3,  5),
+    new THREE.Vector3(-5,  5, -5), // Nhìn chéo xuyên phòng
+    new THREE.Vector3( 0,  1,  0),
+    new THREE.Vector3( 0,  3,  0)
+]);
+lookAtPath.closed = true;
+
+window.addEventListener('resize', () => {
+    if (isPreviewing && cinematicContainer) {
+        const w = window.innerWidth;
+        const h = window.innerHeight;
+        cinematicCamera.aspect = w / h;
+        cinematicCamera.updateProjectionMatrix();
+        cinematicRenderer.setSize(w, h);
+    }
+});
+
+const btnPreview = document.getElementById('btn-preview');
+if (btnPreview) {
+    btnPreview.addEventListener('click', () => {
+        isPreviewing = true;
+        cinematicOverlay.classList.remove('hidden');
+        cinematicOverlay.style.display = 'block';
+        
+        const w = window.innerWidth;
+        const h = window.innerHeight;
+        cinematicCamera.aspect = w / h;
+        cinematicCamera.updateProjectionMatrix();
+        cinematicRenderer.setSize(w, h);
+        
+        previewProgress = 0;
+    });
+}
+
+if (btnClosePreview) {
+    btnClosePreview.addEventListener('click', () => {
+        isPreviewing = false;
+        cinematicOverlay.classList.add('hidden');
+        cinematicOverlay.style.display = 'none';
+    });
+}
+
 // --- VẬT LÝ NHẸ (Trọng lực) ---
 const physicsObjects = [];
 const gravity = -0.02;
@@ -320,6 +395,19 @@ function animate() {
 
     controls2D.update();
     controls3D.update();
+
+    if (isPreviewing) {
+        previewProgress += 0.0015; // Tốc độ di chuyển dọc curve
+        if (previewProgress > 1) previewProgress -= 1;
+        
+        const camPos = cameraPath.getPointAt(previewProgress);
+        const lookPos = lookAtPath.getPointAt(previewProgress);
+        
+        cinematicCamera.position.copy(camPos);
+        cinematicCamera.lookAt(lookPos);
+        
+        cinematicRenderer.render(scene, cinematicCamera);
+    }
 
     updatePhysics();
 

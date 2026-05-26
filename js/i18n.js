@@ -39,11 +39,13 @@ const translations = {
         'tool_undo': '↩ Hoàn tác',
         'tool_redo': '↪ Làm lại',
         'tool_save': '💾 Lưu',
+        'tool_preview': '🎥 Xem trước',
         'tool_newroom': '✨ Phòng mới',
         'tool_delete': '❌ Xóa',
         'tool_help': 'ℹ️ Hướng dẫn',
         'lbl_bg': 'Nền:',
-        'btn_back_home': '🏠 Về trang chủ'
+        'btn_back_home': '🏠 Về trang chủ',
+        'btn_close_preview': '✕ Đóng Preview'
     },
     'en': {
         // index.html
@@ -85,11 +87,13 @@ const translations = {
         'tool_undo': '↩ Undo',
         'tool_redo': '↪ Redo',
         'tool_save': '💾 Save',
+        'tool_preview': '🎥 Preview',
         'tool_newroom': '🏠 New Room',
         'tool_delete': '❌ Delete',
         'tool_help': 'ℹ️ Help',
         'lbl_bg': 'Bg:',
-        'btn_back_home': '🏠 Back to Home'
+        'btn_back_home': '🏠 Back to Home',
+        'btn_close_preview': '✕ Close Preview'
     }
 };
 
