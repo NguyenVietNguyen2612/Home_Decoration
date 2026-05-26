@@ -39,33 +39,12 @@ export function setupUIManager() {
     // ======================================================
     // 2. TOOLBAR ACTIVE STATE
     // ======================================================
-    const toolBtns  = document.querySelectorAll('.tool-btn');
     const btnHelp   = document.getElementById('btn-help');
     const helpPanel = document.getElementById('help-panel');
     const helpClose = document.getElementById('help-close-btn');
 
-    function setActiveBtn(activeId) {
-        toolBtns.forEach(btn => {
-            if (btn.id !== 'btn-delete' && btn.id !== 'btn-help') {
-                if (btn.id === activeId) {
-                    btn.style.background = '#007bff';
-                    btn.style.color = 'white';
-                } else {
-                    btn.style.background = '#f8f9fa';
-                    btn.style.color = '#333';
-                }
-            }
-        });
-    }
-
-    document.getElementById('btn-translate').addEventListener('click', () => setActiveBtn('btn-translate'));
-    document.getElementById('btn-rotate').addEventListener('click', () => setActiveBtn('btn-rotate'));
-    document.getElementById('btn-scale').addEventListener('click', () => setActiveBtn('btn-scale'));
-
     if (btnHelp)   btnHelp.addEventListener('click',  () => { if (helpPanel) helpPanel.style.display = 'flex'; });
     if (helpClose) helpClose.addEventListener('click', () => { if (helpPanel) helpPanel.style.display = 'none'; });
-
-    setActiveBtn('');
 
     // ======================================================
     // 3. RESIZE HANDLES – kéo để thay đổi kích thước panels

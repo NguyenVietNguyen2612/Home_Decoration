@@ -18,7 +18,7 @@
     </script>
 </head>
 
-<body>
+<body class="dark-mode">
     <div id="app-container">
         <!-- Panel Trái: Thư viện Objects -->
         <div id="left-sidebar">
@@ -40,7 +40,7 @@
                 </details>
 
                 <details class="category-details">
-                    <summary class="category-header" data-i18n="cat_wallpapers">🏠 Wallpapers</summary>
+                    <summary class="category-header" data-i18n="cat_wallpapers">🎨 Wallpapers</summary>
                     <div class="object-grid" id="rooms-grid">
                         <div class="object-item" data-type="wall_wallpaper_floral" draggable="true">
                             <img src="rooms/wallpaper_floral.png" alt="Floral Wallpaper" draggable="false">
@@ -147,6 +147,34 @@
             <div id="view-3d-container">
                 <div class="view-title" data-i18n="view_3d">3D Preview</div>
                 <div id="view-3d"></div>
+                <!-- Bảng thuộc tính (Properties Panel) -->
+                <div id="properties-panel" class="hidden">
+                    <div class="prop-header">Thông số vật thể</div>
+                    <div class="prop-section">
+                        <label>Vị trí</label>
+                        <div class="prop-row">
+                            <div class="prop-input-wrapper"><span>X</span><input type="number" id="prop-pos-x" step="0.1"></div>
+                            <div class="prop-input-wrapper"><span>Y</span><input type="number" id="prop-pos-y" step="0.1"></div>
+                            <div class="prop-input-wrapper"><span>Z</span><input type="number" id="prop-pos-z" step="0.1"></div>
+                        </div>
+                    </div>
+                    <div class="prop-section">
+                        <label>Góc xoay</label>
+                        <div class="prop-row">
+                            <div class="prop-input-wrapper"><span>X</span><input type="number" id="prop-rot-x" step="1"></div>
+                            <div class="prop-input-wrapper"><span>Y</span><input type="number" id="prop-rot-y" step="1"></div>
+                            <div class="prop-input-wrapper"><span>Z</span><input type="number" id="prop-rot-z" step="1"></div>
+                        </div>
+                    </div>
+                    <div class="prop-section">
+                        <label>Kích thước</label>
+                        <div class="prop-row">
+                            <div class="prop-input-wrapper"><span>X</span><input type="number" id="prop-scale-x" step="0.1" min="0.01"></div>
+                            <div class="prop-input-wrapper"><span>Y</span><input type="number" id="prop-scale-y" step="0.1" min="0.01"></div>
+                            <div class="prop-input-wrapper"><span>Z</span><input type="number" id="prop-scale-z" step="0.1" min="0.01"></div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -169,7 +197,7 @@
             </div>
             <div class="divider"></div>
             <button class="tool-btn" id="btn-save" title="Lưu bản thiết kế" data-i18n="tool_save">💾 Save</button>
-            <button class="tool-btn" id="btn-new-room" title="Create a New Room" data-i18n="tool_newroom">🏠 New Room</button>
+            <button class="tool-btn" id="btn-new-room" title="Create a New Room" data-i18n="tool_newroom">✨ New Room</button>
             <button class="tool-btn" id="btn-delete" title="Delete Object" data-i18n="tool_delete">❌ Delete</button>
             <button class="tool-btn" id="btn-help" title="Help" data-i18n="tool_help">ℹ️ Help</button>
         </div>
@@ -203,12 +231,6 @@
     <input type="file" id="file-loader" accept=".glb" style="display: none;">
 
     <script src="js/i18n.js"></script>
-    <script>
-        // Áp dụng giao diện tối nếu người dùng đã thiết lập
-        if (localStorage.getItem('app_theme') === 'dark') {
-            document.body.classList.add('dark-mode');
-        }
-    </script>
     <!-- Nhúng file main.js -->
     <script type="module" src="js/main.js"></script>
 </body>

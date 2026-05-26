@@ -117,6 +117,8 @@ export function setupGizmos(context) {
             collisionManager.hideAll();
             _saveState(t);
         }
+        
+        if (context.onChange) context.onChange();
     }
 
     let _isGizmoDragging = false;

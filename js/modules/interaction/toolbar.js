@@ -15,10 +15,10 @@ export function setupToolbarUI(context) {
         for (const [key, btn] of Object.entries(map)) {
             if (!btn) continue;
             const active = key === currentTool;
-            btn.style.backgroundColor = active ? '#b8daff' : '';
-            btn.style.borderColor = active ? '#0056b3' : '';
-            btn.style.color = active ? '#004085' : '';
-            btn.style.fontWeight = active ? 'bold' : 'normal';
+            btn.style.backgroundColor = active ? 'rgba(99, 102, 241, 0.2)' : '';
+            btn.style.borderColor = active ? '#6366f1' : '';
+            btn.style.color = active ? '#ffffff' : '';
+            btn.style.fontWeight = active ? 'bold' : '';
         }
     }
 

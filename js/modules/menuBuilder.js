@@ -24,7 +24,7 @@ export async function buildFurnitureMenu() {
         for (const category of categories) {
             const details = document.createElement('details');
             details.className = 'category-details';
-            if (category.open !== false) details.open = true;
+            if (category.open === true) details.open = true;
 
             const summary = document.createElement('summary');
             summary.className = 'category-header';

@@ -7,6 +7,7 @@ import { setupToolbarUI } from './interaction/toolbar.js';
 import { setupSelectionUtils } from './interaction/selectionUtils.js';
 import { setupHistoryManager } from './interaction/history.js';
 import { updateWallHoles } from './doorManager.js';
+import { setupPropertiesPanel } from './interaction/propertiesPanel.js';
 
 export function setupInteractionManager(scene, camera2D, renderer2D, orbitControls2D, camera3D, renderer3D, orbitControls3D, collisionManager = null) {
 
@@ -48,6 +49,9 @@ export function setupInteractionManager(scene, camera2D, renderer2D, orbitContro
                 updateWallHoles(scene);
                 saveHistoryState();
             }
+        },
+        onChange: () => {
+            if (updatePropertiesPanel) updatePropertiesPanel();
         }
     });
 
@@ -61,6 +65,21 @@ export function setupInteractionManager(scene, camera2D, renderer2D, orbitContro
     const { updateToolbarUI } = setupToolbarUI({
         scene, selectedObjects, interactableObjects, collisionManager, setTool, selectObject,
         undo, redo, saveHistoryState
+    });
+
+    // ==========================================
+    // 3.5 PROPERTIES PANEL
+    // ==========================================
+    const { updatePropertiesPanel } = setupPropertiesPanel({
+        scene, selectedObjects, saveHistoryState, updateWallHoles,
+        onPropertyChange: () => {
+            // When values change via panel, we need to update the gizmo attachments if active
+            const currentTransform3D = transformControl3D.object;
+            if (currentTransform3D) {
+                // transformControl3D and 2D will automatically read new pos/rot/scale of the object in their next render cycle
+                // Just let them detach/attach if needed, or simply let the render loop handle it.
+            }
+        }
     });
 
     // ==========================================
@@ -110,6 +129,7 @@ export function setupInteractionManager(scene, camera2D, renderer2D, orbitContro
         saveState();
 
         attachGizmo();
+        updatePropertiesPanel();
     }
 
     // ==========================================

@@ -28,9 +28,9 @@ const translations = {
         'cat_decorations': '🪴 Trang trí',
         'cat_things': '🛋️ Vật dụng',
         'cat_doors': '🚪 Cửa & Cửa sổ',
-        'cat_wallpapers': '🏠 Giấy dán tường',
+        'cat_wallpapers': '🎨 Giấy dán tường',
         'cat_floors': '🌿 Sàn nhà',
-        'cat_bg': '🌌 Nền',
+        'cat_bg': '🌌 Phong cảnh',
         'view_2d': 'Góc nhìn 2D (Từ trên xuống)',
         'view_3d': 'Xem trước 3D',
         'tool_move': '⬌ Di chuyển',
@@ -39,7 +39,7 @@ const translations = {
         'tool_undo': '↩ Hoàn tác',
         'tool_redo': '↪ Làm lại',
         'tool_save': '💾 Lưu',
-        'tool_newroom': '🏠 Phòng mới',
+        'tool_newroom': '✨ Phòng mới',
         'tool_delete': '❌ Xóa',
         'tool_help': 'ℹ️ Hướng dẫn',
         'lbl_bg': 'Nền:',
@@ -93,13 +93,8 @@ const translations = {
     }
 };
 
-window.setLanguage = function(lang) {
-    localStorage.setItem('app_lang', lang);
-    applyLanguage();
-}
-
-window.applyLanguage = function() {
-    const lang = localStorage.getItem('app_lang') || 'vi';
+window.applyLanguage = function () {
+    const lang = 'vi';
     const dict = translations[lang];
     if (!dict) return;
 
