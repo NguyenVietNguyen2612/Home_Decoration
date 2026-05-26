@@ -132,16 +132,13 @@ export function setupDualScene() {
     scene.environment = null;
 
     const groundGeo = new THREE.PlaneGeometry(100, 100);
-    const groundMat = new THREE.MeshStandardMaterial({ 
+    const groundMat = new THREE.MeshBasicMaterial({ 
         color: 0x888888, 
-        roughness: 1, 
-        metalness: 0,
         side: THREE.DoubleSide
     });
     const groundPlane = new THREE.Mesh(groundGeo, groundMat);
     groundPlane.rotation.x = -Math.PI / 2;
     groundPlane.position.y = -0.01;
-    groundPlane.receiveShadow = true;
     scene.add(groundPlane);
 
     // ======================================

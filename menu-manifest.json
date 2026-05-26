@@ -2,6 +2,17 @@
   "generatedAt": "2026-05-25T10:45:18.395632Z",
   "categories": [
     {
+      "id": "light",
+      "label": "Lights",
+      "icon": "💡",
+      "items": [
+        {
+          "type": "light/titanic_lamp",
+          "label": "Titanic Lamp"
+        }
+      ]
+    },
+    {
       "id": "decorations",
       "label": "Decorations",
       "icon": "🪴",

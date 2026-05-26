@@ -32,7 +32,7 @@ const translations = {
         'cat_floors': '🌿 Sàn nhà',
         'cat_bg': '🌌 Phong cảnh',
         'view_2d': 'Góc nhìn 2D (Từ trên xuống)',
-        'view_3d': 'Xem trước 3D',
+        'view_3d': 'Góc nhìn 3D',
         'tool_move': '⬌ Di chuyển',
         'tool_rotate': '↻ Xoay',
         'tool_scale': '⤡ Kích thước',

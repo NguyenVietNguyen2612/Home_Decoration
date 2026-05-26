@@ -1,5 +1,5 @@
 import { setupDualScene } from './modules/sceneSetup.js';
-import { setupLighting } from './modules/lighting.js';
+import { setupLighting, updateTimeOfDay } from './modules/lighting.js';
 import { createRoomGeometry } from './modules/roomGeometry.js';
 import { setupInteractionManager } from './modules/interactionManager.js';
 import { setupDragDrop } from './modules/dragDrop.js';
@@ -50,6 +50,20 @@ if (inputGridSize && inputGridColor) {
 
 // --- ÁNH SÁNG & BÓNG ĐỔ ---
 setupLighting(scene);
+const timeSlider = document.getElementById('time-slider');
+const timeDisplay = document.getElementById('time-display');
+if (timeSlider && timeDisplay) {
+    timeSlider.value = 12;
+    updateTimeOfDay(scene, 12);
+    timeSlider.addEventListener('input', (e) => {
+        const val = parseFloat(e.target.value);
+        updateTimeOfDay(scene, val);
+        // Tính toán hiển thị (VD: 12.5 -> 12:30)
+        const hours = Math.floor(val);
+        const minutes = Math.floor((val - hours) * 60);
+        timeDisplay.textContent = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+    });
+}
 
 // --- VẼ PHÒNG ---
 const { roomGroup, walls } = createRoomGeometry('room_basic');

@@ -59,6 +59,19 @@ export function loadGLTFModel(url, targetSize = 3.0) {
                         group.userData.isCollidable = false; // Ngăn collision manager làm kẹt cửa với tường khi đục lỗ
                     }
 
+                    // Tự động gắn đèn phát sáng nếu model nằm trong thư mục light hoặc tên có chữ lamp
+                    if (url.includes('/light/') || url.includes('lamp')) {
+                        const bulbLight = new THREE.PointLight(0xfff5e6, 1.5, 12);
+                        // Đặt bóng đèn lơ lửng ngay phía trên tâm của vật thể một chút
+                        bulbLight.position.set(0, size.y / 2 + 0.1, 0);
+                        bulbLight.castShadow = true;
+                        bulbLight.shadow.bias = -0.002;
+                        group.add(bulbLight);
+                        
+                        // Lưu cờ để sau này có thể thêm tính năng tắt/bật đèn
+                        group.userData.isLightFixture = true;
+                    }
+
                     resolve(group);
                 },
                 undefined,
@@ -145,6 +158,15 @@ export async function createModel(type) {
         mesh.userData.baseY = yOffset + 0.02;
         mesh.userData.velocity = new THREE.Vector3();
 
+        if (type === 'lamp') {
+            const bulbLight = new THREE.PointLight(0xfff5e6, 1.5, 10);
+            bulbLight.position.set(0, 1.0, 0);
+            bulbLight.castShadow = true;
+            bulbLight.shadow.bias = -0.002;
+            mesh.add(bulbLight);
+            mesh.userData.isLightFixture = true;
+        }
+
         return mesh;
     }
 
@@ -160,8 +182,8 @@ export async function createModel(type) {
         candidates.push(path);
     }
 
-    // Cố gắng tìm file chính xác theo cấu trúc folders/things/decorations
-    if (category === 'doors' || category === 'things' || category === 'decorations') {
+    // Cố gắng tìm file chính xác theo cấu trúc folders
+    if (category === 'doors' || category === 'things' || category === 'decorations' || category === 'light') {
         pushCandidate(`furnitures/${category}/${baseName}.glb`);
         pushCandidate(`furnitures/${category}/${baseName}_single.glb`);
         pushCandidate(`furnitures/${category}/${baseName}_1.glb`);
@@ -174,6 +196,7 @@ export async function createModel(type) {
         pushCandidate(`furnitures/things/${normalizedType}.glb`);
         pushCandidate(`furnitures/decorations/${normalizedType}.glb`);
         pushCandidate(`furnitures/doors/${normalizedType}.glb`);
+        pushCandidate(`furnitures/light/${normalizedType}.glb`);
     }
 
     const uniqueCandidates = [...new Set(candidates)];
