@@ -14,6 +14,7 @@ import * as THREE from 'three';
 import { GLTFExporter } from 'three/addons/exporters/GLTFExporter.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { applyBackground } from './modules/dragDrop.js';
+import { CustomModal } from './modal.js';
 
 // --- KHỞI TẠO UI ---
 setupUIManager();
@@ -96,7 +97,7 @@ if (btnNewRoom) {
     btnNewRoom.addEventListener('click', () => {
         let existingRoom = scene.getObjectByName('room');
         if (existingRoom) {
-            alert('Căn phòng vẫn đang tồn tại. Bạn chỉ cần tạo mới khi lỡ tay xóa mất phòng thôi nhé!');
+            CustomModal.alert('Căn phòng vẫn đang tồn tại. Bạn chỉ cần tạo mới khi lỡ tay xóa mất phòng thôi nhé!');
             return;
         }
 
@@ -110,8 +111,8 @@ if (btnNewRoom) {
 // --- NÚT LƯU BẢN THIẾT KẾ (.GLB) ---
 const btnSave = document.getElementById('btn-save');
 if (btnSave) {
-    btnSave.addEventListener('click', () => {
-        const designName = prompt('Nhập tên cho file thiết kế (không cần đuôi .glb):', 'My_Dream_Room');
+    btnSave.addEventListener('click', async () => {
+        const designName = await CustomModal.prompt('Nhập tên cho file thiết kế (không cần đuôi .glb):', 'My_Dream_Room');
         if (!designName) return;
 
         const exporter = new GLTFExporter();
@@ -131,6 +132,8 @@ if (btnSave) {
             exportGroup,
             function (gltf) {
                 const blob = new Blob([gltf], { type: 'application/octet-stream' });
+                
+                // 1. Tải file về máy
                 const url = URL.createObjectURL(blob);
                 const link = document.createElement('a');
                 link.style.display = 'none';
@@ -140,10 +143,40 @@ if (btnSave) {
                 link.click();
                 document.body.removeChild(link);
                 URL.revokeObjectURL(url);
+
+                // 2. Lưu vào Danh sách dự án gần đây (Recent Projects)
+                const projectId = 'proj_' + Date.now();
+                const projectMeta = {
+                    id: projectId,
+                    name: designName,
+                    date: new Date().toLocaleString('vi-VN')
+                };
+
+                let recentProjects = JSON.parse(localStorage.getItem('recentProjects') || '[]');
+                recentProjects.unshift(projectMeta);
+                if (recentProjects.length > 5) recentProjects.pop(); // Giữ tối đa 5 dự án gần nhất
+                localStorage.setItem('recentProjects', JSON.stringify(recentProjects));
+
+                // 3. Lưu dữ liệu GLB vào IndexedDB
+                const request = indexedDB.open('RoomDecoDB', 1);
+                request.onupgradeneeded = function(e) {
+                    const db = e.target.result;
+                    if (!db.objectStoreNames.contains('files')) {
+                        db.createObjectStore('files');
+                    }
+                };
+                request.onsuccess = function(e) {
+                    const db = e.target.result;
+                    const tx = db.transaction('files', 'readwrite');
+                    const store = tx.objectStore('files');
+                    store.put(blob, projectId);
+                    // Cập nhật luôn projectGLB hiện tại để lần sau load vào lại đúng file này
+                    store.put(blob, 'projectGLB'); 
+                };
             },
             function (error) {
                 console.error('Lỗi khi xuất GLTF:', error);
-                alert('Có lỗi xảy ra khi lưu file!');
+                CustomModal.alert('Có lỗi xảy ra khi lưu file!');
             },
             { binary: true }
         );
@@ -183,7 +216,7 @@ function processGLBFile(file) {
             });
         }, function (error) {
             console.error('Lỗi khi parse file .glb:', error);
-            alert('File không hợp lệ hoặc bị lỗi!');
+            CustomModal.alert('File không hợp lệ hoặc bị lỗi!');
         });
     };
     reader.readAsArrayBuffer(file);

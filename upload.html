@@ -93,6 +93,78 @@
             font-weight: 600;
             margin-top: 20px;
         }
+
+        /* Recent Projects */
+        .recent-section {
+            margin-top: 30px;
+            text-align: left;
+            display: none;
+            animation: slideUp 0.5s ease forwards;
+        }
+        .recent-section h3 {
+            color: #f8fafc;
+            font-size: 1.1rem;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .recent-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-height: 200px;
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+        .recent-list::-webkit-scrollbar {
+            width: 6px;
+        }
+        .recent-list::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+        }
+        .recent-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.03);
+            padding: 12px 16px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.2s;
+        }
+        .recent-item:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+        .recent-info {
+            display: flex;
+            flex-direction: column;
+        }
+        .recent-name {
+            color: #f8fafc;
+            font-weight: 600;
+            font-size: 1rem;
+        }
+        .recent-date {
+            color: #94a3b8;
+            font-size: 0.8rem;
+            margin-top: 4px;
+        }
+        .btn-open-recent {
+            background: #6366f1;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: background 0.2s;
+        }
+        .btn-open-recent:hover {
+            background: #4f46e5;
+        }
     </style>
 </head>
 <body>
@@ -113,10 +185,18 @@
 
         <div class="loading" id="loading" data-i18n="upload_loading">Đang tải dữ liệu...</div>
 
+        <div class="recent-section" id="recent-section">
+            <h3 data-i18n="upload_recent">Dự án gần đây</h3>
+            <div class="recent-list" id="recent-list">
+                <!-- Recent items will be injected here -->
+            </div>
+        </div>
+
         <a href="index.html" class="btn-back" data-i18n="upload_back">← Quay lại trang chủ</a>
     </div>
 
     <script src="js/i18n.js"></script>
+    <script src="js/modal.js" type="module"></script>
     <script>
         const dropZone = document.getElementById('drop-zone');
         const fileInput = document.getElementById('file-input');
@@ -154,7 +234,7 @@
 
         function handleFile(file) {
             if (!file.name.toLowerCase().endsWith('.glb')) {
-                alert('Vui lòng chọn file định dạng .glb');
+                CustomModal.alert('Vui lòng chọn file định dạng .glb');
                 return;
             }
 
@@ -186,18 +266,85 @@
                 };
                 
                 tx.onerror = function() {
-                    alert('Đã xảy ra lỗi khi lưu file vào trình duyệt.');
+                    CustomModal.alert('Đã xảy ra lỗi khi lưu file vào trình duyệt.');
                     dropZone.style.display = 'block';
                     loading.style.display = 'none';
                 };
             };
 
             request.onerror = function(e) {
-                alert('Trình duyệt của bạn không hỗ trợ IndexedDB.');
+                CustomModal.alert('Trình duyệt của bạn không hỗ trợ IndexedDB.');
                 dropZone.style.display = 'block';
                 loading.style.display = 'none';
             };
         }
+
+        // Load recent projects from localStorage
+        function loadRecentProjects() {
+            const recentProjects = JSON.parse(localStorage.getItem('recentProjects') || '[]');
+            const section = document.getElementById('recent-section');
+            const list = document.getElementById('recent-list');
+            
+            if (recentProjects.length > 0) {
+                section.style.display = 'block';
+                list.innerHTML = '';
+                
+                recentProjects.forEach(proj => {
+                    const item = document.createElement('div');
+                    item.className = 'recent-item';
+                    item.innerHTML = `
+                        <div class="recent-info">
+                            <div class="recent-name">${proj.name}</div>
+                            <div class="recent-date">${proj.date}</div>
+                        </div>
+                        <button class="btn-open-recent" onclick="openRecent('${proj.id}')" data-i18n="upload_open_recent">Mở</button>
+                    `;
+                    list.appendChild(item);
+                });
+            }
+        }
+
+        window.openRecent = function(projectId) {
+            dropZone.style.display = 'none';
+            document.getElementById('recent-section').style.display = 'none';
+            loading.style.display = 'block';
+
+            const request = indexedDB.open('RoomDecoDB', 1);
+            
+            request.onupgradeneeded = function(e) {
+                const db = e.target.result;
+                if (!db.objectStoreNames.contains('files')) {
+                    db.createObjectStore('files');
+                }
+            };
+
+            request.onsuccess = function(e) {
+                const db = e.target.result;
+                const tx = db.transaction('files', 'readonly');
+                const store = tx.objectStore('files');
+                const getReq = store.get(projectId);
+                
+                getReq.onsuccess = function() {
+                    if (getReq.result) {
+                        // Put it into 'projectGLB' so editor can load it easily
+                        const txWrite = db.transaction('files', 'readwrite');
+                        const storeWrite = txWrite.objectStore('files');
+                        storeWrite.put(getReq.result, 'projectGLB');
+                        
+                        txWrite.oncomplete = function() {
+                            window.location.href = 'editor.html?action=loadFromDB';
+                        };
+                    } else {
+                        CustomModal.alert('Không tìm thấy dữ liệu dự án! Có thể file đã bị xóa trong bộ nhớ tạm.').then(() => {
+                            location.reload();
+                        });
+                    }
+                };
+            };
+        };
+
+        // Initialize
+        loadRecentProjects();
     </script>
 </body>
 </html>

@@ -1,0 +1,107 @@
+/* modal.css */
+.custom-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    z-index: 100000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+.custom-modal-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.custom-modal {
+    background: #1e293b;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    padding: 24px;
+    width: 90%;
+    max-width: 400px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    transform: translateY(20px);
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    color: #f8fafc;
+    font-family: inherit;
+}
+
+.custom-modal-overlay.active .custom-modal {
+    transform: translateY(0);
+}
+
+.custom-modal-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+    color: #f8fafc;
+}
+
+.custom-modal-message {
+    font-size: 1rem;
+    color: #cbd5e1;
+    margin-bottom: 20px;
+    line-height: 1.5;
+}
+
+.custom-modal-input {
+    width: 100%;
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    padding: 10px 14px;
+    color: #f8fafc;
+    font-size: 1rem;
+    margin-bottom: 20px;
+    outline: none;
+    transition: border-color 0.2s;
+    box-sizing: border-box;
+}
+
+.custom-modal-input:focus {
+    border-color: #6366f1;
+}
+
+.custom-modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+}
+
+.custom-modal-btn {
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s;
+}
+
+.custom-modal-btn-cancel {
+    background: rgba(255, 255, 255, 0.1);
+    color: #f8fafc;
+}
+
+.custom-modal-btn-cancel:hover {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.custom-modal-btn-confirm {
+    background: #6366f1;
+    color: white;
+}
+
+.custom-modal-btn-confirm:hover {
+    background: #4f46e5;
+}

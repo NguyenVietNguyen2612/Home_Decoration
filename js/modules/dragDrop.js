@@ -92,11 +92,9 @@ export function setupDragDrop(scene, camera2D, renderer2D, camera3D, renderer3D,
         const objectType = e.dataTransfer.getData('objectType');
         if (!objectType) return;
 
-        // -- XỬ LÝ BACKGROUND -- (Không cần raycast điểm rơi)
-        if (objectType.startsWith('bg_')) {
-            applyBackground(scene, objectType);
-            return;
-        }
+        // -- XỬ LÝ BACKGROUND -- (Không còn, đã thay bằng Dynamic Sky)
+        // Nếu vẫn còn sót bg_ thì bỏ qua
+        if (objectType.startsWith('bg_')) return;
 
         // Tính tọa độ điểm drop của chuột trên màn hình 2D
         const rect = container2D.getBoundingClientRect();
@@ -186,7 +184,55 @@ export function setupDragDrop(scene, camera2D, renderer2D, camera3D, renderer3D,
                 return;
             }
 
+            // -- XỬ LÝ VẬT LIỆU CHO NỘI THẤT (MATERIAL) --
+            if (objectType.startsWith('mat_')) {
+                const intersects = raycaster.intersectObjects(scene.children, true);
+                if (intersects.length > 0) {
+                    const firstHit = intersects[0].object;
+                    // Bỏ qua nếu thả vào tường hoặc nền nhà
+                    if (firstHit.userData && (firstHit.userData.isWall || firstHit.name === 'roomFloor' || firstHit.name === 'shadowPlane')) {
+                        return; // Chưa làm áp texture cho tường, nền ở đây
+                    }
+                    
+                    const textureType = objectType.replace('mat_', '');
+                    let textureName = textureType;
+                    if (textureType === 'fabric') textureName = 'sand'; // Dùng tạm sand làm fabric
+                    
+                    const textureLoader = new THREE.TextureLoader();
+                    const texture = textureLoader.load(`grounds/${textureName}.png`);
+                    texture.wrapS = THREE.RepeatWrapping;
+                    texture.wrapT = THREE.RepeatWrapping;
+                    texture.repeat.set(2, 2);
+                    texture.colorSpace = THREE.SRGBColorSpace;
+                    
+                    let roughness = 0.8;
+                    let metalness = 0;
+                    switch(textureType) {
+                        case 'marble': roughness = 0.1; break;
+                        case 'wood': roughness = 0.6; break;
+                        case 'concrete': roughness = 0.8; break;
+                        case 'fabric': roughness = 0.9; break;
+                    }
 
+                    // Tự động gán cho toàn bộ group cha nếu click trúng một mesh con
+                    let rootObj = firstHit;
+                    while (rootObj.parent && rootObj.parent.name !== 'room' && rootObj.parent.type === 'Group') {
+                        rootObj = rootObj.parent;
+                    }
+                    
+                    rootObj.traverse(child => {
+                        if (child.isMesh && child.material) {
+                            child.material = child.material.clone();
+                            child.material.map = texture;
+                            child.material.color.set(0xffffff); // Đặt lại màu gốc
+                            child.material.roughness = roughness;
+                            child.material.metalness = metalness;
+                            child.material.needsUpdate = true;
+                        }
+                    });
+                }
+                return;
+            }
 
             // -- XỬ LÝ NỘI THẤT --
             const newObject = await createModel(objectType);
@@ -211,11 +257,8 @@ export function setupDragDrop(scene, camera2D, renderer2D, camera3D, renderer3D,
         const objectType = e.dataTransfer.getData('objectType');
         if (!objectType) return;
 
-        // -- XỬ LÝ BACKGROUND -- (Không cần raycast điểm rơi)
-        if (objectType.startsWith('bg_')) {
-            applyBackground(scene, objectType);
-            return;
-        }
+        // -- XỬ LÝ BACKGROUND -- (Đã thay bằng Dynamic Sky)
+        if (objectType.startsWith('bg_')) return;
 
         const rect = container3D.getBoundingClientRect();
         const mouseX = ((e.clientX - rect.left) / rect.width) * 2 - 1;
@@ -299,7 +342,53 @@ export function setupDragDrop(scene, camera2D, renderer2D, camera3D, renderer3D,
                 return;
             }
 
+            // -- XỬ LÝ VẬT LIỆU CHO NỘI THẤT (MATERIAL) --
+            if (objectType.startsWith('mat_')) {
+                const intersects = raycaster.intersectObjects(scene.children, true);
+                if (intersects.length > 0) {
+                    const firstHit = intersects[0].object;
+                    if (firstHit.userData && (firstHit.userData.isWall || firstHit.name === 'roomFloor' || firstHit.name === 'shadowPlane')) {
+                        return; 
+                    }
+                    
+                    const textureType = objectType.replace('mat_', '');
+                    let textureName = textureType;
+                    if (textureType === 'fabric') textureName = 'sand';
+                    
+                    const textureLoader = new THREE.TextureLoader();
+                    const texture = textureLoader.load(`grounds/${textureName}.png`);
+                    texture.wrapS = THREE.RepeatWrapping;
+                    texture.wrapT = THREE.RepeatWrapping;
+                    texture.repeat.set(2, 2);
+                    texture.colorSpace = THREE.SRGBColorSpace;
+                    
+                    let roughness = 0.8;
+                    let metalness = 0;
+                    switch(textureType) {
+                        case 'marble': roughness = 0.1; break;
+                        case 'wood': roughness = 0.6; break;
+                        case 'concrete': roughness = 0.8; break;
+                        case 'fabric': roughness = 0.9; break;
+                    }
 
+                    let rootObj = firstHit;
+                    while (rootObj.parent && rootObj.parent.name !== 'room' && rootObj.parent.type === 'Group') {
+                        rootObj = rootObj.parent;
+                    }
+                    
+                    rootObj.traverse(child => {
+                        if (child.isMesh && child.material) {
+                            child.material = child.material.clone();
+                            child.material.map = texture;
+                            child.material.color.set(0xffffff);
+                            child.material.roughness = roughness;
+                            child.material.metalness = metalness;
+                            child.material.needsUpdate = true;
+                        }
+                    });
+                }
+                return;
+            }
 
             // -- XỬ LÝ NỘI THẤT --
             const newObject = await createModel(objectType);

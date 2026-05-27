@@ -11,10 +11,21 @@ export function setupPropertiesPanel(context) {
         rotX: document.getElementById('prop-rot-x'),
         rotY: document.getElementById('prop-rot-y'),
         rotZ: document.getElementById('prop-rot-z'),
+        rotZ: document.getElementById('prop-rot-z'),
         scaleX: document.getElementById('prop-scale-x'),
         scaleY: document.getElementById('prop-scale-y'),
         scaleZ: document.getElementById('prop-scale-z')
     };
+    
+    const propContent = document.getElementById('prop-content');
+    const toggleBtn = document.getElementById('btn-toggle-props');
+    if (toggleBtn && propContent) {
+        toggleBtn.addEventListener('click', () => {
+            const isHidden = propContent.style.display === 'none';
+            propContent.style.display = isHidden ? 'block' : 'none';
+            toggleBtn.textContent = isHidden ? '▼' : '▲';
+        });
+    }
 
     if (!panel) return { updatePropertiesPanel: () => {} };
 
