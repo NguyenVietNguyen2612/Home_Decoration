@@ -55,10 +55,11 @@ export function setupLighting(scene) {
     dirLight.shadow.mapSize.width = 2048; 
     dirLight.shadow.mapSize.height = 2048;
     dirLight.shadow.camera.near = 0.5;
-    dirLight.shadow.camera.far = 50;
+    dirLight.shadow.camera.far = 100; // Tăng tầm nhìn bóng đổ
+    dirLight.shadow.bias = -0.0005; // Giảm lỗi shadow acne (cặn đen viền)
     
     // Vùng ảnh hưởng của bóng đổ
-    const d = 10;
+    const d = 15; // Tăng vùng bao phủ bóng đổ (do mặt trời có thể di chuyển ra xa 30)
     dirLight.shadow.camera.left = -d;
     dirLight.shadow.camera.right = d;
     dirLight.shadow.camera.top = d;

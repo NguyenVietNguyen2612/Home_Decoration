@@ -53,10 +53,24 @@ export function loadGLTFModel(url, targetSize = 3.0) {
                     group.userData.velocity = new THREE.Vector3();
 
                     // Cấu hình đặc biệt nếu là cửa
-                    if (url.includes('door')) {
+                    if (url.includes('door') || url.includes('window')) {
                         group.userData.isDoor = true;
                         group.userData.isOpen = false;
                         group.userData.isCollidable = false; // Ngăn collision manager làm kẹt cửa với tường khi đục lỗ
+                        
+                        // Để ánh sáng xuyên qua, ta tắt castShadow của toàn bộ cửa/cửa sổ
+                        model.traverse(child => {
+                            if (child.isMesh) {
+                                // Tắt bóng đổ để ánh sáng chiếu xuyên qua cửa sổ/cửa chính
+                                child.castShadow = false;
+                                
+                                // Có thể điều chỉnh material để kính trong suốt hơn nếu cần
+                                if (child.material && child.material.name && child.material.name.toLowerCase().includes('glass')) {
+                                    child.material.transparent = true;
+                                    child.material.opacity = Math.min(child.material.opacity, 0.3);
+                                }
+                            }
+                        });
                     }
 
                     // Tự động gắn đèn phát sáng nếu model nằm trong thư mục light hoặc tên có chữ lamp

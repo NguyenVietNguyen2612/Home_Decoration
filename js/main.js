@@ -66,13 +66,23 @@ if (timeSlider && timeDisplay) {
     });
 }
 
+// Tự động bật Isolate Light từ đầu để không có ánh sáng dư thừa lọt qua trần
+toggleLightIsolation(scene);
+
 const btnIsolateLight = document.getElementById('btn-isolate-light');
 if (btnIsolateLight) {
+    // Đặt trạng thái ban đầu (đang bật)
+    btnIsolateLight.style.background = '#6366f1';
+    btnIsolateLight.style.color = '#fff';
+    btnIsolateLight.style.borderColor = '#6366f1';
+    btnIsolateLight.title = 'Disable Light Isolation';
+
     btnIsolateLight.addEventListener('click', () => {
         const isolated = toggleLightIsolation(scene);
         btnIsolateLight.style.background = isolated ? '#6366f1' : '';
         btnIsolateLight.style.color = isolated ? '#fff' : '';
         btnIsolateLight.style.borderColor = isolated ? '#6366f1' : '';
+        btnIsolateLight.title = isolated ? 'Disable Light Isolation' : 'Isolate Light';
     });
 }
 
