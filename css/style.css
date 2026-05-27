@@ -48,6 +48,19 @@ body.dark-mode .tool-btn { background: rgba(255,255,255,0.05); border-color: rgb
 body.dark-mode .tool-btn:hover { background: rgba(255,255,255,0.1); border-color: #6366f1; color: #fff; }
 .tool-btn.primary { background: linear-gradient(135deg, #6366f1, #a855f7); color: #fff; border: none; }
 body.dark-mode .tool-btn.primary { background: linear-gradient(135deg, #6366f1, #a855f7); color: #fff; border: none; }
+
+/* Styles mới cho toolbar gọn gàng */
+.tool-group { display: flex; align-items: center; background: rgba(0,0,0,0.03); border-radius: 10px; padding: 4px; gap: 4px; border: 1px solid rgba(0,0,0,0.05); }
+body.dark-mode .tool-group { background: rgba(255,255,255,0.03); border-color: rgba(255,255,255,0.05); }
+
+.tool-btn.icon-btn { width: 34px; height: 34px; padding: 0; font-size: 16px; border-radius: 6px; background: transparent; border: 1px solid transparent; }
+.tool-btn.icon-btn:hover { background: rgba(255,255,255,0.8); border-color: rgba(0,0,0,0.1); box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+body.dark-mode .tool-btn.icon-btn:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.1); }
+.tool-btn.icon-btn.active { background: #fff; border-color: #6366f1; color: #6366f1; box-shadow: 0 2px 5px rgba(99,102,241,0.2); }
+body.dark-mode .tool-btn.icon-btn.active { background: rgba(99,102,241,0.2); color: #818cf8; border-color: #6366f1; }
+
+.tool-btn.action-btn { padding: 6px 14px; border-radius: 8px; font-weight: 600; height: 34px; }
+.text-danger:hover { color: #ef4444 !important; }
 .divider { height: 24px; width: 1px; background: rgba(0,0,0,0.1); margin: 0 5px; }
 body.dark-mode .divider { background: rgba(255,255,255,0.1); }
 .hidden { display: none; }

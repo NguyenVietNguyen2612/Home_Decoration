@@ -33,6 +33,7 @@ export async function generateThumbnails(renderer) {
         if (type.startsWith('doors/')) path = `furnitures/doors/${type.replace('doors/', '')}.glb`;
         else if (type.startsWith('things/')) path = `furnitures/things/${type.replace('things/', '')}.glb`;
         else if (type.startsWith('decorations/')) path = `furnitures/decorations/${type.replace('decorations/', '')}.glb`;
+        else if (type.startsWith('light/')) path = `furnitures/light/${type.replace('light/', '')}.glb`;
         
         if (!path) continue; // Bỏ qua các object cơ bản
 

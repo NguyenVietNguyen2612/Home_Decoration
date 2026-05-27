@@ -23,7 +23,8 @@
         <!-- Panel Trái: Thư viện Objects -->
         <div id="left-sidebar">
             <div style="padding: 15px 15px 0 15px;">
-                <button class="tool-btn primary" style="width: 100%;" onclick="window.location.href='index.html'" data-i18n="btn_back_home">
+                <button class="tool-btn primary" style="width: 100%;" onclick="window.location.href='index.html'"
+                    data-i18n="btn_back_home">
                     🏠 Về trang chủ
                 </button>
             </div>
@@ -153,25 +154,34 @@
                     <div class="prop-section">
                         <label>Vị trí</label>
                         <div class="prop-row">
-                            <div class="prop-input-wrapper"><span>X</span><input type="number" id="prop-pos-x" step="0.1"></div>
-                            <div class="prop-input-wrapper"><span>Y</span><input type="number" id="prop-pos-y" step="0.1"></div>
-                            <div class="prop-input-wrapper"><span>Z</span><input type="number" id="prop-pos-z" step="0.1"></div>
+                            <div class="prop-input-wrapper"><span>X</span><input type="number" id="prop-pos-x"
+                                    step="0.1"></div>
+                            <div class="prop-input-wrapper"><span>Y</span><input type="number" id="prop-pos-y"
+                                    step="0.1"></div>
+                            <div class="prop-input-wrapper"><span>Z</span><input type="number" id="prop-pos-z"
+                                    step="0.1"></div>
                         </div>
                     </div>
                     <div class="prop-section">
                         <label>Góc xoay</label>
                         <div class="prop-row">
-                            <div class="prop-input-wrapper"><span>X</span><input type="number" id="prop-rot-x" step="1"></div>
-                            <div class="prop-input-wrapper"><span>Y</span><input type="number" id="prop-rot-y" step="1"></div>
-                            <div class="prop-input-wrapper"><span>Z</span><input type="number" id="prop-rot-z" step="1"></div>
+                            <div class="prop-input-wrapper"><span>X</span><input type="number" id="prop-rot-x" step="1">
+                            </div>
+                            <div class="prop-input-wrapper"><span>Y</span><input type="number" id="prop-rot-y" step="1">
+                            </div>
+                            <div class="prop-input-wrapper"><span>Z</span><input type="number" id="prop-rot-z" step="1">
+                            </div>
                         </div>
                     </div>
                     <div class="prop-section">
                         <label>Kích thước</label>
                         <div class="prop-row">
-                            <div class="prop-input-wrapper"><span>X</span><input type="number" id="prop-scale-x" step="0.1" min="0.01"></div>
-                            <div class="prop-input-wrapper"><span>Y</span><input type="number" id="prop-scale-y" step="0.1" min="0.01"></div>
-                            <div class="prop-input-wrapper"><span>Z</span><input type="number" id="prop-scale-z" step="0.1" min="0.01"></div>
+                            <div class="prop-input-wrapper"><span>X</span><input type="number" id="prop-scale-x"
+                                    step="0.1" min="0.01"></div>
+                            <div class="prop-input-wrapper"><span>Y</span><input type="number" id="prop-scale-y"
+                                    step="0.1" min="0.01"></div>
+                            <div class="prop-input-wrapper"><span>Z</span><input type="number" id="prop-scale-z"
+                                    step="0.1" min="0.01"></div>
                         </div>
                     </div>
                 </div>
@@ -180,31 +190,54 @@
 
         <!-- Dưới cùng: Toolbar cho các phép biến đổi -->
         <div id="bottom-toolbar">
-            <button class="tool-btn" id="btn-translate" title="Move Object" data-i18n="tool_move">⬌ Move</button>
-            <button class="tool-btn" id="btn-rotate" title="Rotate Object" data-i18n="tool_rotate">↻ Rotate</button>
-            <button class="tool-btn" id="btn-scale" title="Scale Object" data-i18n="tool_scale">⤡ Scale</button>
-            <div class="divider"></div>
-            <button class="tool-btn" id="btn-undo" title="Undo (Ctrl+Z)" data-i18n="tool_undo">↩ Undo</button>
-            <button class="tool-btn" id="btn-redo" title="Redo (Ctrl+Y)" data-i18n="tool_redo">↪ Redo</button>
-            <div class="divider"></div>
-            <div class="grid-controls"
-                style="display: flex; align-items: center; gap: 8px; margin-left: 10px; margin-right: 10px;">
-                <label style="font-size: 13px; font-weight: 600;" data-i18n="lbl_time">Giờ:</label>
-                <input type="range" id="time-slider" min="0" max="24" step="0.1" value="12" style="width: 100px; cursor: ew-resize;">
-                <span id="time-display" style="font-size: 13px; min-width: 40px; font-family: monospace;">12:00</span>
-                <div class="divider" style="margin: 0 5px;"></div>
-                <label style="font-size: 13px; font-weight: 600;" data-i18n="lbl_bg">Nền:</label>
-                <input type="number" id="grid-size" value="100" min="10" max="500" step="10" title="Kích thước nền"
-                    style="width: 55px; height: 26px; border: 1px solid #ccc; border-radius: 4px; padding: 2px;">
-                <input type="color" id="grid-color" value="#888888" title="Màu nền"
-                    style="padding: 0; cursor: pointer; border: 1px solid #ccc; border-radius: 4px; background: transparent; width: 30px; height: 26px;">
+            <div class="tool-group">
+                <button class="tool-btn icon-btn" id="btn-translate" data-i18n-title="tool_move">⬌</button>
+                <button class="tool-btn icon-btn" id="btn-rotate" data-i18n-title="tool_rotate">↻</button>
+                <button class="tool-btn icon-btn" id="btn-scale" data-i18n-title="tool_scale">⤡</button>
             </div>
+
             <div class="divider"></div>
-            <button class="tool-btn" id="btn-save" title="Lưu bản thiết kế" data-i18n="tool_save">💾 Save</button>
-            <button class="tool-btn" id="btn-preview" title="Preview Room" data-i18n="tool_preview">🎥 Preview</button>
-            <button class="tool-btn" id="btn-new-room" title="Create a New Room" data-i18n="tool_newroom">✨ New Room</button>
-            <button class="tool-btn" id="btn-delete" title="Delete Object" data-i18n="tool_delete">❌ Delete</button>
-            <button class="tool-btn" id="btn-help" title="Help" data-i18n="tool_help">ℹ️ Help</button>
+
+            <div class="tool-group">
+                <button class="tool-btn icon-btn" id="btn-undo" data-i18n-title="tool_undo">↩</button>
+                <button class="tool-btn icon-btn" id="btn-redo" data-i18n-title="tool_redo">↪</button>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="tool-group" style="padding: 4px 10px;">
+                <span style="font-size: 15px; margin-right: 4px;" title="Time of Day">☀️</span>
+                <input type="range" id="time-slider" min="0" max="24" step="0.1" value="12"
+                    style="width: 80px; cursor: ew-resize;">
+                <span id="time-display"
+                    style="font-size: 12px; min-width: 38px; font-family: monospace; font-weight: 600; text-align: right;">12:00</span>
+
+                <div class="divider" style="margin: 0 8px; height: 16px;"></div>
+
+                <span style="font-size: 15px; margin-right: 4px;" title="Grid settings">📐</span>
+                <input type="number" id="grid-size" value="100" min="10" max="500" step="10" title="Grid Size"
+                    style="width: 45px; height: 22px; border: 1px solid rgba(0,0,0,0.1); border-radius: 4px; padding: 2px 4px; font-size: 12px; background: rgba(255,255,255,0.5);">
+                <input type="color" id="grid-color" value="#888888" title="Grid Color"
+                    style="padding: 0; margin-left: 4px; cursor: pointer; border: 1px solid rgba(0,0,0,0.1); border-radius: 4px; background: transparent; width: 22px; height: 22px;">
+            </div>
+
+            <div class="spacer" style="flex: 1;"></div>
+
+            <div class="tool-group">
+                <button class="tool-btn icon-btn text-danger" id="btn-delete" data-i18n-title="tool_delete">🗑️</button>
+            </div>
+
+            <div class="divider"></div>
+
+            <button class="tool-btn action-btn" id="btn-new-room" data-i18n-title="tool_newroom">➕ <span
+                    data-i18n="tool_newroom_text">New Room</span></button>
+            <button class="tool-btn action-btn" id="btn-save" data-i18n-title="tool_save">💾 <span
+                    data-i18n="tool_save_text">Save</span></button>
+            <button class="tool-btn primary action-btn" id="btn-preview" data-i18n-title="tool_preview">🎥 <span
+                    data-i18n="tool_preview_text">Preview</span></button>
+
+            <div class="divider"></div>
+            <button class="tool-btn icon-btn" id="btn-help" data-i18n-title="tool_help">❓</button>
         </div>
     </div>
 
@@ -234,8 +267,12 @@
     </div>
 
     <!-- Fullscreen Cinematic Preview Overlay -->
-    <div id="cinematic-overlay" class="hidden" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 10000; background: #000; display: none;">
-        <button id="btn-close-preview" style="position: absolute; top: 20px; right: 20px; z-index: 10001; padding: 10px 20px; font-size: 16px; cursor: pointer; background: rgba(0,0,0,0.5); color: white; border: 1px solid white; border-radius: 5px; transition: background 0.3s;" onmouseover="this.style.background='rgba(0,0,0,0.8)'" onmouseout="this.style.background='rgba(0,0,0,0.5)'" data-i18n="btn_close_preview">✕ Close Preview</button>
+    <div id="cinematic-overlay" class="hidden"
+        style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 10000; background: #000; display: none;">
+        <button id="btn-close-preview"
+            style="position: absolute; top: 20px; right: 20px; z-index: 10001; padding: 10px 20px; font-size: 16px; cursor: pointer; background: rgba(0,0,0,0.5); color: white; border: 1px solid white; border-radius: 5px; transition: background 0.3s;"
+            onmouseover="this.style.background='rgba(0,0,0,0.8)'" onmouseout="this.style.background='rgba(0,0,0,0.5)'"
+            data-i18n="btn_close_preview">✕ Close Preview</button>
         <div id="cinematic-container" style="width: 100%; height: 100%;"></div>
     </div>
 

@@ -33,16 +33,19 @@ const translations = {
         'cat_bg': '🌌 Phong cảnh',
         'view_2d': 'Góc nhìn 2D (Từ trên xuống)',
         'view_3d': 'Góc nhìn 3D',
-        'tool_move': '⬌ Di chuyển',
-        'tool_rotate': '↻ Xoay',
-        'tool_scale': '⤡ Kích thước',
-        'tool_undo': '↩ Hoàn tác',
-        'tool_redo': '↪ Làm lại',
-        'tool_save': '💾 Lưu',
-        'tool_preview': '🎥 Xem trước',
-        'tool_newroom': '✨ Phòng mới',
-        'tool_delete': '❌ Xóa',
-        'tool_help': 'ℹ️ Hướng dẫn',
+        'tool_move': 'Di chuyển (T)',
+        'tool_rotate': 'Xoay (E)',
+        'tool_scale': 'Kích thước (R)',
+        'tool_undo': 'Hoàn tác (Ctrl+Z)',
+        'tool_redo': 'Làm lại (Ctrl+Y)',
+        'tool_save': 'Lưu',
+        'tool_save_text': 'Lưu',
+        'tool_preview': 'Xem trước',
+        'tool_preview_text': 'Xem trước',
+        'tool_newroom': 'Phòng mới',
+        'tool_newroom_text': 'Phòng mới',
+        'tool_delete': 'Xóa',
+        'tool_help': 'Hướng dẫn',
         'lbl_bg': 'Nền:',
         'btn_back_home': '🏠 Về trang chủ',
         'btn_close_preview': '✕ Đóng Preview'
@@ -81,16 +84,19 @@ const translations = {
         'cat_bg': '🌌 Background',
         'view_2d': '2D Top-down View',
         'view_3d': '3D Preview',
-        'tool_move': '⬌ Move',
-        'tool_rotate': '↻ Rotate',
-        'tool_scale': '⤡ Scale',
-        'tool_undo': '↩ Undo',
-        'tool_redo': '↪ Redo',
-        'tool_save': '💾 Save',
-        'tool_preview': '🎥 Preview',
-        'tool_newroom': '🏠 New Room',
-        'tool_delete': '❌ Delete',
-        'tool_help': 'ℹ️ Help',
+        'tool_move': 'Move (T)',
+        'tool_rotate': 'Rotate (E)',
+        'tool_scale': 'Scale (R)',
+        'tool_undo': 'Undo (Ctrl+Z)',
+        'tool_redo': 'Redo (Ctrl+Y)',
+        'tool_save': 'Save',
+        'tool_save_text': 'Save',
+        'tool_preview': 'Preview',
+        'tool_preview_text': 'Preview',
+        'tool_newroom': 'New Room',
+        'tool_newroom_text': 'New Room',
+        'tool_delete': 'Delete',
+        'tool_help': 'Help',
         'lbl_bg': 'Bg:',
         'btn_back_home': '🏠 Back to Home',
         'btn_close_preview': '✕ Close Preview'
@@ -110,6 +116,13 @@ window.applyLanguage = function () {
             } else {
                 el.innerHTML = dict[key];
             }
+        }
+    });
+
+    document.querySelectorAll('[data-i18n-title]').forEach(el => {
+        const key = el.getAttribute('data-i18n-title');
+        if (dict[key]) {
+            el.setAttribute('title', dict[key]);
         }
     });
 }
