@@ -42,6 +42,7 @@ export function loadGLTFModel(url, targetSize = 3.0) {
                 model.position.z += (model.position.z - center.z);
                 
                 const group = new THREE.Group();
+                group.rotation.order = 'YXZ'; // Trình tự xoay trực quan cho nội thất (Yaw -> Pitch -> Roll)
                 group.add(model);
                 
                 // Đặt model nổi lên trên mặt sàn cộng thêm 0.02 để cách mặt đất

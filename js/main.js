@@ -426,6 +426,13 @@ function updatePhysics() {
             // Thực sự áp dụng di chuyển
             mesh.position.y += mesh.userData.velocity.y;
             
+            // Đồng bộ Properties Panel nếu vật thể đang rơi mà lại đang được select
+            if (interactionManager && interactionManager.getSelectedObjects().includes(mesh)) {
+                if (typeof interactionManager.updatePropertiesPanel === 'function') {
+                    interactionManager.updatePropertiesPanel();
+                }
+            }
+            
             // Đảm bảo landingY không bao giờ thấp hơn mặt sàn gốc
             landingY = Math.max(landingY, mesh.userData.baseY);
             

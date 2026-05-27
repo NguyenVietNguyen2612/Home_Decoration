@@ -11,7 +11,6 @@ export function setupPropertiesPanel(context) {
         rotX: document.getElementById('prop-rot-x'),
         rotY: document.getElementById('prop-rot-y'),
         rotZ: document.getElementById('prop-rot-z'),
-        rotZ: document.getElementById('prop-rot-z'),
         scaleX: document.getElementById('prop-scale-x'),
         scaleY: document.getElementById('prop-scale-y'),
         scaleZ: document.getElementById('prop-scale-z')
@@ -55,6 +54,11 @@ export function setupPropertiesPanel(context) {
     }
 
     function updatePropertiesPanel() {
+        // Không cập nhật nếu người dùng đang nhập liệu (focus vào input)
+        if (document.activeElement && document.activeElement.tagName === 'INPUT' && document.activeElement.id.startsWith('prop-')) {
+            return;
+        }
+
         if (selectedObjects.length >= 1) {
             panel.classList.remove('hidden');
             

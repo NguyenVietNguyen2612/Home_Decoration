@@ -198,6 +198,7 @@ export function setupInteractionManager(scene, camera2D, renderer2D, orbitContro
         getSelectedObjects: () => selectedObjects,
         isGizmoDragging,
         gizmoScene3D,
-        gizmoScene2D
+        gizmoScene2D,
+        updatePropertiesPanel
     };
 }

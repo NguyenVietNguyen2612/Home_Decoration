@@ -5,6 +5,7 @@ export function setupSelectionUtils(context) {
 
     const selectionGroup = new THREE.Group();
     selectionGroup.name = '__selectionGroup__';
+    selectionGroup.rotation.order = 'YXZ';
     scene.add(selectionGroup);
 
     const _box = new THREE.Box3();
