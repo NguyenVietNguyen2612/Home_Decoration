@@ -114,6 +114,7 @@ const TutorialSteps = [
 class TutorialManager {
     constructor() {
         this.currentStep = 0;
+        this.currentAudio = null;
         this.buildUI();
         
         // Wait a bit for main.js to load UI properly
@@ -188,11 +189,20 @@ class TutorialManager {
     }
     
     updateStep() {
+        if (this.currentAudio) {
+            this.currentAudio.pause();
+            this.currentAudio.currentTime = 0;
+        }
+
         const step = TutorialSteps[this.currentStep];
         
         if (step.onEnter) step.onEnter();
         
         this.speechText.innerHTML = step.text;
+        
+        // Play tutorial audio
+        this.currentAudio = new Audio(`assets/audio/tutorial/step_${this.currentStep}.mp3`);
+        this.currentAudio.play().catch(e => console.warn('Tutorial audio blocked by browser:', e));
         
         // Update Mascot position
         this.mascotContainer.className = `tutorial-mascot-container show ${step.posClass} ${step.layoutClass}`;
@@ -233,6 +243,9 @@ class TutorialManager {
     }
     
     endTutorial() {
+        if (this.currentAudio) {
+            this.currentAudio.pause();
+        }
         window.location.href = 'index.html';
     }
 }

@@ -105,28 +105,6 @@
                     </div>
                 </details>
 
-                <details class="category-details">
-                    <summary class="category-header">🎨 Materials</summary>
-                    <div class="object-grid" id="material-grid">
-                        <div class="object-item" data-type="mat_wood" draggable="true">
-                            <img src="grounds/wood.png" alt="Wood" draggable="false">
-                            <span>Wood</span>
-                        </div>
-                        <div class="object-item" data-type="mat_marble" draggable="true">
-                            <img src="grounds/marble.png" alt="Marble" draggable="false">
-                            <span>Marble</span>
-                        </div>
-                        <div class="object-item" data-type="mat_concrete" draggable="true">
-                            <img src="grounds/concrete.png" alt="Concrete" draggable="false">
-                            <span>Concrete</span>
-                        </div>
-                        <div class="object-item" data-type="mat_fabric" draggable="true">
-                            <img src="grounds/sand.png" alt="Fabric" draggable="false">
-                            <span>Fabric</span>
-                        </div>
-                    </div>
-                </details>
-
             </div>
         </div>
 
@@ -152,44 +130,49 @@
                 <div id="view-3d"></div>
                 <!-- Bảng thuộc tính (Properties Panel) -->
                 <div id="properties-panel" class="hidden">
-                    <div class="prop-header" style="display: flex; justify-content: space-between; align-items: center;">
+                    <div class="prop-header"
+                        style="display: flex; justify-content: space-between; align-items: center;">
                         <span>Object Properties</span>
-                        <button id="btn-toggle-props" style="background: none; border: none; cursor: pointer; color: inherit; font-size: 12px;">▼</button>
+                        <button id="btn-toggle-props"
+                            style="background: none; border: none; cursor: pointer; color: inherit; font-size: 12px;">▼</button>
                     </div>
                     <div id="prop-content">
-                    <div class="prop-section">
-                        <label>Position</label>
-                        <div class="prop-row">
-                            <div class="prop-input-wrapper"><span>X</span><input type="number" id="prop-pos-x"
-                                    step="0.1"></div>
-                            <div class="prop-input-wrapper"><span>Y</span><input type="number" id="prop-pos-y"
-                                    step="0.1"></div>
-                            <div class="prop-input-wrapper"><span>Z</span><input type="number" id="prop-pos-z"
-                                    step="0.1"></div>
-                        </div>
-                    </div>
-                    <div class="prop-section">
-                        <label>Rotation</label>
-                        <div class="prop-row">
-                            <div class="prop-input-wrapper"><span>X</span><input type="number" id="prop-rot-x" step="1">
-                            </div>
-                            <div class="prop-input-wrapper"><span>Y</span><input type="number" id="prop-rot-y" step="1">
-                            </div>
-                            <div class="prop-input-wrapper"><span>Z</span><input type="number" id="prop-rot-z" step="1">
+                        <div class="prop-section">
+                            <label>Position</label>
+                            <div class="prop-row">
+                                <div class="prop-input-wrapper"><span>X</span><input type="number" id="prop-pos-x"
+                                        step="0.1"></div>
+                                <div class="prop-input-wrapper"><span>Y</span><input type="number" id="prop-pos-y"
+                                        step="0.1"></div>
+                                <div class="prop-input-wrapper"><span>Z</span><input type="number" id="prop-pos-z"
+                                        step="0.1"></div>
                             </div>
                         </div>
-                    </div>
-                    <div class="prop-section">
-                        <label>Scale</label>
-                        <div class="prop-row">
-                            <div class="prop-input-wrapper"><span>X</span><input type="number" id="prop-scale-x"
-                                    step="0.1" min="0.01"></div>
-                            <div class="prop-input-wrapper"><span>Y</span><input type="number" id="prop-scale-y"
-                                    step="0.1" min="0.01"></div>
-                            <div class="prop-input-wrapper"><span>Z</span><input type="number" id="prop-scale-z"
-                                    step="0.1" min="0.01"></div>
+                        <div class="prop-section">
+                            <label>Rotation</label>
+                            <div class="prop-row">
+                                <div class="prop-input-wrapper"><span>X</span><input type="number" id="prop-rot-x"
+                                        step="1">
+                                </div>
+                                <div class="prop-input-wrapper"><span>Y</span><input type="number" id="prop-rot-y"
+                                        step="1">
+                                </div>
+                                <div class="prop-input-wrapper"><span>Z</span><input type="number" id="prop-rot-z"
+                                        step="1">
+                                </div>
+                            </div>
                         </div>
-                    </div>
+                        <div class="prop-section">
+                            <label>Scale</label>
+                            <div class="prop-row">
+                                <div class="prop-input-wrapper"><span>X</span><input type="number" id="prop-scale-x"
+                                        step="0.1" min="0.01"></div>
+                                <div class="prop-input-wrapper"><span>Y</span><input type="number" id="prop-scale-y"
+                                        step="0.1" min="0.01"></div>
+                                <div class="prop-input-wrapper"><span>Z</span><input type="number" id="prop-scale-z"
+                                        step="0.1" min="0.01"></div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -213,7 +196,8 @@
             <div class="divider"></div>
 
             <div class="tool-group" style="padding: 4px 10px;">
-                <button class="tool-btn icon-btn" id="btn-isolate-light" title="Isolate Light" style="margin-right: 4px;">💡</button>
+                <button class="tool-btn icon-btn" id="btn-isolate-light" title="Isolate Light"
+                    style="margin-right: 4px;">💡</button>
                 <span style="font-size: 15px; margin-right: 4px;" title="Time of Day">☀️</span>
                 <input type="range" id="time-slider" min="0" max="24" step="0.1" value="12"
                     style="width: 80px; cursor: ew-resize;">
@@ -239,7 +223,8 @@
 
             <button class="tool-btn action-btn" id="btn-new-room" title="New Room">➕ <span>New Room</span></button>
             <button class="tool-btn action-btn" id="btn-save" title="Save">💾 <span>Save</span></button>
-            <button class="tool-btn primary action-btn" id="btn-preview" title="Preview">🎥 <span>Preview</span></button>
+            <button class="tool-btn primary action-btn" id="btn-preview" title="Preview">🎥
+                <span>Preview</span></button>
 
             <div class="divider"></div>
             <button class="tool-btn icon-btn" id="btn-help" title="Help">❓</button>
@@ -252,15 +237,25 @@
                 <h2>User Guide</h2>
                 <button id="help-close-btn" title="Close help">✕</button>
             </div>
-            <div class="help-content" style="max-height: 400px; overflow-y: auto; padding-right: 10px; line-height: 1.6;">
-                <p>1. <strong>Add Objects:</strong> Drag and drop from the left library into the 2D or 3D view. Wallpapers and floors automatically apply to walls and ground.</p>
-                <p>2. <strong>Select & Transform:</strong> Left-click to select. Use the toolbar or press <strong>T</strong> (Move), <strong>E</strong> (Rotate), <strong>R</strong> (Scale). Drag the 3D Gizmo axes to adjust.</p>
-                <p>3. <strong>Properties Panel:</strong> When an object is selected, precisely edit its exact Position, Rotation, and Scale values on the right panel.</p>
-                <p>4. <strong>Undo / Redo:</strong> Use the toolbar arrows or press <strong>Ctrl+Z</strong> (Undo) and <strong>Ctrl+Y</strong> (Redo) to revert changes.</p>
-                <p>5. <strong>Camera Navigation:</strong> Right-click and drag to rotate (in 3D) or pan (in 2D). Use the Scroll wheel to Zoom In/Out.</p>
-                <p>6. <strong>Environment:</strong> Adjust the ☀️ Time of Day slider to change lighting, and tweak 📐 Grid Settings for precision snapping.</p>
-                <p>7. <strong>Delete Objects:</strong> Select objects and press <strong>Delete / Backspace</strong> or the 🗑️ Delete button on the toolbar.</p>
-                <p>8. <strong>Project Actions:</strong> Use <b>New Room</b> to start fresh, <b>Save</b> to download your .json project, and <b>Preview</b> for a cinematic view.</p>
+            <div class="help-content"
+                style="max-height: 400px; overflow-y: auto; padding-right: 10px; line-height: 1.6;">
+                <p>1. <strong>Add Objects:</strong> Drag and drop from the left library into the 2D or 3D view.
+                    Wallpapers and floors automatically apply to walls and ground.</p>
+                <p>2. <strong>Select & Transform:</strong> Left-click to select. Use the toolbar or press
+                    <strong>T</strong> (Move), <strong>E</strong> (Rotate), <strong>R</strong> (Scale). Drag the 3D
+                    Gizmo axes to adjust.</p>
+                <p>3. <strong>Properties Panel:</strong> When an object is selected, precisely edit its exact Position,
+                    Rotation, and Scale values on the right panel.</p>
+                <p>4. <strong>Undo / Redo:</strong> Use the toolbar arrows or press <strong>Ctrl+Z</strong> (Undo) and
+                    <strong>Ctrl+Y</strong> (Redo) to revert changes.</p>
+                <p>5. <strong>Camera Navigation:</strong> Right-click and drag to rotate (in 3D) or pan (in 2D). Use the
+                    Scroll wheel to Zoom In/Out.</p>
+                <p>6. <strong>Environment:</strong> Adjust the ☀️ Time of Day slider to change lighting, and tweak 📐
+                    Grid Settings for precision snapping.</p>
+                <p>7. <strong>Delete Objects:</strong> Select objects and press <strong>Delete / Backspace</strong> or
+                    the 🗑️ Delete button on the toolbar.</p>
+                <p>8. <strong>Project Actions:</strong> Use <b>New Room</b> to start fresh, <b>Save</b> to download your
+                    .json project, and <b>Preview</b> for a cinematic view.</p>
             </div>
         </div>
     </div>
@@ -270,7 +265,8 @@
         style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 10000; background: #000; display: none;">
         <button id="btn-close-preview"
             style="position: absolute; top: 20px; right: 20px; z-index: 10001; padding: 10px 20px; font-size: 16px; cursor: pointer; background: rgba(0,0,0,0.5); color: white; border: 1px solid white; border-radius: 5px; transition: background 0.3s;"
-            onmouseover="this.style.background='rgba(0,0,0,0.8)'" onmouseout="this.style.background='rgba(0,0,0,0.5)'">✕ Close Preview</button>
+            onmouseover="this.style.background='rgba(0,0,0,0.8)'" onmouseout="this.style.background='rgba(0,0,0,0.5)'">✕
+            Close Preview</button>
         <div id="cinematic-container" style="width: 100%; height: 100%;"></div>
     </div>
 
@@ -278,6 +274,7 @@
 
     <script type="module" src="js/main.js"></script>
     <script src="js/tutorial.js"></script>
+    <script src="js/audio.js"></script>
 </body>
 
 </html>
