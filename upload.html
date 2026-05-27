@@ -168,34 +168,34 @@
     </style>
 </head>
 <body>
+    <script src="js/settings.js"></script>
     <div class="orb orb-1"></div>
     <div class="orb orb-2"></div>
     <div class="orb orb-3"></div>
 
     <div class="upload-container">
-        <h1 data-i18n="upload_title">Tải lên bản thiết kế</h1>
-        <p data-i18n="upload_desc">Chọn file .glb dự án của bạn để tiếp tục chỉnh sửa</p>
+        <h1>Upload Project</h1>
+        <p>Select your .glb project file to continue editing</p>
         
         <div class="drop-zone" id="drop-zone">
             <span class="icon">📁</span>
-            <div class="text" data-i18n="upload_drop">Kéo thả file .glb vào đây</div>
-            <div class="sub-text" data-i18n="upload_or">hoặc click để chọn file</div>
+            <div class="text">Drag & drop .glb file here</div>
+            <div class="sub-text">or click to browse</div>
             <input type="file" id="file-input" accept=".glb">
         </div>
 
-        <div class="loading" id="loading" data-i18n="upload_loading">Đang tải dữ liệu...</div>
+        <div class="loading" id="loading">Loading data...</div>
 
         <div class="recent-section" id="recent-section">
-            <h3 data-i18n="upload_recent">Dự án gần đây</h3>
+            <h3>Recent Projects</h3>
             <div class="recent-list" id="recent-list">
                 <!-- Recent items will be injected here -->
             </div>
         </div>
 
-        <a href="index.html" class="btn-back" data-i18n="upload_back">← Quay lại trang chủ</a>
+        <a href="index.html" class="btn-back">← Back to Home</a>
     </div>
 
-    <script src="js/i18n.js"></script>
     <script src="js/modal.js" type="module"></script>
     <script>
         const dropZone = document.getElementById('drop-zone');
@@ -234,7 +234,7 @@
 
         function handleFile(file) {
             if (!file.name.toLowerCase().endsWith('.glb')) {
-                CustomModal.alert('Vui lòng chọn file định dạng .glb');
+                CustomModal.alert('Please select a valid .glb file');
                 return;
             }
 
@@ -266,14 +266,14 @@
                 };
                 
                 tx.onerror = function() {
-                    CustomModal.alert('Đã xảy ra lỗi khi lưu file vào trình duyệt.');
+                    CustomModal.alert('An error occurred while saving the file to the browser.');
                     dropZone.style.display = 'block';
                     loading.style.display = 'none';
                 };
             };
 
             request.onerror = function(e) {
-                CustomModal.alert('Trình duyệt của bạn không hỗ trợ IndexedDB.');
+                CustomModal.alert('Your browser does not support IndexedDB.');
                 dropZone.style.display = 'block';
                 loading.style.display = 'none';
             };
@@ -297,7 +297,7 @@
                             <div class="recent-name">${proj.name}</div>
                             <div class="recent-date">${proj.date}</div>
                         </div>
-                        <button class="btn-open-recent" onclick="openRecent('${proj.id}')" data-i18n="upload_open_recent">Mở</button>
+                        <button class="btn-open-recent" onclick="openRecent('${proj.id}')">Open</button>
                     `;
                     list.appendChild(item);
                 });
@@ -335,7 +335,7 @@
                             window.location.href = 'editor.html?action=loadFromDB';
                         };
                     } else {
-                        CustomModal.alert('Không tìm thấy dữ liệu dự án! Có thể file đã bị xóa trong bộ nhớ tạm.').then(() => {
+                        CustomModal.alert('Project data not found! It may have been cleared from temporary storage.').then(() => {
                             location.reload();
                         });
                     }

@@ -265,17 +265,38 @@ body {
     font-style: italic;
 }
 
+.setting-btn {
+    flex: 1;
+    padding: 10px 15px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #cbd5e1;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.95rem;
+    font-weight: 600;
+    transition: all 0.2s;
+}
+.setting-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+.setting-btn.active {
+    background: #6366f1;
+    color: white;
+    border-color: #6366f1;
+}
+
 /* --- LIGHT MODE OVERRIDES --- */
 body.light-mode {
-    background: linear-gradient(45deg, #e2e8f0, #f8fafc, #cbd5e1, #f8fafc);
+    background: linear-gradient(45deg, #f1f5f9, #e2e8f0, #cbd5e1, #e2e8f0);
     color: #1e293b;
 }
 
 body.light-mode .home-container, 
 body.light-mode .upload-container {
-    background: rgba(255, 255, 255, 0.6);
-    border: 1px solid rgba(255, 255, 255, 0.4);
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1);
+    background: rgba(255, 255, 255, 0.85);
+    border: 1px solid rgba(148, 163, 184, 0.3);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.08);
 }
 
 body.light-mode .home-container h1, 
@@ -346,4 +367,17 @@ body.light-mode .btn-back {
 }
 body.light-mode .btn-back:hover {
     color: #1e293b;
+}
+
+body.light-mode .setting-btn {
+    background: rgba(0, 0, 0, 0.05);
+    border-color: rgba(0, 0, 0, 0.1);
+    color: #475569;
+}
+body.light-mode .setting-btn:hover {
+    background: rgba(0, 0, 0, 0.1);
+}
+body.light-mode .setting-btn.active {
+    background: #6366f1;
+    color: white;
 }

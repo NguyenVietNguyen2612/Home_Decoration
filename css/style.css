@@ -1,7 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
-body { overflow: hidden; font-family: 'Outfit', sans-serif; background: linear-gradient(135deg, #e2e8f0, #f8fafc, #cbd5e1); background-size: 400% 400%; animation: gradientBG 15s ease infinite; color: #1e293b; }
+body { overflow: hidden; font-family: 'Outfit', sans-serif; background: linear-gradient(135deg, #f1f5f9, #e2e8f0, #cbd5e1); background-size: 400% 400%; animation: gradientBG 15s ease infinite; color: #1e293b; }
 @keyframes gradientBG { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
 body.dark-mode { background: linear-gradient(135deg, #0f172a, #1e293b, #09090b); background-size: 400% 400%; color: #f8fafc; }
 #app-container { display: grid; grid-template-columns: var(--sidebar-w, 280px) 6px 1fr; grid-template-rows: 1fr 60px; height: 100vh; width: 100vw; }
@@ -46,8 +46,15 @@ body.dark-mode .view-title { background: rgba(15, 23, 42, 0.85); color: #f8fafc;
 body.dark-mode .tool-btn { background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.1); color: #cbd5e1; }
 .tool-btn:hover { background: #fff; border-color: #6366f1; color: #6366f1; transform: translateY(-1px); }
 body.dark-mode .tool-btn:hover { background: rgba(255,255,255,0.1); border-color: #6366f1; color: #fff; }
-.tool-btn.primary { background: linear-gradient(135deg, #6366f1, #a855f7); color: #fff; border: none; }
-body.dark-mode .tool-btn.primary { background: linear-gradient(135deg, #6366f1, #a855f7); color: #fff; border: none; }
+.tool-btn.primary { background: #ffffff; color: #4f46e5; border: 1px solid #c7d2fe; box-shadow: 0 4px 6px -1px rgba(99, 102, 241, 0.1); font-weight: 600; }
+.tool-btn.primary:hover { background: #f8fafc; color: #4338ca; border-color: #6366f1; transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.2); }
+body.dark-mode .tool-btn.primary { background: linear-gradient(135deg, #6366f1, #a855f7); box-shadow: 0 4px 10px rgba(99, 102, 241, 0.4); border: none; color: #fff; }
+body.dark-mode .tool-btn.primary:hover { background: linear-gradient(135deg, #4f46e5, #9333ea); box-shadow: 0 6px 15px rgba(99, 102, 241, 0.6); color: #fff; border: none; }
+
+.btn-back-home { width: 100%; padding: 12px; background: rgba(255, 255, 255, 0.9); border: 1px solid rgba(0, 0, 0, 0.1); border-radius: 12px; color: #475569; font-family: 'Outfit', sans-serif; font-weight: 600; font-size: 14px; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); }
+.btn-back-home:hover { background: #fff; color: #6366f1; border-color: #6366f1; transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.15); }
+body.dark-mode .btn-back-home { background: rgba(255, 255, 255, 0.05); border-color: rgba(255, 255, 255, 0.1); color: #cbd5e1; }
+body.dark-mode .btn-back-home:hover { background: rgba(255, 255, 255, 0.1); color: #fff; border-color: #6366f1; box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.3); }
 
 /* Styles mới cho toolbar gọn gàng */
 .tool-group { display: flex; align-items: center; background: rgba(0,0,0,0.03); border-radius: 10px; padding: 4px; gap: 4px; border: 1px solid rgba(0,0,0,0.05); }

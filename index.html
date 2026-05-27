@@ -13,21 +13,29 @@
     <div class="orb orb-3"></div>
 
     <div class="home-container">
-        <h1 data-i18n="home_title">Room Decoration</h1>
-        <p data-i18n="home_desc">Design your dream space in stunning 3D. Create, explore, and visualize your ideas with ease.</p>
+        <h1>Room Decoration</h1>
+        <p>Design your dream space in stunning 3D. Create, explore, and visualize your ideas with ease.</p>
         
         <div class="menu-grid">
             <button class="menu-btn primary" onclick="window.location.href='editor.html'">
                 <span class="btn-icon">✨</span>
-                <span data-i18n="btn_new">Dự án mới</span>
+                <span>New Project</span>
             </button>
             <button class="menu-btn" onclick="window.location.href='upload.html'">
                 <span class="btn-icon">📁</span>
-                <span data-i18n="btn_saved">Dự án sẵn có</span>
+                <span>Saved Projects</span>
+            </button>
+            <button class="menu-btn" onclick="window.location.href='tutorial.html'">
+                <span class="btn-icon">🎓</span>
+                <span>Tutorial</span>
+            </button>
+            <button class="menu-btn" onclick="toggleTheme()" id="btn-theme-toggle">
+                <span class="btn-icon" id="theme-icon">🌙</span>
+                <span id="theme-text">Switch to Light Mode</span>
             </button>
         </div>
     </div>
 
-    <script src="js/i18n.js"></script>
+    <script src="js/settings.js"></script>
 </body>
 </html>
