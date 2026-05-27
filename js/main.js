@@ -1,5 +1,5 @@
 import { setupDualScene } from './modules/sceneSetup.js';
-import { setupLighting, updateTimeOfDay } from './modules/lighting.js';
+import { setupLighting, updateTimeOfDay, toggleLightIsolation, updateDynamicWindowLighting } from './modules/lighting.js';
 import { createRoomGeometry } from './modules/roomGeometry.js';
 import { setupInteractionManager } from './modules/interactionManager.js';
 import { setupDragDrop } from './modules/dragDrop.js';
@@ -63,6 +63,16 @@ if (timeSlider && timeDisplay) {
         const hours = Math.floor(val);
         const minutes = Math.floor((val - hours) * 60);
         timeDisplay.textContent = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+    });
+}
+
+const btnIsolateLight = document.getElementById('btn-isolate-light');
+if (btnIsolateLight) {
+    btnIsolateLight.addEventListener('click', () => {
+        const isolated = toggleLightIsolation(scene);
+        btnIsolateLight.style.background = isolated ? '#6366f1' : '';
+        btnIsolateLight.style.color = isolated ? '#fff' : '';
+        btnIsolateLight.style.borderColor = isolated ? '#6366f1' : '';
     });
 }
 
@@ -457,6 +467,9 @@ function animate() {
     }
 
     updatePhysics();
+
+    // Cập nhật tia sáng tỏa ra từ cửa sổ (nếu có)
+    updateDynamicWindowLighting(scene);
 
     // Chỉ sync box của những helper đang visible (khi va chạm)
     collisionManager.update();

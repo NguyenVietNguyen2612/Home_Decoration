@@ -26,7 +26,7 @@ export function loadGLTFModel(url, targetSize = 3.0) {
                 // Đa số model tải trên mạng dùng đơn vị cm, milimet hoặc tỉ lệ tuỳ ý.
                 // Ta sẽ scale nó lại sao cho chiều dài nhất của model là khoảng targetSize
                 const maxSize = Math.max(initialSize.x, initialSize.y, initialSize.z);
-                const scaleFactor = targetSize / maxSize;
+                const scaleFactor = targetSize / (maxSize || 1);
                 
                 model.scale.set(scaleFactor, scaleFactor, scaleFactor);
                 model.updateMatrixWorld(true); // Cập nhật lại ma trận sau khi scale

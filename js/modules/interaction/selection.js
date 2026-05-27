@@ -181,18 +181,47 @@ export function setupViewSelection(context) {
             const intersects = raycaster.intersectObjects(interactableObjects, true);
 
             if (intersects.length > 0) {
-                let hit = intersects[0].object;
-                while (hit && !interactableObjects.includes(hit)) {
-                    hit = hit.parent;
-                    if (!hit || hit === context.scene) { hit = null; break; }
+                let bestHit = null;
+                let wallHit = null;
+                let firstDistance = intersects[0].distance;
+
+                for (let i = 0; i < intersects.length; i++) {
+                    let hit = intersects[i].object;
+                    // Bỏ qua các object tàng hình (ví dụ: lightBlocker)
+                    if (hit.material && hit.material.colorWrite === false) continue;
+                    
+                    while (hit && !interactableObjects.includes(hit)) {
+                        hit = hit.parent;
+                        if (!hit || hit === context.scene) { hit = null; break; }
+                    }
+
+                    if (hit) {
+                        if (hit.userData.isWall) {
+                            if (!wallHit) wallHit = hit;
+                        } else {
+                            // Cửa sổ/đồ vật
+                            // Ưu tiên chọn cửa sổ nếu nó nằm rất gần mặt tường (distance diff < 0.5)
+                            // Điều này sửa lỗi không chọn được cửa sổ khi nhét sâu vào tường
+                            if (wallHit && (intersects[i].distance - firstDistance > 0.5)) {
+                                break; // Tường che khuất, không chọn xuyên tường
+                            }
+                            bestHit = hit;
+                            break;
+                        }
+                    }
                 }
 
-                if (hit) {
+                const finalHit = bestHit || wallHit;
+
+                if (finalHit) {
                     const isMulti = e.ctrlKey || e.metaKey;
-                    selectObject(hit, isMulti);
+                    selectObject(finalHit, isMulti);
                     if (selectedObjects.length > 0 && getCurrentTool() === 'none') {
                         setTool('translate');
                     }
+                } else {
+                    selectObject(null, false);
+                    setTool('none');
                 }
             } else {
                 selectObject(null, false);

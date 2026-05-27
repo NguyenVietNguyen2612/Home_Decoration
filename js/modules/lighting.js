@@ -1,5 +1,43 @@
 import * as THREE from 'three';
 
+export let isLightIsolated = false;
+
+export function toggleLightIsolation(scene) {
+    isLightIsolated = !isLightIsolated;
+    
+    // Cập nhật castShadow cho các tấm chắn sáng (lightBlocker)
+    scene.traverse(child => {
+        if (child.name === 'lightBlocker') {
+            child.castShadow = isLightIsolated;
+        }
+    });
+    
+    updateDynamicWindowLighting(scene); // Cập nhật ngay khi bật/tắt
+    
+    return isLightIsolated;
+}
+
+export function updateDynamicWindowLighting(scene) {
+    const dirLight = scene.getObjectByName('dirLight');
+    const ambientLight = scene.getObjectByName('ambientLight');
+    if (!dirLight || !ambientLight) return;
+
+    let windowCount = 0;
+    const sunIntensity = dirLight.intensity;
+
+    scene.traverse(child => {
+        if (child.userData && child.userData.isDoor) {
+            windowCount++;
+        }
+    });
+
+    if (isLightIsolated) {
+        // Ánh sáng bounce (dội lại): Nếu có cửa sổ, phòng sẽ sáng lên tự nhiên
+        const bounceLight = (windowCount > 0) ? (sunIntensity * 0.25) : 0;
+        ambientLight.intensity = 0.15 + bounceLight;
+    }
+}
+
 export function setupLighting(scene) {
     // 1. Ánh sáng môi trường (Ambient Light)
     // Cung cấp ánh sáng nền nhẹ, tránh cho bóng đổ bị tối đen hoàn toàn
@@ -179,10 +217,16 @@ export function updateTimeOfDay(scene, timeValue) {
     // Cập nhật màu sắc từ gradient
     scene.background = interpolateColor(t, skyGradient);
     dirLight.color = interpolateColor(t, sunGradient);
-    ambientLight.color = interpolateColor(t, ambientColorGradient);
-    
     dirLight.intensity = interpolateValue(t, intensityGradient);
-    ambientLight.intensity = interpolateValue(t, ambientIntensityGradient);
+    
+    if (isLightIsolated) {
+        // Ánh sáng cách ly trong phòng giống với lúc 24h (màu xanh dương đậm, cường độ 0.15)
+        ambientLight.color = new THREE.Color(0x88aaff);
+        ambientLight.intensity = 0.15;
+    } else {
+        ambientLight.color = interpolateColor(t, ambientColorGradient);
+        ambientLight.intensity = interpolateValue(t, ambientIntensityGradient);
+    }
 
     let starOpacity = 0;
     
@@ -222,4 +266,7 @@ export function updateTimeOfDay(scene, timeValue) {
     }
     
     scene.userData.backgroundType = 'dynamic_sky';
+    
+    // Gọi update window lighting sau khi đã đổi cường độ ánh sáng
+    updateDynamicWindowLighting(scene);
 }

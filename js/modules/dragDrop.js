@@ -107,10 +107,10 @@ export function setupDragDrop(scene, camera2D, renderer2D, camera3D, renderer3D,
         raycaster.setFromCamera(mouseVector, camera2D);
 
         const raycastPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
-        const intersectPoint = new THREE.Vector3();
+        let intersectPoint = new THREE.Vector3();
         
         // Toán học điểm chạm của tia ray từ camera 2D với mặt phẳng sàn
-        raycaster.ray.intersectPlane(raycastPlane, intersectPoint);
+        intersectPoint = raycaster.ray.intersectPlane(raycastPlane, intersectPoint);
 
         if (intersectPoint) {
             // Snap tọa độ lưới 0.1 để đảm bảo khít khi kéo
@@ -269,9 +269,9 @@ export function setupDragDrop(scene, camera2D, renderer2D, camera3D, renderer3D,
         raycaster.setFromCamera(mouseVector, camera3D);
 
         const raycastPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
-        const intersectPoint = new THREE.Vector3();
+        let intersectPoint = new THREE.Vector3();
         
-        raycaster.ray.intersectPlane(raycastPlane, intersectPoint);
+        intersectPoint = raycaster.ray.intersectPlane(raycastPlane, intersectPoint);
 
         if (intersectPoint) {
             // Snap tọa độ lưới 0.1 để đảm bảo khít khi kéo

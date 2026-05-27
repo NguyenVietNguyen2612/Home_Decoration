@@ -109,7 +109,16 @@ export function updateWallHoles(scene) {
 
             // Extrude thành 3D
             const extrudeSettings = { depth: d, bevelEnabled: false };
-            const geo = new THREE.ExtrudeGeometry(shape, extrudeSettings);
+            let geo;
+            try {
+                geo = new THREE.ExtrudeGeometry(shape, extrudeSettings);
+                if (!geo.attributes.position || geo.attributes.position.count === 0) {
+                    throw new Error("Invalid geometry generated");
+                }
+            } catch (e) {
+                console.error("Failed to generate wall holes:", e);
+                return;
+            }
             
             // Dịch chuyển lùi lại để khớp với tâm của BoxGeometry cũ
             geo.translate(0, 0, -d/2);
