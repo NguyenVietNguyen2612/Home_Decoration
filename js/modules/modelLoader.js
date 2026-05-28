@@ -216,12 +216,27 @@ export async function createModel(type) {
 
     const uniqueCandidates = [...new Set(candidates)];
 
-    // Heuristics for targetSize
+    // Heuristics for targetSize – căn chỉnh kích thước phù hợp từng loại object
     let targetSize = 2.0;
-    if (normalizedType.includes('decorat') || normalizedType.startsWith('decorations')) targetSize = 0.6;
-    if (normalizedType.includes('bed')) targetSize = 3.0;
-    if (normalizedType.includes('sofa')) targetSize = 3.0;
-    if (normalizedType.includes('thing') || normalizedType.startsWith('things')) targetSize = 2.5;
+    const nt = normalizedType.toLowerCase();
+
+    if (nt.includes('decorat') || nt.startsWith('decorations')) {
+        targetSize = 0.6;                          // Bình hoa, cây nhỏ
+    }
+    if (nt.includes('potted_tree'))   targetSize = 1.8; // Cây to hơn
+    if (nt.includes('bed'))           targetSize = 3.5;
+    if (nt.includes('sofa') || nt.includes('couch')) targetSize = 3.0;
+    if (nt.includes('rug') || nt.includes('carpet') || nt.includes('bhadoi')) targetSize = 4.0; // Thảm trải sàn rộng
+    if (nt.includes('bookshelf') || nt.includes('bookcase')) targetSize = 3.5;
+    if (nt.includes('cabinet') || nt.includes('drawer')) targetSize = 2.5;
+    if (nt.includes('desk') || nt.includes('table')) targetSize = 2.5;
+    if (nt.includes('chair'))         targetSize = 1.5;
+    if (nt.includes('lamp'))          targetSize = 1.2; // Đèn bàn không quá to
+    if (nt.includes('titanic_lamp'))  targetSize = 2.0;
+    if (nt.includes('fan'))           targetSize = 1.5;
+    if (nt.includes('tv') || nt.includes('television')) targetSize = 2.0;
+    if (nt.includes('gaming_desktop') || nt.includes('pc-9801')) targetSize = 1.2;
+    if (nt.includes('speaker') || nt.includes('fnaf'))  targetSize = 1.0;
 
     for (const url of uniqueCandidates) {
         if (await fileExists(encodeURI(url))) {

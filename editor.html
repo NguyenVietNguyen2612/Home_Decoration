@@ -170,7 +170,65 @@
                         </div>
                     </div>
                     </div>
+
+                    <!-- Room Appearance – chỉ hiện khi chọn phòng -->
+                    <div id="room-appearance-section" style="display:none;">
+                        <div class="prop-divider"></div>
+                        <div class="prop-header" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+                            <span style="font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;opacity:.7;">🎨 Room Appearance</span>
+                        </div>
+
+                        <!-- Wall Color -->
+                        <div class="prop-section" style="margin-bottom:8px;">
+                            <label style="margin-bottom:6px;display:block;">Wall Color</label>
+                            <div class="room-color-row">
+                                <div class="room-color-item">
+                                    <div class="room-color-swatch-wrap">
+                                        <input type="color" id="room-wall-color" value="#efefef" title="Wall Color">
+                                        <span class="room-color-swatch-label">All Walls</span>
+                                    </div>
+                                </div>
+                                <div class="room-color-item">
+                                    <div class="room-color-swatch-wrap">
+                                        <input type="range" id="room-wall-roughness" min="0" max="1" step="0.05" value="0.8" style="width:100%;margin-top:4px;">
+                                        <span class="room-color-swatch-label" style="font-size:9px;">Roughness</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Floor Color -->
+                        <div class="prop-section" style="margin-bottom:8px;">
+                            <label style="margin-bottom:6px;display:block;">Floor Color</label>
+                            <div class="room-color-row">
+                                <div class="room-color-item">
+                                    <div class="room-color-swatch-wrap">
+                                        <input type="color" id="room-floor-color" value="#e0e0e0" title="Floor Color">
+                                        <span class="room-color-swatch-label">Floor</span>
+                                    </div>
+                                </div>
+                                <div class="room-color-item">
+                                    <div class="room-color-swatch-wrap">
+                                        <input type="range" id="room-floor-roughness" min="0" max="1" step="0.05" value="0.8" style="width:100%;margin-top:4px;">
+                                        <span class="room-color-swatch-label" style="font-size:9px;">Roughness</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Metalness slider -->
+                        <div class="prop-section">
+                            <label style="margin-bottom:6px;display:block;">Wall Metalness</label>
+                            <div class="room-color-row">
+                                <div class="room-color-item" style="flex:1;">
+                                    <input type="range" id="room-wall-metalness" min="0" max="1" step="0.05" value="0" style="width:100%;">
+                                </div>
+                                <span id="room-wall-metalness-val" style="font-size:10px;min-width:28px;text-align:right;opacity:.7;">0.00</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
+
             </div>
         </div>
 
