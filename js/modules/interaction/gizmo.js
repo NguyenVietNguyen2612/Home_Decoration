@@ -36,21 +36,23 @@ export function setupGizmos(context) {
 
         const originalUpdate = gizmo.updateMatrixWorld;
         gizmo.updateMatrixWorld = function (force) {
-            originalUpdate.call(this, force); 
+            originalUpdate.call(this, force);
 
             const mode = this.mode;
-            if (!this.picker || !this.picker[mode]) return;
+            if (!this.gizmo || !this.gizmo[mode]) return;
 
-            const handles = [
-                ...this.picker[mode].children,
-                ...this.gizmo[mode].children,
-                ...this.helper[mode].children
+            // CHỈ scale visual handles (gizmo + helper) – KHÔNG scale pickers (hit-area ẩn).
+            // Nếu scale cả pickers, khi chọn object lớn (roomGroup), vùng hit-area
+            // sẽ che phủ toàn bộ viewport → transformControl.axis !== null mọi lúc
+            // → block toàn bộ pointer events → đơ hoàn toàn.
+            const visualHandles = [
+                ...(this.gizmo[mode] ? this.gizmo[mode].children : []),
+                ...(this.helper[mode] ? this.helper[mode].children : []),
             ];
 
-            for (let i = 0; i < handles.length; i++) {
-                const handle = handles[i];
-                if (handle.name === 'DELTA') continue; 
-
+            for (let i = 0; i < visualHandles.length; i++) {
+                const handle = visualHandles[i];
+                if (handle.name === 'DELTA') continue;
                 if (handle.scale.x > 0.0005) {
                     handle.scale.set(2.5, 2.5, 2.5);
                     handle.updateMatrixWorld(true);
@@ -95,6 +97,13 @@ export function setupGizmos(context) {
 
         const t = selectedObjects.length > 1 ? selectionGroup : selectedObjects[0];
         if (!t) return;
+
+        // Bỏ qua roomGroup – không áp dụng floor-clamp hay collision check cho phòng.
+        // Box3 của roomGroup có min.y = 0 → điều kiện < 0.02 luôn đúng → phòng bị đẩy lên liên tục.
+        if (t.name === 'room' || t.userData.isRoom) {
+            if (context.onChange) context.onChange();
+            return;
+        }
 
         const objBox = new THREE.Box3().setFromObject(t);
         if (objBox.min.y < 0.02) {

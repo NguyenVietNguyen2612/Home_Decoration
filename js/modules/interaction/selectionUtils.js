@@ -40,6 +40,8 @@ export function setupSelectionUtils(context) {
             const mats = Array.isArray(node.material) ? node.material : [node.material];
             mats.forEach(mat => {
                 if (!mat) return;
+                // MeshBasicMaterial không có emissive → bỏ qua (vd: lightBlocker)
+                if (mat.type === 'MeshBasicMaterial' || mat.isMeshBasicMaterial) return;
                 if (highlight) {
                     if (!mat.userData.origEmissive) {
                         mat.userData.origEmissive = mat.emissive

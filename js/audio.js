@@ -6,10 +6,10 @@ const CLICK_PATH = 'assets/audio/click.wav';
 // Create audio elements
 const bgmAudio = new Audio(BGM_PATH);
 bgmAudio.loop = true;
-bgmAudio.volume = 0.7; // Soft volume
+bgmAudio.volume = 0.5; // Soft volume
 
 const clickAudio = new Audio(CLICK_PATH);
-clickAudio.volume = 1;
+clickAudio.volume = 0.8;
 
 let isBgmPlaying = false;
 

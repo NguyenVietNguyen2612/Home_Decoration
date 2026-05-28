@@ -106,6 +106,11 @@ export function setupViewSelection(context) {
 
                     // Quét toàn bộ object và kiểm tra va chạm 2D AABB
                     interactableObjects.forEach(obj => {
+                        // Không box-select roomGroup: bbox của nó (~10×10 units) bao phủ toàn bộ
+                        // viewport → mọi lần box-select đều vô tình kéo thêm cả phòng vào selection.
+                        // Để chọn phòng, dùng click trực tiếp vào tường/sàn.
+                        if (obj.name === 'room' || obj.userData.isRoom) return;
+
                         box3.setFromObject(obj);
                         let objMinX = Infinity, objMaxX = -Infinity;
                         let objMinY = Infinity, objMaxY = -Infinity;
@@ -196,6 +201,14 @@ export function setupViewSelection(context) {
                     }
 
                     if (hit) {
+                        // roomGroup được phép chọn bình thường.
+                        // Gizmo pickers đã được fix để không oversized (xem gizmo.js makeConstantWorldSize).
+                        // Khi click tường/sàn (mesh con), parent chain leo lên roomGroup → select phòng.
+                        if (hit.name === 'room' || hit.userData.isRoom) {
+                            bestHit = hit;
+                            break;
+                        }
+
                         if (hit.userData.isWall) {
                             if (!wallHit) wallHit = hit;
                         } else {
