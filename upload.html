@@ -165,6 +165,28 @@
         .btn-open-recent:hover {
             background: #4f46e5;
         }
+        .recent-actions {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+        }
+        .btn-delete-recent {
+            background: rgba(239, 68, 68, 0.15);
+            color: #f87171;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+        .btn-delete-recent:hover {
+            background: #ef4444;
+            color: white;
+            border-color: #ef4444;
+        }
     </style>
 </head>
 <body>
@@ -289,7 +311,7 @@
                 section.style.display = 'block';
                 list.innerHTML = '';
                 
-                recentProjects.forEach(proj => {
+                recentProjects.forEach((proj, index) => {
                     const item = document.createElement('div');
                     item.className = 'recent-item';
                     item.innerHTML = `
@@ -297,7 +319,10 @@
                             <div class="recent-name">${proj.name}</div>
                             <div class="recent-date">${proj.date}</div>
                         </div>
-                        <button class="btn-open-recent" onclick="openRecent('${proj.id}')">Open</button>
+                        <div class="recent-actions">
+                            <button class="btn-open-recent" onclick="openRecent('${proj.id}')">Open</button>
+                            <button class="btn-delete-recent" onclick="deleteRecent(${index})" title="Remove from list">Delete</button>
+                        </div>
                     `;
                     list.appendChild(item);
                 });
@@ -341,6 +366,32 @@
                     }
                 };
             };
+        };
+
+        window.deleteRecent = function(index) {
+            let recentProjects = JSON.parse(localStorage.getItem('recentProjects') || '[]');
+            if (index < 0 || index >= recentProjects.length) return;
+
+            const proj = recentProjects[index];
+
+            // Xóa khỏi danh sách localStorage
+            recentProjects.splice(index, 1);
+            localStorage.setItem('recentProjects', JSON.stringify(recentProjects));
+
+            // Xóa dữ liệu file trong IndexedDB nếu không còn project nào dùng cùng id
+            const stillUsed = recentProjects.some(p => p.id === proj.id);
+            if (!stillUsed && proj.id !== 'projectGLB') {
+                const req = indexedDB.open('RoomDecoDB', 1);
+                req.onsuccess = function(e) {
+                    const db = e.target.result;
+                    if (!db.objectStoreNames.contains('files')) return;
+                    const tx = db.transaction('files', 'readwrite');
+                    tx.objectStore('files').delete(proj.id);
+                };
+            }
+
+            // Cập nhật lại UI
+            loadRecentProjects();
         };
 
         // Initialize

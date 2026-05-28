@@ -29,17 +29,17 @@ const inputGridColor = document.getElementById('grid-color');
 function updateGrid() {
     const size = parseInt(inputGridSize.value) || 100;
     const color = inputGridColor.value;
-    
+
     // Cập nhật kích thước
     groundPlane.geometry.dispose(); // Xóa hình học cũ
     groundPlane.geometry = new THREE.PlaneGeometry(size, size);
-    
+
     // Cập nhật độ lặp lại của texture (tránh kéo căng)
     if (groundPlane.material.map) {
         groundPlane.material.map.repeat.set(size / 10, size / 10);
         groundPlane.material.map.needsUpdate = true;
     }
-    
+
     // Cập nhật màu sắc
     groundPlane.material.color.set(color);
 }
@@ -126,7 +126,7 @@ if (btnSave) {
         if (!designName) return;
 
         const exporter = new GLTFExporter();
-        
+
         // Nhóm tất cả các object vào một group để xuất khẩu
         const exportGroup = new THREE.Group();
         exportGroup.name = "export_scene";
@@ -142,7 +142,7 @@ if (btnSave) {
             exportGroup,
             function (gltf) {
                 const blob = new Blob([gltf], { type: 'application/octet-stream' });
-                
+
                 // 1. Tải file về máy
                 const url = URL.createObjectURL(blob);
                 const link = document.createElement('a');
@@ -169,19 +169,19 @@ if (btnSave) {
 
                 // 3. Lưu dữ liệu GLB vào IndexedDB
                 const request = indexedDB.open('RoomDecoDB', 1);
-                request.onupgradeneeded = function(e) {
+                request.onupgradeneeded = function (e) {
                     const db = e.target.result;
                     if (!db.objectStoreNames.contains('files')) {
                         db.createObjectStore('files');
                     }
                 };
-                request.onsuccess = function(e) {
+                request.onsuccess = function (e) {
                     const db = e.target.result;
                     const tx = db.transaction('files', 'readwrite');
                     const store = tx.objectStore('files');
                     store.put(blob, projectId);
                     // Cập nhật luôn projectGLB hiện tại để lần sau load vào lại đúng file này
-                    store.put(blob, 'projectGLB'); 
+                    store.put(blob, 'projectGLB');
                 };
             },
             function (error) {
@@ -196,10 +196,10 @@ if (btnSave) {
 // --- XỬ LÝ TẢI FILE (.GLB) ---
 function processGLBFile(file) {
     const reader = new FileReader();
-    reader.onload = function(e) {
+    reader.onload = function (e) {
         const contents = e.target.result;
         const loader = new GLTFLoader();
-        loader.parse(contents, '', function(gltf) {
+        loader.parse(contents, '', function (gltf) {
             const loadedGroup = gltf.scene.children[0] || gltf.scene;
 
             // Xóa các object hiện tại
@@ -246,14 +246,14 @@ if (fileLoaderInput) {
 const urlParams = new URLSearchParams(window.location.search);
 if (urlParams.get('action') === 'loadFromDB') {
     const request = indexedDB.open('RoomDecoDB', 1);
-    request.onsuccess = function(e) {
+    request.onsuccess = function (e) {
         const db = e.target.result;
         if (!db.objectStoreNames.contains('files')) return;
         const tx = db.transaction('files', 'readonly');
         const store = tx.objectStore('files');
         const getReq = store.get('projectGLB');
-        
-        getReq.onsuccess = function() {
+
+        getReq.onsuccess = function () {
             if (getReq.result) {
                 processGLBFile(getReq.result);
                 // Dọn URL để tránh reload lại tự parse tiếp
@@ -261,7 +261,7 @@ if (urlParams.get('action') === 'loadFromDB') {
             }
         };
     };
-    request.onerror = function() {
+    request.onerror = function () {
         console.error('Không thể truy cập IndexedDB');
     };
 }
@@ -289,25 +289,25 @@ if (cinematicContainer) {
 
 // Đường dẫn camera (Nhiều vị trí)
 const cameraPath = new THREE.CatmullRomCurve3([
-    new THREE.Vector3( 25, 15,  25), // Góc cao
-    new THREE.Vector3(-20,  5,  20), // Góc thấp
+    new THREE.Vector3(25, 15, 25), // Góc cao
+    new THREE.Vector3(-20, 5, 20), // Góc thấp
     new THREE.Vector3(-25, 10, -25), // Góc vừa
-    new THREE.Vector3( 20,  5, -20), // Góc thấp đối diện
-    new THREE.Vector3( 28,  2,  28), // Góc siêu thấp từ sát vách tường
-    new THREE.Vector3(  0, 25,   0), // Từ trên trần nhìn xuống
-    new THREE.Vector3( 25, 15,  25)  // Vòng lặp
+    new THREE.Vector3(20, 5, -20), // Góc thấp đối diện
+    new THREE.Vector3(28, 2, 28), // Góc siêu thấp từ sát vách tường
+    new THREE.Vector3(0, 25, 0), // Từ trên trần nhìn xuống
+    new THREE.Vector3(25, 15, 25)  // Vòng lặp
 ]);
 cameraPath.closed = true;
 
 // Đường dẫn mục tiêu nhìn
 const lookAtPath = new THREE.CatmullRomCurve3([
-    new THREE.Vector3( 0,  3,  0),
-    new THREE.Vector3( 5,  3, -5),
-    new THREE.Vector3( 0,  1,  0),
-    new THREE.Vector3(-5,  3,  5),
-    new THREE.Vector3(-5,  5, -5), // Nhìn chéo xuyên phòng
-    new THREE.Vector3( 0,  1,  0),
-    new THREE.Vector3( 0,  3,  0)
+    new THREE.Vector3(0, 3, 0),
+    new THREE.Vector3(5, 3, -5),
+    new THREE.Vector3(0, 1, 0),
+    new THREE.Vector3(-5, 3, 5),
+    new THREE.Vector3(-5, 5, -5), // Nhìn chéo xuyên phòng
+    new THREE.Vector3(0, 1, 0),
+    new THREE.Vector3(0, 3, 0)
 ]);
 lookAtPath.closed = true;
 
@@ -327,13 +327,13 @@ if (btnPreview) {
         isPreviewing = true;
         cinematicOverlay.classList.remove('hidden');
         cinematicOverlay.style.display = 'block';
-        
+
         const w = window.innerWidth;
         const h = window.innerHeight;
         cinematicCamera.aspect = w / h;
         cinematicCamera.updateProjectionMatrix();
         cinematicRenderer.setSize(w, h);
-        
+
         previewProgress = 0;
     });
 }
@@ -369,19 +369,19 @@ function updatePhysics() {
 
         if (mesh.position.y > mesh.userData.baseY) {
             mesh.userData.velocity.y += gravity;
-            
+
             const nextY = mesh.position.y + mesh.userData.velocity.y;
-            
+
             // --- Va chạm dọc: tìm object cao nhất bên dưới ---
             // Lấy AABB của object đang rơi tại vị trí TIẾP THEO
             const meshBox = new THREE.Box3().setFromObject(mesh);
             const meshHeight = meshBox.max.y - meshBox.min.y;
-            
+
             // Giả lập vị trí tiếp theo để tính box
             const futureMinY = nextY - meshHeight / 2;
-            
+
             let landingY = mesh.userData.baseY; // Mặc định là mặt sàn
-            
+
             for (const otherMesh of interactionManager.interactableObjects) {
                 if (otherMesh === mesh) continue;
                 // Bỏ qua chính các physicsObjects khác không liên quan
@@ -389,7 +389,7 @@ function updatePhysics() {
                 if (otherMesh.name === 'room') continue;
 
                 const otherBox = new THREE.Box3().setFromObject(otherMesh);
-                
+
                 // Kiểm tra XZ overlap (2 bounding box có chồng lên nhau theo mặt phẳng ngang không?)
                 const meshBoxXZ = meshBox.clone();
                 meshBoxXZ.min.y = -Infinity;
@@ -397,12 +397,12 @@ function updatePhysics() {
                 const otherBoxXZ = otherBox.clone();
                 otherBoxXZ.min.y = -Infinity;
                 otherBoxXZ.max.y = Infinity;
-                
+
                 if (!meshBoxXZ.intersectsBox(otherBoxXZ)) continue; // Không chồng XZ → bỏ qua
-                
+
                 // Nếu chồng XZ, kiểm tra xem đỉnh của otherMesh có nằm TRONG đường rơi không
                 const topOfOther = otherBox.max.y;
-                
+
                 // object đang rơi xuống, topOfOther phải cao hơn sàn và thấp hơn vị trí hiện tại
                 if (topOfOther > mesh.userData.baseY && topOfOther < mesh.position.y) {
                     // Điểm đứng mới = đỉnh object kia + nửa chiều cao object đang rơi
@@ -412,29 +412,29 @@ function updatePhysics() {
                     }
                 }
             }
-            
+
             // Thực sự áp dụng di chuyển
             mesh.position.y += mesh.userData.velocity.y;
-            
+
             // Đồng bộ Properties Panel nếu vật thể đang rơi mà lại đang được select
             if (interactionManager && interactionManager.getSelectedObjects().includes(mesh)) {
                 if (typeof interactionManager.updatePropertiesPanel === 'function') {
                     interactionManager.updatePropertiesPanel();
                 }
             }
-            
+
             // Đảm bảo landingY không bao giờ thấp hơn mặt sàn gốc
             landingY = Math.max(landingY, mesh.userData.baseY);
-            
+
             if (mesh.position.y <= landingY) {
                 mesh.position.y = landingY;
                 mesh.userData.velocity.y = 0;
-                
+
                 physicsObjects.splice(i, 1); // Xóa khỏi danh sách vật lý khi đã nằm yên
                 if (collisionManager) collisionManager.update();
                 if (mesh.userData.isDoor) updateWallHoles(scene);
             }
-            
+
             // Failsafe: nếu vì lý do nào đó object đã lọt xuống dưới sàn → kéo lên ngay
             if (mesh.position.y < mesh.userData.baseY) {
                 mesh.position.y = mesh.userData.baseY;
@@ -463,13 +463,13 @@ function animate() {
     if (isPreviewing) {
         previewProgress += 0.0015; // Tốc độ di chuyển dọc curve
         if (previewProgress > 1) previewProgress -= 1;
-        
+
         const camPos = cameraPath.getPointAt(previewProgress);
         const lookPos = lookAtPath.getPointAt(previewProgress);
-        
+
         cinematicCamera.position.copy(camPos);
         cinematicCamera.lookAt(lookPos);
-        
+
         cinematicRenderer.render(scene, cinematicCamera);
     }
 
