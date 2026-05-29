@@ -237,6 +237,21 @@ export async function createModel(type) {
     if (nt.includes('tv') || nt.includes('television')) targetSize = 2.0;
     if (nt.includes('gaming_desktop') || nt.includes('pc-9801')) targetSize = 1.2;
     if (nt.includes('speaker') || nt.includes('fnaf'))  targetSize = 1.0;
+    // New objects
+    if (nt.includes('gaming_chair'))   targetSize = 1.8;
+    if (nt.includes('laptop'))         targetSize = 0.5;
+    if (nt.includes('computer_mouse')) targetSize = 0.2;
+    if (nt.includes('monitor'))        targetSize = 0.9;
+    if (nt.includes('fridge') || nt.includes('samsung')) targetSize = 2.5;
+    if (nt.includes('microwave'))      targetSize = 0.6;
+    if (nt.includes('robot_vacuum'))   targetSize = 0.4;
+    if (nt.includes('curtain'))        targetSize = 3.5;
+    if (nt.includes('wall_clock'))     targetSize = 0.5;
+    if (nt.includes('cat_ornament'))   targetSize = 0.4;
+    if (nt.includes('oscillating') || nt.includes('pedestal')) targetSize = 1.8;
+    if (nt.includes('glass_window'))   targetSize = 2.5;
+    if (nt.includes('modern_furniture') || nt.includes('stylized_furniture')) targetSize = 2.5;
+    if (nt.includes('desk_light'))     targetSize = 1.0;
 
     for (const url of uniqueCandidates) {
         if (await fileExists(encodeURI(url))) {
