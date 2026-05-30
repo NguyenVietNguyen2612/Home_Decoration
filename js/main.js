@@ -76,6 +76,14 @@ if (btnIsolateLight) {
     });
 }
 
+const btnToggleCollision = document.getElementById('btn-toggle-collision');
+if (btnToggleCollision) {
+    btnToggleCollision.addEventListener('click', () => {
+        const active = btnToggleCollision.classList.toggle('active');
+        btnToggleCollision.title = active ? 'Kiểm soát va chạm: Đang bật' : 'Kiểm soát va chạm: Đang tắt (Cho phép chồng/xuyên nhau)';
+    });
+}
+
 // --- VẼ PHÒNG ---
 const { roomGroup, walls } = createRoomGeometry('room_basic');
 scene.add(roomGroup);

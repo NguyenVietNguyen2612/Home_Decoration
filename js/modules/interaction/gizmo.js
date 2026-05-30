@@ -111,19 +111,21 @@ export function setupGizmos(context) {
             t.updateMatrixWorld(true);
         }
 
-        if (!collisionManager) {
-            _saveState(t);
-            return;
-        }
+        const collisionBtn = document.getElementById('btn-toggle-collision');
+        const enableCollision = collisionBtn ? collisionBtn.classList.contains('active') : false;
 
+        if (enableCollision && collisionManager) {
+            const { collides, collidingWith } = collisionManager.checkCollision(t, selectedObjects, _sv.pos);
 
-        const { collides, collidingWith } = collisionManager.checkCollision(t, selectedObjects, _sv.pos);
-
-        if (collides) {
-            collisionManager.showColliding([...collidingWith]);
-            _restoreState(t);
+            if (collides) {
+                collisionManager.showColliding([...collidingWith]);
+                _restoreState(t);
+            } else {
+                collisionManager.hideAll();
+                _saveState(t);
+            }
         } else {
-            collisionManager.hideAll();
+            if (collisionManager) collisionManager.hideAll();
             _saveState(t);
         }
         
