@@ -140,11 +140,17 @@
         .recent-info {
             display: flex;
             flex-direction: column;
+            overflow: hidden;
+            flex: 1;
+            padding-right: 15px;
         }
         .recent-name {
             color: #f8fafc;
             font-weight: 600;
             font-size: 1rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
         .recent-date {
             color: #94a3b8;
@@ -197,13 +203,13 @@
 
     <div class="upload-container">
         <h1>Upload Project</h1>
-        <p>Select your .glb project file to continue editing</p>
+        <p>Upload your project to continue editing in 3D</p>
         
         <div class="drop-zone" id="drop-zone">
             <span class="icon">📁</span>
-            <div class="text">Drag & drop .glb file here</div>
-            <div class="sub-text">or click to browse</div>
-            <input type="file" id="file-input" accept=".glb">
+            <div class="text">Drag & drop your project file here</div>
+            <div class="sub-text">Supports <strong>.json</strong> (full project) and <strong>.glb</strong> (geometry only)</div>
+            <input type="file" id="file-input" accept=".glb,.json">
         </div>
 
         <div class="loading" id="loading">Loading data...</div>
@@ -255,8 +261,9 @@
         });
 
         function handleFile(file) {
-            if (!file.name.toLowerCase().endsWith('.glb')) {
-                CustomModal.alert('Please select a valid .glb file');
+            const ext = file.name.split('.').pop().toLowerCase();
+            if (ext !== 'glb' && ext !== 'json') {
+                CustomModal.alert('Please select a valid .json or .glb file');
                 return;
             }
 
@@ -279,8 +286,9 @@
                 const tx = db.transaction('files', 'readwrite');
                 const store = tx.objectStore('files');
                 
-                // Put the file into DB
+                // Lưu file và loại file để editor biết cách load
                 store.put(file, 'projectGLB');
+                store.put(ext, 'projectFileType'); // 'json' hoặc 'glb'
 
                 tx.oncomplete = function() {
                     // Navigate to editor with load action
@@ -316,7 +324,7 @@
                     item.className = 'recent-item';
                     item.innerHTML = `
                         <div class="recent-info">
-                            <div class="recent-name">${proj.name}</div>
+                            <div class="recent-name" title="${proj.name}">${proj.name}</div>
                             <div class="recent-date">${proj.date}</div>
                         </div>
                         <div class="recent-actions">
@@ -326,6 +334,10 @@
                     `;
                     list.appendChild(item);
                 });
+            } else {
+                // Ẩn phần recent nếu không còn project nào
+                section.style.display = 'none';
+                list.innerHTML = '';
             }
         }
 
@@ -347,17 +359,21 @@
                 const db = e.target.result;
                 const tx = db.transaction('files', 'readonly');
                 const store = tx.objectStore('files');
-                const getReq = store.get(projectId);
+                const getFile = store.get(projectId);
+                const getType = store.get(projectId + '_type'); // loại file lưu kèm
                 
-                getReq.onsuccess = function() {
-                    if (getReq.result) {
-                        // Put it into 'projectGLB' so editor can load it easily
-                        const txWrite = db.transaction('files', 'readwrite');
-                        const storeWrite = txWrite.objectStore('files');
-                        storeWrite.put(getReq.result, 'projectGLB');
-                        
-                        txWrite.oncomplete = function() {
-                            window.location.href = 'editor.html?action=loadFromDB';
+                getFile.onsuccess = function() {
+                    if (getFile.result) {
+                        getType.onsuccess = function() {
+                            const fileType = getType.result || 'glb';
+                            const txWrite = db.transaction('files', 'readwrite');
+                            const storeWrite = txWrite.objectStore('files');
+                            storeWrite.put(getFile.result, 'projectGLB');
+                            storeWrite.put(fileType, 'projectFileType');
+                            
+                            txWrite.oncomplete = function() {
+                                window.location.href = 'editor.html?action=loadFromDB';
+                            };
                         };
                     } else {
                         CustomModal.alert('Project data not found! It may have been cleared from temporary storage.').then(() => {
@@ -387,6 +403,7 @@
                     if (!db.objectStoreNames.contains('files')) return;
                     const tx = db.transaction('files', 'readwrite');
                     tx.objectStore('files').delete(proj.id);
+                    tx.objectStore('files').delete(proj.id + '_type');
                 };
             }
 

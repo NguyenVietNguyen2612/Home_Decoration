@@ -156,7 +156,10 @@ export function setupDualScene() {
     camera2D.position.set(0, 20, 0);
     camera2D.lookAt(0, 0, 0);
 
-    const renderer2D = new THREE.WebGLRenderer({ antialias: true });
+    const renderer2D = new THREE.WebGLRenderer({ 
+        antialias: true,
+        powerPreference: 'high-performance'
+    });
     renderer2D.setSize(container2D.clientWidth, container2D.clientHeight);
     container2D.appendChild(renderer2D.domElement);
 
@@ -184,7 +187,11 @@ export function setupDualScene() {
     camera3D.position.set(10, 8, 10);
     camera3D.lookAt(0, 0, 0);
 
-    const renderer3D = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    const renderer3D = new THREE.WebGLRenderer({ 
+        antialias: true, 
+        alpha: true,
+        powerPreference: 'high-performance'
+    });
     renderer3D.setSize(container3D.clientWidth, container3D.clientHeight);
     renderer3D.shadowMap.enabled = true;
     container3D.appendChild(renderer3D.domElement);
@@ -211,13 +218,15 @@ export function setupDualScene() {
             renderer2D.setSize(w2, h2);
         }
 
-        // Update 3D
-        const w3 = container3D.clientWidth;
-        const h3 = container3D.clientHeight;
-        if (w3 > 0 && h3 > 0) {
-            camera3D.aspect = w3 / h3;
-            camera3D.updateProjectionMatrix();
-            renderer3D.setSize(w3, h3);
+        // Update 3D (Chỉ cập nhật nếu KHÔNG trong chế độ preview)
+        if (!window.isPreviewing) {
+            const w3 = container3D.clientWidth;
+            const h3 = container3D.clientHeight;
+            if (w3 > 0 && h3 > 0) {
+                camera3D.aspect = w3 / h3;
+                camera3D.updateProjectionMatrix();
+                renderer3D.setSize(w3, h3);
+            }
         }
     });
 
