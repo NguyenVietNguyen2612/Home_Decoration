@@ -286,9 +286,21 @@
                 const tx = db.transaction('files', 'readwrite');
                 const store = tx.objectStore('files');
                 
-                // Lưu file và loại file để editor biết cách load
+                // Lưu file và loại file để editor biết cách load hiện tại
                 store.put(file, 'projectGLB');
                 store.put(ext, 'projectFileType'); // 'json' hoặc 'glb'
+
+                // Đồng thời lưu vào Recent Projects
+                const projectId = 'proj_' + Date.now();
+                const designName = file.name.replace(/\.[^/.]+$/, ""); // Bỏ đuôi file
+                
+                store.put(file, projectId);
+                store.put(ext, projectId + '_type');
+
+                let recentProjects = JSON.parse(localStorage.getItem('recentProjects') || '[]');
+                recentProjects.unshift({ id: projectId, name: designName, date: new Date().toLocaleString('vi-VN') });
+                if (recentProjects.length > 5) recentProjects.pop();
+                localStorage.setItem('recentProjects', JSON.stringify(recentProjects));
 
                 tx.oncomplete = function() {
                     // Navigate to editor with load action
