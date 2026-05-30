@@ -53,7 +53,7 @@ const TutorialSteps = [
         layoutClass: 'mascot-right'
     },
     {
-        text: "Adjust the <b>Time of Day</b> (lighting) and <b>Grid Settings</b> (snapping) here to customize your workspace.",
+        text: "Adjust the <b>Time of Day</b> (lighting), <b>Grid</b>, and <b>Collision</b> (🧩) here to customize your workspace.",
         target: "#bottom-toolbar .tool-group:nth-child(5)",
         padding: 10,
         posClass: 'pos-top-right',

@@ -386,7 +386,7 @@ const btnSaveJson = document.getElementById('btn-save-json');
 if (btnSaveJson) {
     btnSaveJson.addEventListener('click', async () => {
         if (saveDropdown) saveDropdown.classList.add('hidden');
-        const designName = await CustomModal.prompt('Nhập tên file (lưu dưới dạng .json - đầy đủ phòng và ánh sáng):', 'My_Dream_Room');
+        const designName = await CustomModal.prompt('Enter file name (saves as .json - full room and lighting):', 'My_Dream_Room');
         if (!designName) return;
 
         const projectData = await saveProject(designName);
@@ -419,7 +419,7 @@ const btnSaveGlb = document.getElementById('btn-save-glb');
 if (btnSaveGlb) {
     btnSaveGlb.addEventListener('click', async () => {
         if (saveDropdown) saveDropdown.classList.add('hidden');
-        const designName = await CustomModal.prompt('Nhập tên file (lưu dưới dạng .glb - chỉ geometry):', 'My_Dream_Room');
+        const designName = await CustomModal.prompt('Enter file name (saves as .glb - geometry only):', 'My_Dream_Room');
         if (!designName) return;
 
         const exporter = new GLTFExporter();
@@ -460,7 +460,7 @@ if (btnSaveGlb) {
             },
             function (error) {
                 console.error('Lỗi khi xuất GLTF:', error);
-                CustomModal.alert('Có lỗi xảy ra khi lưu file!');
+                CustomModal.alert('An error occurred while saving the file!');
             },
             { binary: true }
         );
