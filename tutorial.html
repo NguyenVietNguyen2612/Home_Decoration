@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mini 3D Interior Design</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/tutorial.css">
+
+    <!-- Sử dụng Import Map để nạp Three.js từ CDN - Pin cùng version để tránh xung đột prototype -->
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+                "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+            }
+        }
+    </script>
+</head>
+
+<body>
+    <script src="js/settings.js"></script>
+    <div id="app-container">
+        <!-- Panel Trái: Thư viện Objects -->
+        <div id="left-sidebar">
+            <div style="padding: 15px 15px 0 15px;">
+                <button class="btn-back-home" onclick="window.location.href='index.html'">
+                    <span style="font-size: 18px;">🏠</span> Back to Home
+                </button>
+            </div>
+            <div class="search-box">
+                <input type="text" id="search-input" placeholder="Search objects...">
+            </div>
+            <div id="sidebar-content" class="sidebar-scrollable">
+
+                <details class="category-details">
+                    <summary class="category-header">🛋️ Furnitures</summary>
+                    <div style="margin-left: 10px;" id="furnitures-categories">
+                        <p style="color: #888; padding: 10px 0;">Loading furniture items...</p>
+                    </div>
+                </details>
+
+                <details class="category-details">
+                    <summary class="category-header">🎨 Wallpapers</summary>
+                    <div class="object-grid" id="rooms-grid">
+                        <div class="object-item" data-type="wall_wallpaper_floral" draggable="true">
+                            <img src="rooms/wallpaper_floral.png" alt="Floral Wallpaper" draggable="false">
+                            <span>Floral</span>
+                        </div>
+                        <div class="object-item" data-type="wall_brick_wall" draggable="true">
+                            <img src="rooms/brick_wall.png" alt="Brick Wall" draggable="false">
+                            <span>Brick</span>
+                        </div>
+                        <div class="object-item" data-type="wall_wood_panel" draggable="true">
+                            <img src="rooms/wood_panel.png" alt="Wood Panel" draggable="false">
+                            <span>Wood Panel</span>
+                        </div>
+                        <div class="object-item" data-type="wall_concrete_wall" draggable="true">
+                            <img src="rooms/concrete_wall.png" alt="Concrete Wall" draggable="false">
+                            <span>Concrete</span>
+                        </div>
+                        <div class="object-item" data-type="wall_paint_blue" draggable="true">
+                            <img src="rooms/paint_blue.png" alt="Blue Paint" draggable="false">
+                            <span>Blue Paint</span>
+                        </div>
+                    </div>
+                </details>
+
+                <details class="category-details">
+                    <summary class="category-header">🌿 Floor</summary>
+                    <div class="object-grid" id="ground-grid">
+                        <div class="object-item" data-type="ground_wood" draggable="true">
+                            <img src="grounds/wood.png" alt="Wood Floor" draggable="false">
+                            <span>Wood</span>
+                        </div>
+                        <div class="object-item" data-type="ground_tile" draggable="true">
+                            <img src="grounds/tile.png" alt="Tile Floor" draggable="false">
+                            <span>Tile</span>
+                        </div>
+                        <div class="object-item" data-type="ground_grass" draggable="true">
+                            <img src="grounds/grass.png" alt="Grass Floor" draggable="false">
+                            <span>Grass</span>
+                        </div>
+                        <div class="object-item" data-type="ground_marble" draggable="true">
+                            <img src="grounds/marble.png" alt="Marble Floor" draggable="false">
+                            <span>Marble</span>
+                        </div>
+                        <div class="object-item" data-type="ground_concrete" draggable="true">
+                            <img src="grounds/concrete.png" alt="Concrete Floor" draggable="false">
+                            <span>Concrete</span>
+                        </div>
+                        <div class="object-item" data-type="ground_brick" draggable="true">
+                            <img src="grounds/brick.png" alt="Brick Floor" draggable="false">
+                            <span>Brick</span>
+                        </div>
+                        <div class="object-item" data-type="ground_stone" draggable="true">
+                            <img src="grounds/stone.png" alt="Stone Floor" draggable="false">
+                            <span>Stone</span>
+                        </div>
+                        <div class="object-item" data-type="ground_sand" draggable="true">
+                            <img src="grounds/sand.png" alt="Sand Floor" draggable="false">
+                            <span>Sand</span>
+                        </div>
+                    </div>
+                </details>
+
+            </div>
+        </div>
+
+        <!-- Thanh kéo thả 1: giữa Sidebar và Main Views -->
+        <div class="resize-handle" id="rh-sidebar" title="Kéo để thay đổi độ rộng">
+            <div class="resize-grip"></div>
+        </div>
+
+        <!-- Vùng chính giữa và bên phải: Views -->
+        <div id="main-views">
+            <div id="view-2d-container">
+                <div class="view-title">2D Top-down View</div>
+                <div id="view-2d"></div>
+            </div>
+
+            <!-- Thanh kéo thả 2: giữa 2D View và 3D View -->
+            <div class="resize-handle resize-handle-inner" id="rh-views" title="Kéo để thay đổi độ rộng">
+                <div class="resize-grip"></div>
+            </div>
+
+            <div id="view-3d-container">
+                <div class="view-title">3D Preview</div>
+                <div id="view-3d"></div>
+                <!-- Bảng thuộc tính (Properties Panel) -->
+                <div id="properties-panel" class="hidden">
+                    <div class="prop-header"
+                        style="display: flex; justify-content: space-between; align-items: center;">
+                        <span>Object Properties</span>
+                        <button id="btn-toggle-props"
+                            style="background: none; border: none; cursor: pointer; color: inherit; font-size: 12px;">▼</button>
+                    </div>
+                    <div id="prop-content">
+                        <div class="prop-section">
+                            <label>Position</label>
+                            <div class="prop-row">
+                                <div class="prop-input-wrapper"><span>X</span><input type="number" id="prop-pos-x"
+                                        step="0.1"></div>
+                                <div class="prop-input-wrapper"><span>Y</span><input type="number" id="prop-pos-y"
+                                        step="0.1"></div>
+                                <div class="prop-input-wrapper"><span>Z</span><input type="number" id="prop-pos-z"
+                                        step="0.1"></div>
+                            </div>
+                        </div>
+                        <div class="prop-section">
+                            <label>Rotation</label>
+                            <div class="prop-row">
+                                <div class="prop-input-wrapper"><span>X</span><input type="number" id="prop-rot-x"
+                                        step="1">
+                                </div>
+                                <div class="prop-input-wrapper"><span>Y</span><input type="number" id="prop-rot-y"
+                                        step="1">
+                                </div>
+                                <div class="prop-input-wrapper"><span>Z</span><input type="number" id="prop-rot-z"
+                                        step="1">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="prop-section">
+                            <label>Scale</label>
+                            <div class="prop-row">
+                                <div class="prop-input-wrapper"><span>X</span><input type="number" id="prop-scale-x"
+                                        step="0.1" min="0.01"></div>
+                                <div class="prop-input-wrapper"><span>Y</span><input type="number" id="prop-scale-y"
+                                        step="0.1" min="0.01"></div>
+                                <div class="prop-input-wrapper"><span>Z</span><input type="number" id="prop-scale-z"
+                                        step="0.1" min="0.01"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dưới cùng: Toolbar cho các phép biến đổi -->
+        <div id="bottom-toolbar">
+            <div class="tool-group">
+                <button class="tool-btn icon-btn" id="btn-translate" title="Move">⬌</button>
+                <button class="tool-btn icon-btn" id="btn-rotate" title="Rotate">↻</button>
+                <button class="tool-btn icon-btn" id="btn-scale" title="Scale">⤡</button>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="tool-group">
+                <button class="tool-btn icon-btn" id="btn-undo" title="Undo">↩</button>
+                <button class="tool-btn icon-btn" id="btn-redo" title="Redo">↪</button>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="tool-group" style="padding: 4px 10px;">
+                <button class="tool-btn icon-btn" id="btn-isolate-light" title="Isolate Light"
+                    style="margin-right: 4px;">💡</button>
+                <span style="font-size: 15px; margin-right: 4px;" title="Time of Day">☀️</span>
+                <input type="range" id="time-slider" min="0" max="24" step="0.1" value="12"
+                    style="width: 80px; cursor: ew-resize;">
+                <span id="time-display"
+                    style="font-size: 12px; min-width: 38px; font-family: monospace; font-weight: 600; text-align: right;">12:00</span>
+
+                <div class="divider" style="margin: 0 8px; height: 16px;"></div>
+
+                <span style="font-size: 15px; margin-right: 4px;" title="Grid settings">📐</span>
+                <input type="number" id="grid-size" value="100" min="10" max="500" step="10" title="Grid Size"
+                    style="width: 45px; height: 22px; border: 1px solid rgba(0,0,0,0.1); border-radius: 4px; padding: 2px 4px; font-size: 12px; background: rgba(255,255,255,0.5);">
+                <input type="color" id="grid-color" value="#888888" title="Grid Color"
+                    style="padding: 0; margin-left: 4px; cursor: pointer; border: 1px solid rgba(0,0,0,0.1); border-radius: 4px; background: transparent; width: 22px; height: 22px;">
+            </div>
+
+            <div class="spacer" style="flex: 1;"></div>
+
+            <div class="tool-group">
+                <button class="tool-btn icon-btn text-danger" id="btn-delete" title="Delete">🗑️</button>
+            </div>
+
+            <div class="divider"></div>
+
+            <button class="tool-btn action-btn" id="btn-new-room" title="New Room">➕ <span>New Room</span></button>
+            <button class="tool-btn action-btn" id="btn-save" title="Save">💾 <span>Save</span></button>
+            <button class="tool-btn primary action-btn" id="btn-preview" title="Preview">🎥
+                <span>Preview</span></button>
+
+            <div class="divider"></div>
+            <button class="tool-btn icon-btn" id="btn-help" title="Help">❓</button>
+        </div>
+    </div>
+
+    <div id="help-panel" class="hidden">
+        <div id="help-card">
+            <div id="help-header">
+                <h2>User Guide</h2>
+                <button id="help-close-btn" title="Close help">✕</button>
+            </div>
+            <div class="help-content"
+                style="max-height: 400px; overflow-y: auto; padding-right: 10px; line-height: 1.6;">
+                <p>1. <strong>Add Objects:</strong> Drag and drop from the left library into the 2D or 3D view.
+                    Wallpapers and floors automatically apply to walls and ground.</p>
+                <p>2. <strong>Select & Transform:</strong> Left-click to select. Use the toolbar or press
+                    <strong>T</strong> (Move), <strong>E</strong> (Rotate), <strong>R</strong> (Scale). Drag the 3D
+                    Gizmo axes to adjust.</p>
+                <p>3. <strong>Properties Panel:</strong> When an object is selected, precisely edit its exact Position,
+                    Rotation, and Scale values on the right panel.</p>
+                <p>4. <strong>Undo / Redo:</strong> Use the toolbar arrows or press <strong>Ctrl+Z</strong> (Undo) and
+                    <strong>Ctrl+Y</strong> (Redo) to revert changes.</p>
+                <p>5. <strong>Camera Navigation:</strong> Right-click and drag to rotate (in 3D) or pan (in 2D). Use the
+                    Scroll wheel to Zoom In/Out.</p>
+                <p>6. <strong>Environment:</strong> Adjust the ☀️ Time of Day slider to change lighting, and tweak 📐
+                    Grid Settings for precision snapping.</p>
+                <p>7. <strong>Delete Objects:</strong> Select objects and press <strong>Delete / Backspace</strong> or
+                    the 🗑️ Delete button on the toolbar.</p>
+                <p>8. <strong>Project Actions:</strong> Use <b>New Room</b> to start fresh, <b>Save</b> to download your
+                    .json project, and <b>Preview</b> for a cinematic view.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Fullscreen Cinematic Preview Overlay -->
+    <div id="cinematic-overlay" class="hidden"
+        style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 10000; background: #000; display: none;">
+        <button id="btn-close-preview"
+            style="position: absolute; top: 20px; right: 20px; z-index: 10001; padding: 10px 20px; font-size: 16px; cursor: pointer; background: rgba(0,0,0,0.5); color: white; border: 1px solid white; border-radius: 5px; transition: background 0.3s;"
+            onmouseover="this.style.background='rgba(0,0,0,0.8)'" onmouseout="this.style.background='rgba(0,0,0,0.5)'">✕
+            Close Preview</button>
+        <div id="cinematic-container" style="width: 100%; height: 100%;"></div>
+    </div>
+
+    <input type="file" id="file-loader" accept=".glb" style="display: none;">
+
+    <script type="module" src="js/main.js"></script>
+    <script src="js/tutorial.js"></script>
+    <script src="js/audio.js"></script>
+</body>
+
+</html>

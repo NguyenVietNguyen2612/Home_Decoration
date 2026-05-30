@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Room Decoration - Upload Project</title>
+    <link rel="stylesheet" href="css/home.css">
+    <style>
+        .upload-container {
+            position: relative;
+            z-index: 10;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 50px 60px;
+            text-align: center;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            max-width: 500px;
+            width: 90%;
+            animation: slideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .upload-container h1 {
+            font-size: 2.2rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+            color: #f8fafc;
+        }
+
+        .upload-container p {
+            font-size: 1rem;
+            color: #cbd5e1;
+            margin-bottom: 30px;
+        }
+
+        .drop-zone {
+            border: 2px dashed rgba(255, 255, 255, 0.3);
+            border-radius: 16px;
+            padding: 40px 20px;
+            background: rgba(255, 255, 255, 0.02);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            margin-bottom: 20px;
+        }
+
+        .drop-zone:hover, .drop-zone.dragover {
+            background: rgba(99, 102, 241, 0.1);
+            border-color: #6366f1;
+            transform: translateY(-2px);
+        }
+
+        .drop-zone .icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .drop-zone .text {
+            color: #f8fafc;
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .drop-zone .sub-text {
+            color: #94a3b8;
+            font-size: 0.9rem;
+        }
+
+        .btn-back {
+            display: inline-block;
+            margin-top: 15px;
+            color: #94a3b8;
+            text-decoration: none;
+            font-size: 1rem;
+            transition: color 0.3s;
+        }
+
+        .btn-back:hover {
+            color: #f8fafc;
+        }
+
+        #file-input {
+            display: none;
+        }
+
+        /* Loading Spinner */
+        .loading {
+            display: none;
+            color: #6366f1;
+            font-weight: 600;
+            margin-top: 20px;
+        }
+
+        /* Recent Projects */
+        .recent-section {
+            margin-top: 30px;
+            text-align: left;
+            display: none;
+            animation: slideUp 0.5s ease forwards;
+        }
+        .recent-section h3 {
+            color: #f8fafc;
+            font-size: 1.1rem;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .recent-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-height: 200px;
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+        .recent-list::-webkit-scrollbar {
+            width: 6px;
+        }
+        .recent-list::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+        }
+        .recent-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.03);
+            padding: 12px 16px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.2s;
+        }
+        .recent-item:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+        .recent-info {
+            display: flex;
+            flex-direction: column;
+        }
+        .recent-name {
+            color: #f8fafc;
+            font-weight: 600;
+            font-size: 1rem;
+        }
+        .recent-date {
+            color: #94a3b8;
+            font-size: 0.8rem;
+            margin-top: 4px;
+        }
+        .btn-open-recent {
+            background: #6366f1;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: background 0.2s;
+        }
+        .btn-open-recent:hover {
+            background: #4f46e5;
+        }
+        .recent-actions {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+        }
+        .btn-delete-recent {
+            background: rgba(239, 68, 68, 0.15);
+            color: #f87171;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+        .btn-delete-recent:hover {
+            background: #ef4444;
+            color: white;
+            border-color: #ef4444;
+        }
+    </style>
+</head>
+<body>
+    <script src="js/settings.js"></script>
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+
+    <div class="upload-container">
+        <h1>Upload Project</h1>
+        <p>Select your .glb project file to continue editing</p>
+        
+        <div class="drop-zone" id="drop-zone">
+            <span class="icon">📁</span>
+            <div class="text">Drag & drop .glb file here</div>
+            <div class="sub-text">or click to browse</div>
+            <input type="file" id="file-input" accept=".glb">
+        </div>
+
+        <div class="loading" id="loading">Loading data...</div>
+
+        <div class="recent-section" id="recent-section">
+            <h3>Recent Projects</h3>
+            <div class="recent-list" id="recent-list">
+                <!-- Recent items will be injected here -->
+            </div>
+        </div>
+
+        <a href="index.html" class="btn-back">← Back to Home</a>
+    </div>
+
+    <script src="js/modal.js" type="module"></script>
+    <script>
+        const dropZone = document.getElementById('drop-zone');
+        const fileInput = document.getElementById('file-input');
+        const loading = document.getElementById('loading');
+
+        // Click to open file dialog
+        dropZone.addEventListener('click', () => {
+            fileInput.click();
+        });
+
+        // Drag and drop events
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('dragover');
+        });
+
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.classList.remove('dragover');
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('dragover');
+            if (e.dataTransfer.files.length) {
+                handleFile(e.dataTransfer.files[0]);
+            }
+        });
+
+        // File input change event
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length) {
+                handleFile(e.target.files[0]);
+            }
+        });
+
+        function handleFile(file) {
+            if (!file.name.toLowerCase().endsWith('.glb')) {
+                CustomModal.alert('Please select a valid .glb file');
+                return;
+            }
+
+            // Show loading
+            dropZone.style.display = 'none';
+            loading.style.display = 'block';
+
+            // Store file in IndexedDB
+            const request = indexedDB.open('RoomDecoDB', 1);
+
+            request.onupgradeneeded = function(e) {
+                const db = e.target.result;
+                if (!db.objectStoreNames.contains('files')) {
+                    db.createObjectStore('files');
+                }
+            };
+
+            request.onsuccess = function(e) {
+                const db = e.target.result;
+                const tx = db.transaction('files', 'readwrite');
+                const store = tx.objectStore('files');
+                
+                // Put the file into DB
+                store.put(file, 'projectGLB');
+
+                tx.oncomplete = function() {
+                    // Navigate to editor with load action
+                    window.location.href = 'editor.html?action=loadFromDB';
+                };
+                
+                tx.onerror = function() {
+                    CustomModal.alert('An error occurred while saving the file to the browser.');
+                    dropZone.style.display = 'block';
+                    loading.style.display = 'none';
+                };
+            };
+
+            request.onerror = function(e) {
+                CustomModal.alert('Your browser does not support IndexedDB.');
+                dropZone.style.display = 'block';
+                loading.style.display = 'none';
+            };
+        }
+
+        // Load recent projects from localStorage
+        function loadRecentProjects() {
+            const recentProjects = JSON.parse(localStorage.getItem('recentProjects') || '[]');
+            const section = document.getElementById('recent-section');
+            const list = document.getElementById('recent-list');
+            
+            if (recentProjects.length > 0) {
+                section.style.display = 'block';
+                list.innerHTML = '';
+                
+                recentProjects.forEach((proj, index) => {
+                    const item = document.createElement('div');
+                    item.className = 'recent-item';
+                    item.innerHTML = `
+                        <div class="recent-info">
+                            <div class="recent-name">${proj.name}</div>
+                            <div class="recent-date">${proj.date}</div>
+                        </div>
+                        <div class="recent-actions">
+                            <button class="btn-open-recent" onclick="openRecent('${proj.id}')">Open</button>
+                            <button class="btn-delete-recent" onclick="deleteRecent(${index})" title="Remove from list">Delete</button>
+                        </div>
+                    `;
+                    list.appendChild(item);
+                });
+            }
+        }
+
+        window.openRecent = function(projectId) {
+            dropZone.style.display = 'none';
+            document.getElementById('recent-section').style.display = 'none';
+            loading.style.display = 'block';
+
+            const request = indexedDB.open('RoomDecoDB', 1);
+            
+            request.onupgradeneeded = function(e) {
+                const db = e.target.result;
+                if (!db.objectStoreNames.contains('files')) {
+                    db.createObjectStore('files');
+                }
+            };
+
+            request.onsuccess = function(e) {
+                const db = e.target.result;
+                const tx = db.transaction('files', 'readonly');
+                const store = tx.objectStore('files');
+                const getReq = store.get(projectId);
+                
+                getReq.onsuccess = function() {
+                    if (getReq.result) {
+                        // Put it into 'projectGLB' so editor can load it easily
+                        const txWrite = db.transaction('files', 'readwrite');
+                        const storeWrite = txWrite.objectStore('files');
+                        storeWrite.put(getReq.result, 'projectGLB');
+                        
+                        txWrite.oncomplete = function() {
+                            window.location.href = 'editor.html?action=loadFromDB';
+                        };
+                    } else {
+                        CustomModal.alert('Project data not found! It may have been cleared from temporary storage.').then(() => {
+                            location.reload();
+                        });
+                    }
+                };
+            };
+        };
+
+        window.deleteRecent = function(index) {
+            let recentProjects = JSON.parse(localStorage.getItem('recentProjects') || '[]');
+            if (index < 0 || index >= recentProjects.length) return;
+
+            const proj = recentProjects[index];
+
+            // Xóa khỏi danh sách localStorage
+            recentProjects.splice(index, 1);
+            localStorage.setItem('recentProjects', JSON.stringify(recentProjects));
+
+            // Xóa dữ liệu file trong IndexedDB nếu không còn project nào dùng cùng id
+            const stillUsed = recentProjects.some(p => p.id === proj.id);
+            if (!stillUsed && proj.id !== 'projectGLB') {
+                const req = indexedDB.open('RoomDecoDB', 1);
+                req.onsuccess = function(e) {
+                    const db = e.target.result;
+                    if (!db.objectStoreNames.contains('files')) return;
+                    const tx = db.transaction('files', 'readwrite');
+                    tx.objectStore('files').delete(proj.id);
+                };
+            }
+
+            // Cập nhật lại UI
+            loadRecentProjects();
+        };
+
+        // Initialize
+        loadRecentProjects();
+    </script>
+    <script src="js/audio.js"></script>
+</body>
+</html>

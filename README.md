@@ -1,4 +1,4 @@
-# Home Decoration - Mini 3D Interior Design Application
+# Room Decoration - Mini 3D Interior Design Application
 
 A web-based 3D interior design tool that allows users to drag and drop furniture objects into both 2D top-down and 3D perspective views. Built with Three.js for rendering and featuring intuitive object manipulation controls.
 
@@ -12,7 +12,7 @@ A web-based 3D interior design tool that allows users to drag and drop furniture
 
 ## 🖼️ Overview
 
-Home Decoration is a mini 3D interior design application that enables users to:
+Room Decoration is a mini 3D interior design application that enables users to:
 - Browse furniture objects in a sidebar library
 - Drag and drop objects into either 2D or 3D views
 - Manipulate objects (move, rotate, scale) using transform controls
@@ -68,7 +68,13 @@ Home_Decoration/
 3. **Open** `index.html` in a modern web browser (Chrome, Firefox, Safari, Edge)
 4. **No build steps or dependencies** required - runs entirely client-side via CDN
 
-*Note: The application uses Three.js from unpkg CDN, so an internet connection is required for initial load.*
+> If you add new furniture `.glb` files under `furnitures/`, run the manifest generator to update the sidebar automatically:
+>
+> ```bash
+> python scripts/generate_menu_manifest.py
+> ```
+>
+>*Note: The application uses Three.js from unpkg CDN, so an internet connection is required for initial load.*
 
 ## 💻 Technologies Used
 
@@ -113,6 +119,7 @@ Home_Decoration/
 ## 📝 Notes & Future Improvements
 
 - Currently uses placeholder geometric shapes for furniture (to be replaced with actual 3D models)
+- Includes a small initial sample layout of objects for testing, such as table, chairs, sofa, plant, TV, cabinet, and lamp
 - Search functionality in sidebar is implemented but not connected to a filter system
 - Object persistence (save/load) not implemented
 - Material/texture system could be enhanced with PBR materials

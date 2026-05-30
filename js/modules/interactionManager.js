@@ -1,184 +1,204 @@
 import * as THREE from 'three';
 import { TransformControls } from 'three/addons/controls/TransformControls.js';
+import { setupViewSelection } from './interaction/selection.js';
+import { setupKeyboardControls } from './interaction/keyboard.js';
+import { setupGizmos } from './interaction/gizmo.js';
+import { setupToolbarUI } from './interaction/toolbar.js';
+import { setupSelectionUtils } from './interaction/selectionUtils.js';
+import { setupHistoryManager } from './interaction/history.js';
+import { updateWallHoles } from './doorManager.js';
+import { setupPropertiesPanel } from './interaction/propertiesPanel.js';
 
-export function setupInteractionManager(scene, camera2D, renderer2D, orbitControls2D, camera3D, renderer3D, orbitControls3D) {
-    let selectedObject = null;
-    let currentTool = 'select'; // Trạng thái công cụ hiện tại: 'select', 'translate', 'rotate', 'scale'
+export function setupInteractionManager(scene, camera2D, renderer2D, orbitControls2D, camera3D, renderer3D, orbitControls3D, collisionManager = null) {
+
+    let selectedObjects = [];
+    let currentTool = 'none';
     const interactableObjects = [];
 
-    // Các nút bấm toolbar
-    const btnSelect = document.getElementById('btn-select');
-    const btnTranslate = document.getElementById('btn-translate');
-    const btnRotate = document.getElementById('btn-rotate');
-    const btnScale = document.getElementById('btn-scale');
-    const btnDelete = document.getElementById('btn-delete');
+    // ==========================================
+    // 1. SELECTION GROUP & HIGHLIGHT (Tách ra module riêng)
+    // ==========================================
+    const { selectionGroup, buildGroup, dissolveGroup, applySelectionHighlight } = setupSelectionUtils({
+        scene, selectedObjects
+    });
 
-    function updateToolbarUI() {
-        const buttons = { 'select': btnSelect, 'translate': btnTranslate, 'rotate': btnRotate, 'scale': btnScale };
-        for (const [key, btn] of Object.entries(buttons)) {
-            if (btn) {
-                if (key === currentTool) {
-                    btn.style.backgroundColor = '#b8daff';
-                    btn.style.borderColor = '#0056b3';
-                    btn.style.color = '#004085';
-                    btn.style.fontWeight = 'bold';
-                } else {
-                    btn.style.backgroundColor = '';
-                    btn.style.borderColor = '';
-                    btn.style.color = '';
-                    btn.style.fontWeight = 'normal';
-                }
+    // ==========================================
+    // 1.5 HISTORY MANAGER (Undo/Redo)
+    // ==========================================
+    const { saveHistoryState, undo, redo } = setupHistoryManager({
+        scene, interactableObjects, collisionManager, selectObject, setTool
+    });
+
+    // ==========================================
+    // 2. TRANSFORM CONTROLS (GIZMO) (Tách ra module riêng)
+    // ==========================================
+    const {
+        gizmoScene3D,
+        gizmoScene2D,
+        transformControl3D,
+        transformControl2D,
+        attachGizmo: _attachGizmo,
+        isGizmoDragging,
+        saveState
+    } = setupGizmos({
+        camera3D, renderer3D, orbitControls3D,
+        camera2D, renderer2D, orbitControls2D,
+        selectedObjects, selectionGroup, collisionManager,
+        onDragChange: (isDragging) => {
+            if (!isDragging) {
+                updateWallHoles(scene);
+                saveHistoryState();
             }
+        },
+        onChange: () => {
+            if (updatePropertiesPanel) updatePropertiesPanel();
         }
+    });
+
+    function attachGizmo() {
+        _attachGizmo(currentTool);
     }
 
+    // ==========================================
+    // 3. TOOLBAR UI (Tách ra module riêng)
+    // ==========================================
+    const { updateToolbarUI } = setupToolbarUI({
+        scene, selectedObjects, interactableObjects, collisionManager, setTool, selectObject,
+        undo, redo, saveHistoryState
+    });
+
+    // ==========================================
+    // 3.5 PROPERTIES PANEL
+    // ==========================================
+    const { updatePropertiesPanel } = setupPropertiesPanel({
+        scene, selectedObjects, saveHistoryState, updateWallHoles,
+        onPropertyChange: () => {
+            // When values change via panel, we need to update the gizmo attachments if active
+            const currentTransform3D = transformControl3D.object;
+            if (currentTransform3D) {
+                // transformControl3D and 2D will automatically read new pos/rot/scale of the object in their next render cycle
+                // Just let them detach/attach if needed, or simply let the render loop handle it.
+            }
+        }
+    });
+
+    // ==========================================
+    // 4. HIGHLIGHT
+    // (Đã được chuyển vào module selectionUtils.js)
+    // ==========================================
+
+
+
+
+    // ==========================================
+    // 6. SET TOOL
+    // ==========================================
     function setTool(tool) {
         currentTool = tool;
         updateToolbarUI();
-        
-        if (tool !== 'select' && selectedObject) {
-            transformControl3D.setMode(tool);
-            transformControl2D.setMode(tool);
-            transformControl3D.attach(selectedObject);
-            transformControl2D.attach(selectedObject);
-        } else {
-            // Khi ở chế độ Select, tháo Gizmo ra để click vào các mesh không bị vướng
-            transformControl3D.detach();
-            transformControl2D.detach();
-        }
+        attachGizmo();
     }
 
     // ==========================================
-    // 1. TRANSFORM CONTROLS (GIZMO NGUYÊN THỦY)
+    // 7. SELECT OBJECT
     // ==========================================
-    const transformControl3D = new TransformControls(camera3D, renderer3D.domElement);
-    transformControl3D.addEventListener('dragging-changed', function (event) {
-        orbitControls3D.enabled = !event.value;
-    });
-    scene.add(transformControl3D);
-
-    const transformControl2D = new TransformControls(camera2D, renderer2D.domElement);
-    transformControl2D.addEventListener('dragging-changed', function (event) {
-        orbitControls2D.enabled = !event.value;
-    });
-    transformControl2D.showY = false; 
-    scene.add(transformControl2D);
-
-    function selectObject(obj) {
-        selectedObject = obj;
-        if (obj) {
-            transformControl3D.attach(obj);
-            transformControl2D.attach(obj);
+    function selectObject(obj, isMultiSelect) {
+        if (!obj) {
+            selectedObjects.forEach(o => applySelectionHighlight(o, false));
+            selectedObjects.length = 0;
+        } else if (isMultiSelect) {
+            const idx = selectedObjects.indexOf(obj);
+            if (idx > -1) {
+                applySelectionHighlight(obj, false);
+                selectedObjects.splice(idx, 1);
+            } else {
+                selectedObjects.push(obj);
+                applySelectionHighlight(obj, true);
+            }
         } else {
-            transformControl3D.detach();
-            transformControl2D.detach();
+            // Chọn đơn
+            selectedObjects.forEach(o => applySelectionHighlight(o, false));
+            selectedObjects.length = 0;
+            selectedObjects.push(obj);
+            applySelectionHighlight(obj, true);
         }
+
+        buildGroup();
+
+        // Cập nhật ngay trạng thái vị trí để tránh dính tọa độ object cũ
+        saveState();
+
+        attachGizmo();
+        updatePropertiesPanel();
     }
 
     // ==========================================
-    // 2. RAYCASTER (CHỌN TỨC THÌ LÚC BẤM CHUỘT XUỐNG)
+    // 8. RAYCASTER – CHỌN OBJECT KHI CLICK
+    //
+    // QUAN TRỌNG: Dùng pointerup thay vì pointerdown.
+    // TransformControls xử lý kéo-gizmo trên pointerdown → pointerup → pointermove.
+    // Nếu dùng pointerdown để chọn, khi người dùng nhấp vào trục gizmo,
+    // raycaster không tìm thấy object nào → gọi selectObject(null) → detach gizmo
+    // → TransformControls mất target trước khi kéo kịp bắt đầu.
+    //
+    // Với pointerup + kiểm tra độ dịch chuyển chuột:
+    //   - Nếu chuột KHÔNG di chuyển nhiều  → là click → thực hiện chọn
+    //   - Nếu chuột DI CHUYỂN nhiều        → là kéo gizmo → bỏ qua
     // ==========================================
     const raycaster = new THREE.Raycaster();
-    const mouse = new THREE.Vector2();
-
-    function setupStandardSelection(renderer, camera, transformCtrl) {
-        renderer.domElement.addEventListener('pointerdown', (e) => {
-            if (e.button !== 0) return; // Chỉ bắt chuột trái
-
-            // CHỈ cho phép Raycast (chọn vật thể) khi đang ở chế độ 'select'
-            if (currentTool !== 'select') return;
-
-            const rect = renderer.domElement.getBoundingClientRect();
-            mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
-            mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
-
-            raycaster.setFromCamera(mouse, camera);
-
-            // Bắn tia raycaster trực tiếp
-            const intersects = raycaster.intersectObjects(interactableObjects, true);
-
-            if (intersects.length > 0) {
-                let obj = intersects[0].object;
-                
-                // Trượt lên gốc (nếu là mesh con)
-                while (obj && !interactableObjects.includes(obj)) {
-                    obj = obj.parent;
-                    if (!obj || obj === scene) break;
-                }
-
-                if (obj && interactableObjects.includes(obj)) {
-                    selectedObject = obj;
-                    // Gọi hàm selectObject để thực thi attach gizmo với object đó vào 2D và 3D TransformControl
-                    selectObject(obj);
-                    // Sau khi chọn thành công, tự động chuyển qua mode 'translate' (Move) để người dùng thao tác
-                    setTool('translate');
-                }
-            } else {
-                // Click ra ngoài background trong mode Select -> Hủy chọn
-                selectObject(null);
-                setTool('select');
-            }
-        });
-    }
-
-    setupStandardSelection(renderer3D, camera3D, transformControl3D);
-    setupStandardSelection(renderer2D, camera2D, transformControl2D);
+    const _mouse = new THREE.Vector2();
+    const CLICK_THRESHOLD = 5; // pixels
 
     // ==========================================
-    // 3. EVENT PHÍM TẮT & GIAO DIỆN
+    // 8. RAYCASTER & BOX SELECTION (Tách ra module riêng)
     // ==========================================
-    window.addEventListener('keydown', (event) => {
-        switch (event.key.toLowerCase()) {
-            case 'w':
-                if (selectedObject) setTool('translate');
-                break;
-            case 'e':
-                if (selectedObject) setTool('rotate');
-                break;
-            case 'r':
-                if (selectedObject) setTool('scale');
-                break;
-            case 'q':
-                selectedObject = null;
-                setTool('select');
-                break;
-            case 'delete':
-            case 'backspace':
-                if (selectedObject) {
-                    const target = selectedObject;
-                    selectedObject = null;
-                    setTool('select');
-                    scene.remove(target);
-                    const index = interactableObjects.indexOf(target);
-                    if (index > -1) interactableObjects.splice(index, 1);
-                }
-                break;
-        }
+    setupViewSelection({
+        renderer3D, camera3D, renderer2D, camera2D,
+        interactableObjects, selectedObjects,
+        transformControl3D, transformControl2D,
+        applySelectionHighlight, buildGroup,
+        _saveState: saveState,
+        attachGizmo, setTool, getCurrentTool: () => currentTool, selectObject,
+        scene
     });
 
-    if(btnSelect) btnSelect.addEventListener('click', () => setTool('select'));
-    if(btnTranslate) btnTranslate.addEventListener('click', () => { if(selectedObject) setTool('translate'); else setTool('select'); });
-    if(btnRotate) btnRotate.addEventListener('click', () => { if(selectedObject) setTool('rotate'); else setTool('select'); });
-    if(btnScale) btnScale.addEventListener('click', () => { if(selectedObject) setTool('scale'); else setTool('select'); });
-    if(btnDelete) btnDelete.addEventListener('click', () => {
-        if (selectedObject) {
-            const target = selectedObject;
-            selectedObject = null;
-            setTool('select');
-            scene.remove(target);
-            const index = interactableObjects.indexOf(target);
-            if (index > -1) interactableObjects.splice(index, 1);
-        }
+    // ==========================================
+    // 9. PHÍM TẮT & CHUỘT (SMOOTH MOVEMENT - Tách ra module riêng)
+    // ==========================================
+    setupKeyboardControls({
+        scene, renderer3D, renderer2D, orbitControls3D, camera2D, orbitControls2D, 
+        selectedObjects, interactableObjects, collisionManager,
+        setTool, selectObject, undo, redo, saveHistoryState
     });
 
-    // Khởi tạo giao diện tool mặc định
-    setTool('select');
+    // ==========================================
+    // 10. TOOLBAR BUTTONS
+    // (Đã được chuyển vào module toolbar.js)
+    // ==========================================
 
-    function registerInteractableObject(mesh) {
+    // ==========================================
+    // 11. ĐĂNG KÝ OBJECT MỚI (từ drag-drop hoặc sample)
+    // ==========================================
+    function registerInteractableObject(mesh, collidable = true, autoSelect = true) {
+        if (!mesh.userData) mesh.userData = {};
+        mesh.userData.isCollidable = collidable;
+
         interactableObjects.push(mesh);
-        selectedObject = mesh;
-        setTool('translate'); // Vừa thả vào là tự động nhảy sang Move
+        if (collisionManager && collidable) collisionManager.register(mesh);
+        if (autoSelect) {
+            selectObject(mesh, false);
+            setTool('translate');
+        }
+        saveHistoryState();
     }
 
-    return { registerInteractableObject, interactableObjects };
+    return {
+        registerInteractableObject,
+        interactableObjects,
+        getSelectedObjects: () => selectedObjects,
+        isGizmoDragging,
+        gizmoScene3D,
+        gizmoScene2D,
+        updatePropertiesPanel
+    };
 }
