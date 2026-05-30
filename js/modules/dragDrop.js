@@ -106,6 +106,31 @@ export function setupDragDrop(scene, camera2D, renderer2D, camera3D, renderer3D,
         const mouseVector = new THREE.Vector2(mouseX, mouseY);
         raycaster.setFromCamera(mouseVector, camera2D);
 
+        // -- XỬ LÝ TƯỜNG (WALLPAPER) --
+        if (objectType.startsWith('wall_')) {
+            const intersects = raycaster.intersectObjects(scene.children, true);
+            const wallIntersection = intersects.find(hit => hit.object.userData && hit.object.userData.isWall);
+            
+            if (wallIntersection) {
+                const firstHit = wallIntersection.object;
+                const textureType = objectType.replace('wall_', '');
+                const textureLoader = new THREE.TextureLoader();
+                const texture = textureLoader.load(`rooms/${textureType}.png`);
+                texture.wrapS = THREE.RepeatWrapping;
+                texture.wrapT = THREE.RepeatWrapping;
+                texture.repeat.set(4, 2); // Kích thước lặp lại cho tường
+                texture.colorSpace = THREE.SRGBColorSpace;
+                
+                // Áp dụng vật liệu mới thay vì chỉnh sửa để không dính các tường khác
+                const newMat = firstHit.material.clone();
+                newMat.map = texture;
+                newMat.color.set(0xffffff);
+                newMat.needsUpdate = true;
+                firstHit.material = newMat;
+            }
+            return;
+        }
+
         const raycastPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
         let intersectPoint = new THREE.Vector3();
         
@@ -159,31 +184,6 @@ export function setupDragDrop(scene, camera2D, renderer2D, camera3D, renderer3D,
                 return;
             }
 
-            // -- XỬ LÝ TƯỜNG (WALLPAPER) --
-            if (objectType.startsWith('wall_')) {
-                const intersects = raycaster.intersectObjects(scene.children, true);
-                if (intersects.length > 0) {
-                    const firstHit = intersects[0].object;
-                    if (firstHit.userData && firstHit.userData.isWall) {
-                        const textureType = objectType.replace('wall_', '');
-                        const textureLoader = new THREE.TextureLoader();
-                        const texture = textureLoader.load(`rooms/${textureType}.png`);
-                        texture.wrapS = THREE.RepeatWrapping;
-                        texture.wrapT = THREE.RepeatWrapping;
-                        texture.repeat.set(4, 2); // Kích thước lặp lại cho tường
-                        texture.colorSpace = THREE.SRGBColorSpace;
-                        
-                        // Áp dụng vật liệu mới thay vì chỉnh sửa để không dính các tường khác
-                        const newMat = firstHit.material.clone();
-                        newMat.map = texture;
-                        newMat.color.set(0xffffff);
-                        newMat.needsUpdate = true;
-                        firstHit.material = newMat;
-                    }
-                }
-                return;
-            }
-
 
 
             // -- XỬ LÝ NỘI THẤT --
@@ -219,6 +219,30 @@ export function setupDragDrop(scene, camera2D, renderer2D, camera3D, renderer3D,
         const raycaster = new THREE.Raycaster();
         const mouseVector = new THREE.Vector2(mouseX, mouseY);
         raycaster.setFromCamera(mouseVector, camera3D);
+
+        // -- XỬ LÝ TƯỜNG (WALLPAPER) --
+        if (objectType.startsWith('wall_')) {
+            const intersects = raycaster.intersectObjects(scene.children, true);
+            const wallIntersection = intersects.find(hit => hit.object.userData && hit.object.userData.isWall);
+            
+            if (wallIntersection) {
+                const firstHit = wallIntersection.object;
+                const textureType = objectType.replace('wall_', '');
+                const textureLoader = new THREE.TextureLoader();
+                const texture = textureLoader.load(`rooms/${textureType}.png`);
+                texture.wrapS = THREE.RepeatWrapping;
+                texture.wrapT = THREE.RepeatWrapping;
+                texture.repeat.set(4, 2);
+                texture.colorSpace = THREE.SRGBColorSpace;
+                
+                const newMat = firstHit.material.clone();
+                newMat.map = texture;
+                newMat.color.set(0xffffff);
+                newMat.needsUpdate = true;
+                firstHit.material = newMat;
+            }
+            return;
+        }
 
         const raycastPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
         let intersectPoint = new THREE.Vector3();
@@ -269,32 +293,6 @@ export function setupDragDrop(scene, camera2D, renderer2D, camera3D, renderer3D,
                 }
                 return;
             }
-
-            // -- XỬ LÝ TƯỜNG (WALLPAPER) --
-            if (objectType.startsWith('wall_')) {
-                const intersects = raycaster.intersectObjects(scene.children, true);
-                if (intersects.length > 0) {
-                    const firstHit = intersects[0].object;
-                    if (firstHit.userData && firstHit.userData.isWall) {
-                        const textureType = objectType.replace('wall_', '');
-                        const textureLoader = new THREE.TextureLoader();
-                        const texture = textureLoader.load(`rooms/${textureType}.png`);
-                        texture.wrapS = THREE.RepeatWrapping;
-                        texture.wrapT = THREE.RepeatWrapping;
-                        texture.repeat.set(4, 2);
-                        texture.colorSpace = THREE.SRGBColorSpace;
-                        
-                        const newMat = firstHit.material.clone();
-                        newMat.map = texture;
-                        newMat.color.set(0xffffff);
-                        newMat.needsUpdate = true;
-                        firstHit.material = newMat;
-                    }
-                }
-                return;
-            }
-
-
 
             // -- XỬ LÝ NỘI THẤT --
             const newObject = await createModel(objectType);
